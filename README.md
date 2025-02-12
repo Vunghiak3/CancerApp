@@ -46,8 +46,8 @@ Mọi đóng góp đều được hoan nghênh! Hãy fork repo, tạo issue ho�
 
 ## 📞 Liên Hệ
 
-📧 Email: your-email@example.com
+📧 Email: vunghiak3@gmail.com
 
 🌐 GitHub: Vunghiak3
 
-✨ CancerApp - Đưa công nghệ AI vào y tế để phát hiện ung thư sớm!
+### ✨ CancerApp - Đưa công nghệ AI vào y tế để phát hiện ung thư sớm!
