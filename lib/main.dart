@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:testfile/ui/welcompage/welcome.dart';
 
-void main() => runApp(const CancerApp());
+void main() {
+  runApp(const ProviderScope(child: CancerApp()));
+}
 
 class CancerApp extends StatelessWidget {
   const CancerApp({super.key});
@@ -19,4 +22,3 @@ class CancerApp extends StatelessWidget {
     );
   }
 }
-
