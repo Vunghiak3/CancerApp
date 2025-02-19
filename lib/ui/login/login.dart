@@ -12,6 +12,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _isPasswordVisible = false;
+  double sizeLogo = 20;
 
   @override
   Widget build(BuildContext context) {
@@ -181,29 +182,28 @@ class _LoginPageState extends State<LoginPage> {
                       ElevatedButton(
                         onPressed: () {},
                         style: ElevatedButton.styleFrom(
-                            minimumSize: Size(90, 50),
+                            // minimumSize: Size(90, 50),
                             backgroundColor: Color(0xFFEEEEEE),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10))),
-                        child: const Icon(Icons.grade_outlined),
+                        child: Image.asset(
+                            'assets/imgs/google.png',
+                          width: sizeLogo,
+                          height: sizeLogo,
+                        ),
                       ),
                       ElevatedButton(
                         onPressed: () {},
                         style: ElevatedButton.styleFrom(
-                            minimumSize: Size(90, 50),
+                            // minimumSize: Size(90, 50),
                             backgroundColor: Color(0xFFEEEEEE),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10))),
-                        child: const Icon(Icons.grade_outlined),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                            minimumSize: Size(90, 50),
-                            backgroundColor: Color(0xFFEEEEEE),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10))),
-                        child: const Icon(Icons.grade_outlined),
+                        child: Image.asset(
+                          'assets/imgs/facebook.png',
+                          width: sizeLogo,
+                          height: sizeLogo,
+                        ),
                       ),
                     ],
                   ),

@@ -12,6 +12,7 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
+  double sizeLogo = 20;
 
   @override
   Widget build(BuildContext context) {
@@ -179,35 +180,30 @@ class _RegisterPageState extends State<RegisterPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         ElevatedButton(
-                          onPressed: (){},
+                          onPressed: () {},
                           style: ElevatedButton.styleFrom(
-                              minimumSize: Size(90, 50),
+                            // minimumSize: Size(90, 50),
                               backgroundColor: Color(0xFFEEEEEE),
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)
-                              )
+                                  borderRadius: BorderRadius.circular(10))),
+                          child: Image.asset(
+                            'assets/imgs/google.png',
+                            width: sizeLogo,
+                            height: sizeLogo,
                           ),
-                          child: const Icon(Icons.grade_outlined),
-                        ),ElevatedButton(
-                          onPressed: (){},
+                        ),
+                        ElevatedButton(
+                          onPressed: () {},
                           style: ElevatedButton.styleFrom(
-                              minimumSize: Size(90, 50),
+                            // minimumSize: Size(90, 50),
                               backgroundColor: Color(0xFFEEEEEE),
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)
-                              )
+                                  borderRadius: BorderRadius.circular(10))),
+                          child: Image.asset(
+                            'assets/imgs/facebook.png',
+                            width: sizeLogo,
+                            height: sizeLogo,
                           ),
-                          child: const Icon(Icons.grade_outlined),
-                        ),ElevatedButton(
-                          onPressed: (){},
-                          style: ElevatedButton.styleFrom(
-                              minimumSize: Size(90, 50),
-                              backgroundColor: Color(0xFFEEEEEE),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)
-                              )
-                          ),
-                          child: const Icon(Icons.grade_outlined),
                         ),
                       ],
                     ),

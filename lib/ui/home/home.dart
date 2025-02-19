@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:testfile/ui/camera/camera.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:testfile/ui/chooseCancer/chooseCancer.dart';
 import 'package:testfile/ui/history/history.dart';
 import 'package:testfile/ui/message/message.dart';
 import 'package:testfile/ui/profile/profile.dart';
@@ -17,8 +20,6 @@ class _CancerHomePageState extends State<CancerHomePage> {
 
   final List<Widget> _tabs = [
     const HomeTab(),
-    const MessageTab(),
-    const CameraTab(),
     const HistoryTab(),
     const ProfileTab(),
   ];
@@ -55,12 +56,11 @@ class _CancerHomePageState extends State<CancerHomePage> {
           ],
         ),
         child: FloatingActionButton(
-          // onPressed: ()=> _onTabSelected(2),
-          onPressed: ()=> nextPage(context, CameraTab()),
+          onPressed: ()=> _showImagePickerDialog(context),
           backgroundColor: Colors.transparent,
           elevation: 0, // Tắt bóng mặc định
           shape: const CircleBorder(),
-          child: const Icon(Icons.camera_alt_outlined, color: Colors.white,),
+          child: const Icon(Icons.file_upload_outlined, color: Colors.white,),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -70,6 +70,57 @@ class _CancerHomePageState extends State<CancerHomePage> {
         onTabSelected: _onTabSelected,
       ),
     );
+  }
+
+  void _showImagePickerDialog(BuildContext context){
+    showDialog(
+        context: context,
+        builder: (BuildContext context){
+          return AlertDialog(
+            title: const Text('Chọn ảnh từ'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.photo_library, color: Colors.blue),
+                  title: const Text('Google Photos'),
+                  onTap: () async {
+                      File? image = await _pickImageFromGallery();
+                      if(image != null){
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context)=> ChooseCancerPage(selectedImage: image)
+                            )
+                        );
+                      }
+                    },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.image, color: Colors.green),
+                  title: const Text('Thư viện'),
+                  onTap: () {},
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Thoát')
+              )
+            ],
+          );
+        }
+    );
+  }
+
+  Future _pickImageFromGallery() async{
+    final returnImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    if (returnImage != null) {
+      return File(returnImage.path);
+    }
+    return null;
   }
 }
 
@@ -105,7 +156,6 @@ class CustomBottomNavigationBar extends StatelessWidget{
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     _buildNavItem(Icons.home, "Home", 0),
-                    // _buildNavItem(Icons.chat_outlined, "Chat", 1),
                     IconButton(
                         onPressed: (){
                           nextPage(context, MessageTab());
@@ -123,9 +173,9 @@ class CustomBottomNavigationBar extends StatelessWidget{
                           ],
                         )
                     ),
-                    SizedBox(width: size.width * 0.10), // Khoảng trống cho FAB
-                    _buildNavItem(Icons.history, "History", 3),
-                    _buildNavItem(Icons.person_outline, "Profile", 4),
+                    SizedBox(width: size.width * 0.10),
+                    _buildNavItem(Icons.history, "History", 1),
+                    _buildNavItem(Icons.person_outline, "Profile", 2),
                   ],
                 ),
               )

@@ -104,7 +104,7 @@ class _HistoryTabState extends State<HistoryTab> {
         ],
       ),
       body: ListView.builder(
-        itemCount: _history.length,
+          itemCount: _history.length,
           itemBuilder: (context, index){
             bool isSelected = index == _selectedIndex;
             return GestureDetector(
