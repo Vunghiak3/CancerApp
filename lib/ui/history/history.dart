@@ -63,8 +63,8 @@ class _HistoryTabState extends State<HistoryTab> {
         context: context,
         builder: (context){
           return AlertDialog(
-            title: Text('Xác nhận xóa'),
-            content: Text('Bạn có chắc chắn muốn xóa mục này không'),
+            title: Text('Confirm deletion'),
+            content: Text('Are you sure you want to delete this item?'),
             actions: [
               TextButton(
                   onPressed: (){
@@ -98,7 +98,7 @@ class _HistoryTabState extends State<HistoryTab> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: Text('History'),
+        title: const Text('History'),
         actions: [
           IconButton(onPressed: (){}, icon: Icon(Icons.more_horiz_outlined, color: Colors.black, size: 30,))
         ],
@@ -130,7 +130,7 @@ class _HistoryTabState extends State<HistoryTab> {
                     )
                   ),
                   child:  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
                     child: Row(
                       children: [
                         ClipRRect(
@@ -150,29 +150,35 @@ class _HistoryTabState extends State<HistoryTab> {
                             },
                           ),
                         ),
-                        SizedBox(width: 15,),
+                        const SizedBox(width: 15,),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                                _history[index]["title"] ?? "Unknow"
+                              _history[index]["title"] ?? "Unknow",
+                              style: TextStyle(
+                                color: Colors.black
+                              ),
                             ),
                             Text(
-                                _history[index]["content"] ?? "Unknow"
+                              _history[index]["content"] ?? "Unknow",
+                              style: TextStyle(
+                                  color: Colors.black
+                              ),
                             )
                           ],
                         ),
-                        Spacer(),
-                        // IconButton(
-                        //     onPressed: (){},
-                        //     icon: Icon(Icons.more_horiz_outlined)
-                        // )
+                        const Spacer(),
                         PopupMenuButton<String>(
+                            icon: Icon(Icons.more_vert, color: Colors.black),
                             onSelected: (value){
                               if(value == 'delete'){
                                 _showDeleteDialog(index);
                               }
                             },
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)
+                            ),
                             itemBuilder: (BuildContext context)=>[
                               PopupMenuItem<String>(
                                   value: 'delete',
@@ -180,7 +186,7 @@ class _HistoryTabState extends State<HistoryTab> {
                                     children: [
                                       Icon(Icons.delete, color: Colors.red),
                                       SizedBox(width: 8),
-                                      Text("Xóa"),
+                                      Text("Delete"),
                                     ],
                                   )
                               )

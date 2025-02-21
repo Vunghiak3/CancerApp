@@ -1,8 +1,9 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:testfile/ui/home/home.dart';
 import 'package:testfile/ui/result/result.dart';
+import 'package:testfile/ui/welcompage/welcome.dart';
 
 class ChooseCancerPage extends StatefulWidget {
   final File selectedImage;
@@ -14,17 +15,17 @@ class ChooseCancerPage extends StatefulWidget {
 }
 
 class _ChooseCancerPageState extends State<ChooseCancerPage> {
-  int _selectedIndex = 0;
+  int _selectedIndex = -1;
   late File _selectedImage;
 
   final List<Map<String, String>> _cancer = [
     {
       "img": "https://via.placeholder.com/110",
-      "title": "Cancer Brain",
+      "title": "Brain cancer",
     },
     {
       "img": "https://via.placeholder.com/110",
-      "title": "Cancer Kidney",
+      "title": "Kidney cancer",
     },
   ];
 
@@ -39,20 +40,46 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Cancer'),
-      ),
-      body: Column(
-        children: [
-          _selectedImage != null
-              ? Image.file(
-              _selectedImage,
-              fit: BoxFit.contain
+        title: Text('Select cancer type'),
+        actions: [
+          IconButton(
+              onPressed: (){
+                nextPage(context, CancerHomePage());
+              },
+              icon: Icon(Icons.home, color: Colors.black,)
           )
-              : Icon(Icons.image, size: 100, color: Colors.grey),
-          ElevatedButton(
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(height: 20),
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 8,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: Image.file(
+                  _selectedImage,
+                  fit: BoxFit.cover,
+                  height: 350,
+                  width: double.infinity,
+                ),
+              ),
+            ),
+            SizedBox(height: 10),
+            ElevatedButton.icon(
               onPressed: () async {
                 File? image = await _pickImageFromGallery();
-
                 if (image != null) {
                   setState(() {
                     _selectedImage = image;
@@ -60,110 +87,124 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
                 }
               },
               style: ElevatedButton.styleFrom(
-                elevation: 0,
                 backgroundColor: Colors.white,
+                foregroundColor: Color(0xFF0E70CB),
+                elevation: 0,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)
+                  borderRadius: BorderRadius.circular(8),
+                  side: BorderSide(color: Color(0xFF0E70CB)),
                 ),
-                side: BorderSide(color: Colors.grey.shade300),
               ),
-              child: Text(
-                'Chọn ảnh khác',
-                style: TextStyle(
-                    color: Colors.black
+              icon: Icon(Icons.photo_library_outlined, color: Color(0xFF0E70CB),),
+              label: Text('Select another photo'),
+            ),
+            SizedBox(height: 10),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Select disease type:',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF0E70CB),
+                  ),
                 ),
-              )
-          ),
-          Expanded(
-            child: ListView.builder(
+              ),
+            ),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
               itemCount: _cancer.length,
-              itemBuilder: (context, index){
+              itemBuilder: (context, index) {
                 bool isSelected = index == _selectedIndex;
                 return GestureDetector(
-                    onTap: (){
-                      setState(() {
-                        _selectedIndex = index;
-                      });
-                    },
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                          child: ElevatedButton(
-                              onPressed: (){
-                                checkCancer(_cancer[index]["title"]!, _selectedImage);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12)
-                                ),
-                                side: BorderSide(color: Colors.grey.shade300),
-                              ),
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-                                child: Row(
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(15),
-                                      child: Image.network(
-                                        _cancer[index]["img"] ?? "https://via.placeholder.com/110",
-                                        width:30,
-                                        height: 30,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) {
-                                          return Container(
-                                            width: 30,
-                                            height: 30,
-                                            color: Colors.grey.shade300,
-                                            child: Icon(Icons.image_not_supported, size: 20, color: Colors.grey),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                    SizedBox(width: 10,),
-                                    Text(
-                                      _cancer[index]["title"]?? "Unknow",
-                                      style: TextStyle(
-                                          color: Colors.black
-                                      ),
-                                    ),
-                                    Spacer(),
-                                    Icon(Icons.arrow_forward_ios_rounded, color: Colors.black,)
-                                  ],
-                                ),
-                              )
-                          ),
+                  onTap: () {
+                    setState(() {
+                      _selectedIndex = index;
+                    });
+                  },
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: isSelected ? Color(0xffe7f1fa) : Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 6,
+                          offset: Offset(0, 3),
                         ),
                       ],
-                    )
+                      border: Border.all(
+                        color: isSelected ? Color(0xFF0E70CB) : Colors.transparent,
+                        width: 2,
+                      ),
+                    ),
+                    child: ListTile(
+                      title: Text(
+                        _cancer[index]["title"]!,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      trailing: Icon(
+                        isSelected
+                            ? Icons.radio_button_checked
+                            : Icons.radio_button_unchecked,
+                        color: isSelected ? Color(0xFF0E70CB) : Colors.grey,
+                      ),
+                    ),
+                  ),
                 );
               },
             ),
-          )
-        ],
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _selectedIndex != -1
+                  ? () {
+                checkCancer(
+                  _cancer[_selectedIndex]["title"]!,
+                  _selectedImage,
+                );
+              }
+                  : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF0E70CB),
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(
+                'Diagnosis',
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+            SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
 
-  Future _pickImageFromGallery() async{
+  Future<File?> _pickImageFromGallery() async {
     final returnImage = await ImagePicker().pickImage(source: ImageSource.gallery);
-
     if (returnImage != null) {
       return File(returnImage.path);
     }
     return null;
   }
 
-  void checkCancer(String cancer, File image){
+  void checkCancer(String cancer, File image) {
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => ResultPage(cancer: cancer, image: image)
-        )
+      context,
+      MaterialPageRoute(
+        builder: (context) => ResultPage(cancer: cancer, image: image),
+      ),
     );
   }
 }
-
-
-

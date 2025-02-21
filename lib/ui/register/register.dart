@@ -66,82 +66,15 @@ class _RegisterPageState extends State<RegisterPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            "Sign up",
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold
-                            ),
-                          ),
-                          Row(
-                            children: [
-                              Text(
-                                'Already have an account?',
-                                style: TextStyle(
-                                    fontSize: 18
-                                ),
-                              ),
-                              TextButton(
-                                onPressed: (){
-                                  nextPage(context, LoginPage());
-                                },
-                                child: Text(
-                                  'Login',
-                                  style: TextStyle(
-                                      color: Color(0xFF0866FF),
-                                      fontSize: 18
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                          Text('Name'),
-                          TextField(
-                            keyboardType: TextInputType.text,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
-                          SizedBox(height: 10,),
-                          Text('Email'),
-                          TextField(
-                            keyboardType: TextInputType.emailAddress,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
-                          SizedBox(height: 10,),
-
-                          Text('Password'),
-                          TextField(
-                            obscureText: !_isPasswordVisible,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                              suffixIcon: IconButton(
-                                  onPressed: ()=> setState(() {
-                                    _isPasswordVisible = !_isPasswordVisible;
-                                  }),
-                                  icon: Icon(_isPasswordVisible ? Icons.visibility : Icons.visibility_off,),
-                              )
-                            ),
-                          ),
-                          SizedBox(height: 10,),
-
-                          Text('Confirm Password'),
-                          TextField(
-                            obscureText: !_isConfirmPasswordVisible,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                              suffixIcon: IconButton(
-                                  onPressed: ()=> setState(() {
-                                    _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
-                                  }),
-                                  icon: Icon(_isConfirmPasswordVisible ? Icons.visibility : Icons.visibility_off)
-                              )
-                            ),
-                          ),
-                          SizedBox(height: 20,),
+                          _buildHeader(),
+                          _buildInputField('Name', TextInputType.text, false),
+                          const SizedBox(height: 10,),
+                          _buildInputField('Email', TextInputType.emailAddress, false),
+                          const SizedBox(height: 10,),
+                          _buildInputField('Password', TextInputType.visiblePassword, true),
+                          const SizedBox(height: 10,),
+                          _buildInputField('Confirm Password', TextInputType.visiblePassword, true),
+                          const SizedBox(height: 20,),
                           ElevatedButton(
                             onPressed: (){
                               nextPage(context, LoginPage());
@@ -162,9 +95,9 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                             ),
                           ),
-                          SizedBox(height: 20,),
+                          const SizedBox(height: 20,),
                           Center(
-                            child: Text(
+                            child: const Text(
                               'or sign up with',
                               style: TextStyle(
                                 fontSize: 15,
@@ -172,41 +105,11 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                             ),
                           ),
-                          SizedBox(height: 20,),
+                          const SizedBox(height: 20,),
                         ],
                       ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            // minimumSize: Size(90, 50),
-                              backgroundColor: Color(0xFFEEEEEE),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10))),
-                          child: Image.asset(
-                            'assets/imgs/google.png',
-                            width: sizeLogo,
-                            height: sizeLogo,
-                          ),
-                        ),
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            // minimumSize: Size(90, 50),
-                              backgroundColor: Color(0xFFEEEEEE),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10))),
-                          child: Image.asset(
-                            'assets/imgs/facebook.png',
-                            width: sizeLogo,
-                            height: sizeLogo,
-                          ),
-                        ),
-                      ],
-                    ),
+                    _buildSocialButtons(),
                   ],
                 ),
               ),
@@ -214,6 +117,102 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildHeader(){
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Sign up",
+          textAlign: TextAlign.left,
+          style: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.bold
+          ),
+        ),
+        Row(
+          children: [
+            const Text(
+              'Already have an account?',
+              style: TextStyle(
+                  fontSize: 18
+              ),
+            ),
+            TextButton(
+              onPressed: (){
+                nextPage(context, LoginPage());
+              },
+              child: const Text(
+                'Login',
+                style: TextStyle(
+                    color: Color(0xFF0866FF),
+                    fontSize: 18
+                ),
+              ),
+            )
+          ],
+        )
+      ],
+    );
+  }
+
+  Widget _buildInputField(String label, TextInputType inputType, bool isPassword){
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label),
+        TextField(
+          obscureText: isPassword && !_isPasswordVisible,
+          keyboardType: inputType,
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(),
+            suffixIcon: isPassword ? IconButton(
+              icon: Icon(
+                _isPasswordVisible
+                    ? Icons.visibility
+                    : Icons.visibility_off,
+              ),
+              onPressed: () => setState(() {
+                _isPasswordVisible = !_isPasswordVisible;
+              }),
+            ) : null,
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget _buildSocialButtons(){
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        ElevatedButton(
+          onPressed: () {},
+          style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFFEEEEEE),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10))),
+          child: Image.asset(
+            'assets/imgs/google.png',
+            width: sizeLogo,
+            height: sizeLogo,
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () {},
+          style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFFEEEEEE),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10))),
+          child: Image.asset(
+            'assets/imgs/facebook.png',
+            width: sizeLogo,
+            height: sizeLogo,
+          ),
+        ),
+      ],
     );
   }
 }

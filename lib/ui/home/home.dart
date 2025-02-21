@@ -58,7 +58,7 @@ class _CancerHomePageState extends State<CancerHomePage> {
         child: FloatingActionButton(
           onPressed: ()=> _showImagePickerDialog(context),
           backgroundColor: Colors.transparent,
-          elevation: 0, // Tắt bóng mặc định
+          elevation: 0,
           shape: const CircleBorder(),
           child: const Icon(Icons.file_upload_outlined, color: Colors.white,),
         ),
@@ -77,7 +77,12 @@ class _CancerHomePageState extends State<CancerHomePage> {
         context: context,
         builder: (BuildContext context){
           return AlertDialog(
-            title: const Text('Chọn ảnh từ'),
+            title: const Text(
+                'Select photo from',
+              style: TextStyle(
+                  fontSize: 20
+              ),
+            ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -98,7 +103,7 @@ class _CancerHomePageState extends State<CancerHomePage> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.image, color: Colors.green),
-                  title: const Text('Thư viện'),
+                  title: const Text('Libary'),
                   onTap: () {},
                 ),
               ],
@@ -106,7 +111,9 @@ class _CancerHomePageState extends State<CancerHomePage> {
             actions: [
               TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Thoát')
+                  child: const Text(
+                    'Cancel',
+                  )
               )
             ],
           );
@@ -140,7 +147,7 @@ class CustomBottomNavigationBar extends StatelessWidget{
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Container(
+        SizedBox(
           width: size.width,
           height: 80,
           child: Stack(
@@ -149,7 +156,7 @@ class CustomBottomNavigationBar extends StatelessWidget{
                 size: Size(size.width, 80),
                 painter: BNBCustomPainter(),
               ),
-              Container(
+              SizedBox(
                 width: size.width,
                 height: 80,
                 child: Row(
@@ -164,7 +171,7 @@ class CustomBottomNavigationBar extends StatelessWidget{
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(Icons.message_outlined, color: Colors.grey,),
-                            Text(
+                            const Text(
                               'Chat',
                               style: TextStyle(
                                   color: Colors.grey
@@ -193,11 +200,11 @@ class CustomBottomNavigationBar extends StatelessWidget{
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: isSelected ? Colors.blue : Colors.grey),
+          Icon(icon, color: isSelected ? Color(0xFF0E70CB) : Colors.grey),
           Text(
             title,
             style: TextStyle(
-              color: isSelected ? Colors.blue : Colors.grey,
+              color: isSelected ? Color(0xFF0E70CB) : Colors.grey,
               fontSize: 16,
             ),
           ),
@@ -215,9 +222,9 @@ class BNBCustomPainter extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     Paint borderPaint = Paint()
-      ..color = Colors.black // Màu viền
+      ..color = Colors.black
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.40; // Độ dày viền
+      ..strokeWidth = 0.40;
 
     Path path = Path()..moveTo(0, 20);
     path.arcToPoint(Offset(20, 0), radius: Radius.circular(20.0), clockwise: true);
@@ -240,14 +247,9 @@ class BNBCustomPainter extends CustomPainter {
     path.lineTo(0, size.height);
     path.close();
 
-    // Vẽ bóng
     canvas.drawShadow(path, Colors.black, -1.0, true);
 
-    // Vẽ nền
     canvas.drawPath(path, paint);
-
-    // Vẽ viền
-    // canvas.drawPath(path, borderPaint);
   }
 
   @override
@@ -269,7 +271,7 @@ class HomeTab extends StatelessWidget {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
+            const Text(
               'Curely',
               style: TextStyle(
                 color: Color(0xFF0E70CB),
@@ -278,8 +280,8 @@ class HomeTab extends StatelessWidget {
                 fontStyle: FontStyle.italic
               ),
             ),
-            SizedBox(width: 10,),
-            Icon(Icons.camera, color: Color(0xFF0E70CB), size: 40,)
+            const SizedBox(width: 10,),
+            Image.asset('assets/imgs/logowelcome2.png', color: Color(0xFF0E70CB), width: 50, height: 50,)
           ],
         ),
       ),

@@ -72,20 +72,41 @@ class _MessageTabState extends State<MessageTab> {
               itemBuilder: (context, index) {
                 final message = _messages[index];
                 return Align(
-                  alignment: message['isBot'] ? Alignment.centerLeft : Alignment.centerRight,
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    margin: const EdgeInsets.symmetric(vertical: 5),
-                    decoration: BoxDecoration(
-                      color: message['isBot'] ? Colors.grey[200] : Colors.blue,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      message['text'],
-                      style: TextStyle(
-                        color: message['isBot'] ? Colors.black : Colors.white,
+                  alignment: message['isBot']
+                      ? Alignment.centerLeft
+                      : Alignment.centerRight,
+                  child: Row(
+                    mainAxisAlignment: message['isBot']
+                        ? MainAxisAlignment.start
+                        : MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (message['isBot']) // Chỉ hiện ảnh khi là tin nhắn của bot
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: Image.asset(
+                            'assets/imgs/logowelcome.png',
+                            width: 30,
+                          ),
+                        ),
+                      Container(
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * 0.8, // Chiều rộng tối đa là 80% màn hình
+                        ),
+                        padding: const EdgeInsets.all(12),
+                        margin: const EdgeInsets.symmetric(vertical: 5),
+                        decoration: BoxDecoration(
+                          color: message['isBot'] ? Colors.grey[200] : Colors.blue,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          message['text'],
+                          style: TextStyle(
+                            color: message['isBot'] ? Colors.black : Colors.white,
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 );
               },

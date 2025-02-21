@@ -30,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
             )),
         child: Center(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Container(
               height: 633,
               width: double.infinity,
@@ -48,90 +48,12 @@ class _LoginPageState extends State<LoginPage> {
               ),
               child: Column(
                 children: [
-                  Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: TextButton(
-                            onPressed: () {
-                              returnPage(context);
-                            },
-                            child: const Icon(
-                              Icons.arrow_back,
-                              color: Colors.black,
-                              size: 30,
-                            )),
-                      )),
-                  Text(
-                    "Login",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 32,
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "You don't have an account ?",
-                        style: TextStyle(
-                          fontSize: 18,
-                        ),
-                      ),
-                      TextButton(
-                          onPressed: () {
-                            nextPage(context, RegisterPage());
-                          },
-                          child: Text(
-                            'Sign up',
-                            style: TextStyle(
-                                fontSize: 18, color: Color(0xFF0866FF)),
-                          )),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Email'),
-                        TextField(
-                          keyboardType: TextInputType.emailAddress,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Password'),
-                        TextField(
-                          obscureText: !_isPasswordVisible,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _isPasswordVisible
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
-                              ),
-                              onPressed: () => setState(() {
-                                _isPasswordVisible = !_isPasswordVisible;
-                              }),
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 10),
+                  _buildHeader(),
+                  const SizedBox(height: 10),
+                  _buildInputField("Email", TextInputType.emailAddress, false),
+                  const SizedBox(height: 20),
+                  _buildInputField("Password", TextInputType.visiblePassword, true),
+                  const SizedBox(height: 10),
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
@@ -146,7 +68,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: ElevatedButton(
@@ -167,7 +89,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Text(
                     'or login with',
                     style: TextStyle(
@@ -175,17 +97,17 @@ class _LoginPageState extends State<LoginPage> {
                       color: Color(0xFF595959),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       ElevatedButton(
                         onPressed: () {},
                         style: ElevatedButton.styleFrom(
-                            // minimumSize: Size(90, 50),
                             backgroundColor: Color(0xFFEEEEEE),
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10))),
+                                borderRadius: BorderRadius.circular(10))
+                        ),
                         child: Image.asset(
                             'assets/imgs/google.png',
                           width: sizeLogo,
@@ -195,10 +117,10 @@ class _LoginPageState extends State<LoginPage> {
                       ElevatedButton(
                         onPressed: () {},
                         style: ElevatedButton.styleFrom(
-                            // minimumSize: Size(90, 50),
                             backgroundColor: Color(0xFFEEEEEE),
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10))),
+                                borderRadius: BorderRadius.circular(10))
+                        ),
                         child: Image.asset(
                           'assets/imgs/facebook.png',
                           width: sizeLogo,
@@ -213,6 +135,80 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildInputField(String label, TextInputType inputType, bool isPassword){
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label),
+          TextField(
+            obscureText: isPassword && !_isPasswordVisible,
+            keyboardType: inputType,
+            decoration: InputDecoration(
+              border: const OutlineInputBorder(),
+              suffixIcon: isPassword ? IconButton(
+                icon: Icon(
+                  _isPasswordVisible
+                      ? Icons.visibility
+                      : Icons.visibility_off,
+                ),
+                onPressed: () => setState(() {
+                  _isPasswordVisible = !_isPasswordVisible;
+                }),
+              ) : null,
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader(){
+    return Column(
+      children: [
+        Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: IconButton(
+                  onPressed: () {
+                    returnPage(context);
+                  },
+                  icon: Icon(Icons.arrow_back_rounded, color: Colors.black, size: 30,)
+              )
+            )),
+        Text(
+          "Login",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 32,
+          ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "You don't have an account ?",
+              style: TextStyle(
+                fontSize: 18,
+              ),
+            ),
+            TextButton(
+                onPressed: () {
+                  nextPage(context, RegisterPage());
+                },
+                child: Text(
+                  'Sign up',
+                  style: TextStyle(
+                      fontSize: 18, color: Color(0xFF0866FF)),
+                )),
+          ],
+        ),
+      ],
     );
   }
 }
