@@ -1,5 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:testfile/ui/home/home.dart';
+import 'package:testfile/ui/welcompage/welcome.dart';
 
 class ResultPage extends StatefulWidget {
   final File image;
@@ -26,8 +29,14 @@ class _ResultPageState extends State<ResultPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
-        title: Text(_cancer),
+        actions: [
+          IconButton(
+              onPressed: (){
+                nextPage(context, CancerHomePage());
+              },
+              icon: Icon(Icons.home, color: Colors.black,)
+          )
+        ],
       ),
       body: Stack(
         children: [
@@ -106,7 +115,7 @@ class _ResultPageState extends State<ResultPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Ask AI',
+                    AppLocalizations.of(context)!.askAi,
                     style: TextStyle(fontSize: 18, color: Colors.white),
                   ),
                   SizedBox(width: 5),

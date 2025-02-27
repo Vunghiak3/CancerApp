@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:testfile/ui/login/login.dart';
 import 'package:testfile/ui/register/register.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
@@ -29,8 +30,8 @@ class WelcomePage extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text(
-                            "Curely",
+                          Text(
+                            AppLocalizations.of(context)!.welcomeTitle,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 35,
@@ -47,8 +48,8 @@ class WelcomePage extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 5,),
-                      const Text(
-                        "Early Caner Detection, Better \nProtection, Healthier Lives.",
+                      Text(
+                        AppLocalizations.of(context)!.welcomeSubTitle,
                         style: TextStyle(
                           fontSize: 20,
                           color: Colors.white,
@@ -58,9 +59,9 @@ class WelcomePage extends StatelessWidget {
                     ],
                   )
               ),
-              buildButton(context: context, text: 'Login', onPressed: (){nextPage(context, LoginPage());}),
+              buildButton(context: context, text: AppLocalizations.of(context)!.login, onPressed: (){nextPage(context, LoginPage());}),
               const SizedBox(height: 10,),
-              buildButton(context: context, text: 'Register', onPressed: (){nextPage(context, RegisterPage());}),
+              buildButton(context: context, text: AppLocalizations.of(context)!.register, onPressed: (){nextPage(context, RegisterPage());}),
               const SizedBox(height: 50,)
             ],
           )

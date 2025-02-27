@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MessageTab extends StatefulWidget {
   const MessageTab({super.key});
@@ -46,8 +47,8 @@ class _MessageTabState extends State<MessageTab> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text(
-          'Chat with us',
+        title: Text(
+          AppLocalizations.of(context)!.chat,
           style: TextStyle(color: Colors.black),
         ),
         backgroundColor: Colors.white,

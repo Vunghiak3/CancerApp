@@ -7,6 +7,7 @@ import 'package:testfile/ui/history/history.dart';
 import 'package:testfile/ui/message/message.dart';
 import 'package:testfile/ui/profile/profile.dart';
 import 'package:testfile/ui/welcompage/welcome.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CancerHomePage extends StatefulWidget {
   const CancerHomePage({super.key});
@@ -77,8 +78,8 @@ class _CancerHomePageState extends State<CancerHomePage> {
         context: context,
         builder: (BuildContext context){
           return AlertDialog(
-            title: const Text(
-                'Select photo from',
+            title: Text(
+                AppLocalizations.of(context)!.selectPhotoFrom,
               style: TextStyle(
                   fontSize: 20
               ),
@@ -88,7 +89,7 @@ class _CancerHomePageState extends State<CancerHomePage> {
               children: [
                 ListTile(
                   leading: const Icon(Icons.photo_library, color: Colors.blue),
-                  title: const Text('Google Photos'),
+                  title: Text(AppLocalizations.of(context)!.googlePhotos),
                   onTap: () async {
                       File? image = await _pickImageFromGallery();
                       if(image != null){
@@ -103,7 +104,7 @@ class _CancerHomePageState extends State<CancerHomePage> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.image, color: Colors.green),
-                  title: const Text('Libary'),
+                  title: Text(AppLocalizations.of(context)!.libary),
                   onTap: () {},
                 ),
               ],
@@ -111,8 +112,8 @@ class _CancerHomePageState extends State<CancerHomePage> {
             actions: [
               TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text(
-                    'Cancel',
+                  child: Text(
+                    AppLocalizations.of(context)!.cancel,
                   )
               )
             ],
@@ -162,7 +163,7 @@ class CustomBottomNavigationBar extends StatelessWidget{
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildNavItem(Icons.home, "Home", 0),
+                    _buildNavItem(Icons.home, AppLocalizations.of(context)!.home, 0),
                     IconButton(
                         onPressed: (){
                           nextPage(context, MessageTab());
@@ -171,18 +172,19 @@ class CustomBottomNavigationBar extends StatelessWidget{
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(Icons.message_outlined, color: Colors.grey,),
-                            const Text(
-                              'Chat',
+                            Text(
+                              AppLocalizations.of(context)!.chat,
                               style: TextStyle(
-                                  color: Colors.grey
+                                  color: Colors.grey,
+                                  fontSize: 12
                               ),
                             )
                           ],
                         )
                     ),
                     SizedBox(width: size.width * 0.10),
-                    _buildNavItem(Icons.history, "History", 1),
-                    _buildNavItem(Icons.person_outline, "Profile", 2),
+                    _buildNavItem(Icons.history, AppLocalizations.of(context)!.history, 1),
+                    _buildNavItem(Icons.person_outline, AppLocalizations.of(context)!.profile, 2),
                   ],
                 ),
               )
@@ -205,7 +207,7 @@ class CustomBottomNavigationBar extends StatelessWidget{
             title,
             style: TextStyle(
               color: isSelected ? Color(0xFF0E70CB) : Colors.grey,
-              fontSize: 16,
+              fontSize: 12,
             ),
           ),
         ],
@@ -271,8 +273,8 @@ class HomeTab extends StatelessWidget {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'Curely',
+            Text(
+              AppLocalizations.of(context)!.welcomeTitle,
               style: TextStyle(
                 color: Color(0xFF0E70CB),
                 fontSize: 44,

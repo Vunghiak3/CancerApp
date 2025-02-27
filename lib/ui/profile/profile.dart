@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:testfile/ui/editprofile/editprofile.dart';
-import 'package:testfile/ui/home/home.dart';
 import 'package:testfile/ui/premium/premium.dart';
 import 'package:testfile/ui/setting/setting.dart';
 import 'package:testfile/ui/welcompage/welcome.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ProfileTab extends StatelessWidget {
   const ProfileTab({super.key});
@@ -16,7 +16,7 @@ class ProfileTab extends StatelessWidget {
         backgroundColor: Color(0xFFFFFFFF),
         centerTitle: true,
         title: Text(
-          "Profile",
+          AppLocalizations.of(context)!.profile,
         ),
         actions: [
           IconButton(
@@ -68,11 +68,11 @@ class ProfileTab extends StatelessWidget {
                       )
                     ],
                   ),
-                  SizedBox(width: 30,),
-                  const Column(
+                  const SizedBox(width: 30,),
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         "John Doe",
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
@@ -80,8 +80,8 @@ class ProfileTab extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'Free',
-                        style: TextStyle(
+                        AppLocalizations.of(context)!.free,
+                        style: const TextStyle(
                             color: Color(0xFF5E5E5E),
                             fontSize: 16
                         ),
@@ -103,7 +103,7 @@ class ProfileTab extends StatelessWidget {
                     ),
                   ],
                 ),
-                margin: EdgeInsets.symmetric(vertical: 40),
+                margin: const EdgeInsets.symmetric(vertical: 40),
                 child: Column(
                   children: [
                     ElevatedButton(
@@ -136,26 +136,29 @@ class ProfileTab extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'My account',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 18
+                              Expanded(
+                                flex: 10,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      AppLocalizations.of(context)!.myAccount,
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 18
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    'Make changes to your account',
-                                    style: TextStyle(
-                                      color: Color(0xFFABABAB)
-                                    ),
-                                  )
-                                ],
+                                    Text(
+                                      AppLocalizations.of(context)!.desMyAccount,
+                                      style: TextStyle(
+                                        color: Color(0xFFABABAB)
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
-                              Spacer(),
-                              Icon(Icons.arrow_forward_ios_rounded, color: Colors.black,)
+                              const Spacer(),
+                              const Icon(Icons.arrow_forward_ios_rounded, color: Colors.black,)
                             ],
                           ),
                         )
@@ -191,19 +194,19 @@ class ProfileTab extends StatelessWidget {
                                 ),
                               ),
                               Expanded(
-                                flex: 4,
+                                flex: 10,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Premium Plans',
+                                      AppLocalizations.of(context)!.premiumPlans,
                                       style: TextStyle(
                                         color: Color(0xFFFF00C8),
                                         fontSize: 18
                                       ),
                                     ),
                                     Text(
-                                      'Unlock exclusive features and benefits by upgrading to a Premium plan.',
+                                      AppLocalizations.of(context)!.desPremiumPlans,
                                       style: TextStyle(
                                         color: Color(0xFFABABAB)
                                       ),
@@ -213,8 +216,8 @@ class ProfileTab extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              Spacer(),
-                              Icon(Icons.arrow_forward_ios_rounded, color: Colors.black,)
+                              const Spacer(),
+                              const Icon(Icons.arrow_forward_ios_rounded, color: Colors.black,)
                             ],
                           ),
                         )
@@ -251,14 +254,14 @@ class ProfileTab extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Log out',
+                                      AppLocalizations.of(context)!.logout,
                                       style: TextStyle(
                                         color: Color(0xff555555),
                                         fontSize: 18
                                       ),
                                     ),
                                     Text(
-                                      'Further secure your account for safety',
+                                      AppLocalizations.of(context)!.desLogout,
                                       style: TextStyle(
                                         color: Color(0xFFABABAB)
                                       ),
@@ -266,8 +269,8 @@ class ProfileTab extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              Spacer(),
-                              Icon(Icons.arrow_forward_ios_rounded, color: Colors.black,)
+                              const Spacer(),
+                              const Icon(Icons.arrow_forward_ios_rounded, color: Colors.black,)
                             ],
                           ),
                         )

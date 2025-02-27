@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HistoryTab extends StatefulWidget {
   const HistoryTab({super.key});
@@ -63,14 +64,14 @@ class _HistoryTabState extends State<HistoryTab> {
         context: context,
         builder: (context){
           return AlertDialog(
-            title: Text('Confirm deletion'),
-            content: Text('Are you sure you want to delete this item?'),
+            title: Text(AppLocalizations.of(context)!.confirmDeletion),
+            content: Text(AppLocalizations.of(context)!.desConfirmDeletion),
             actions: [
               TextButton(
                   onPressed: (){
                     Navigator.pop(context);
                   },
-                  child: Text("Cancel")
+                  child: Text(AppLocalizations.of(context)!.cancel)
               ),
               TextButton(
                   onPressed: (){
@@ -80,7 +81,7 @@ class _HistoryTabState extends State<HistoryTab> {
                     Navigator.pop(context);
                   },
                   child: Text(
-                    'Delete',
+                    AppLocalizations.of(context)!.delete,
                     style: TextStyle(
                       color: Colors.red
                     ),
@@ -98,7 +99,7 @@ class _HistoryTabState extends State<HistoryTab> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: const Text('History'),
+        title: Text(AppLocalizations.of(context)!.history),
         actions: [
           IconButton(onPressed: (){}, icon: Icon(Icons.more_horiz_outlined, color: Colors.black, size: 30,))
         ],
@@ -186,7 +187,7 @@ class _HistoryTabState extends State<HistoryTab> {
                                     children: [
                                       Icon(Icons.delete, color: Colors.red),
                                       SizedBox(width: 8),
-                                      Text("Delete"),
+                                      Text(AppLocalizations.of(context)!.delete),
                                     ],
                                   )
                               )

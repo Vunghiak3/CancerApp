@@ -1,21 +1,7 @@
 import 'package:flutter/material.dart';
-
-// class ChangelanguagePage extends StatelessWidget {
-//   const ChangelanguagePage({super.key});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         centerTitle: true,
-//         title: Text(
-//           'Change Language'
-//         ),
-//       ),
-//       body: ListView.builder(itemBuilder: itemBuilder),
-//     );
-//   }
-// }
+import 'package:testfile/main.dart';
+import 'package:testfile/ui/welcompage/welcome.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ChangeLanguagePage extends StatefulWidget {
   const ChangeLanguagePage({super.key});
@@ -26,17 +12,32 @@ class ChangeLanguagePage extends StatefulWidget {
 
 class _ChangeLanguagePageState extends State<ChangeLanguagePage> {
   int _selectedIndex = 0;
+  Locale? _currentLocale;
 
-  final List<Map<String, String>> _languages = [
-    {"flag": "🇺🇸", "name": "English (US)", "sub": "(English)"},
-    {"flag": "🇻🇳", "name": "Tiếng Việt", "sub": "(Vietnamese)"},
-    {"flag": "🇨🇳", "name": "简体中文", "sub": "(Chinese, Simplified)"},
-    {"flag": "🇯🇵", "name": "日本語", "sub": "(Japanese)"},
-    {"flag": "🇫🇷", "name": "Francais", "sub": "(French)"},
-    {"flag": "🇷🇺", "name": "Русский", "sub": "(Russian)"},
-    {"flag": "🇮🇹", "name": "Italiano", "sub": "(Italian)"},
-    {"flag": "🇰🇷", "name": "한국어", "sub": "(Korean)"},
+  final List<Map<String, dynamic>> _languages = [
+    {"flag": "🇺🇸", "name": "English (US)", "sub": "(English)", "locale": Locale('en')},
+    {"flag": "🇻🇳", "name": "Tiếng Việt", "sub": "(Vietnamese)", "locale": Locale('vi')},
+    {"flag": "🇨🇳", "name": "简体中文", "sub": "(Chinese, Simplified)", "locale": Locale('zh')},
+    {"flag": "🇯🇵", "name": "日本語", "sub": "(Japanese)", "locale": Locale('ja')},
+    {"flag": "🇰🇷", "name": "한국어", "sub": "(Korean)", "locale": Locale('ko')},
   ];
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Lấy Locale hiện tại
+    _currentLocale = Localizations.localeOf(context);
+
+    // Tìm chỉ số của ngôn ngữ hiện tại trong danh sách _languages
+    for (int i = 0; i < _languages.length; i++) {
+      if (_languages[i]["locale"].languageCode == _currentLocale!.languageCode) {
+        _selectedIndex = i;
+        break;
+      }
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -44,13 +45,23 @@ class _ChangeLanguagePageState extends State<ChangeLanguagePage> {
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          'Change Language'
+          AppLocalizations.of(context)!.changeLanguage
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.check, color: Colors.red),
-            onPressed: () {}, // Xử lý xác nhận chọn ngôn ngữ
-          )
+            icon: Icon(Icons.check, color: _selectedIndex != -1 &&
+                _languages[_selectedIndex]["locale"] != _currentLocale
+                ? Colors.red
+                : Colors.grey),
+            onPressed: _selectedIndex != -1 &&
+                _languages[_selectedIndex]["locale"] != _currentLocale
+                ? () {
+              Locale selectedLocale = _languages[_selectedIndex]["locale"];
+              CancerApp.setLocale(context, selectedLocale);
+              nextPage(context, WelcomePage());
+            }
+                : null, // Disable khi không chọn ngôn ngữ hoặc chọn trùng với ngôn ngữ hiện tại
+          ),
         ],
       ),
       body: ListView.builder(

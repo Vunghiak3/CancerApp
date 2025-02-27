@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class EditProfilePage extends StatelessWidget {
   const EditProfilePage({super.key});
@@ -10,7 +11,7 @@ class EditProfilePage extends StatelessWidget {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Edit Profile'),
+        title: Text(AppLocalizations.of(context)!.editProfile),
       ),
       body: Padding(
         padding: EdgeInsets.all(20),
@@ -18,7 +19,7 @@ class EditProfilePage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Nickname'
+              AppLocalizations.of(context)!.nickname
             ),
             TextField(
               keyboardType: TextInputType.text,
@@ -29,7 +30,7 @@ class EditProfilePage extends StatelessWidget {
               ),
             ),
             Text(
-              'Name'
+              AppLocalizations.of(context)!.name
             ),
             TextField(
               keyboardType: TextInputType.text,
@@ -40,7 +41,7 @@ class EditProfilePage extends StatelessWidget {
               ),
             ),
             Text(
-              'Email'
+                AppLocalizations.of(context)!.email
             ),
             TextField(
               keyboardType: TextInputType.emailAddress,
@@ -52,7 +53,7 @@ class EditProfilePage extends StatelessWidget {
             ),
             BirthdayInput(),
             Text(
-                'Region'
+                AppLocalizations.of(context)!.region
             ),
             TextField(
               keyboardType: TextInputType.text,
@@ -76,7 +77,7 @@ class EditProfilePage extends StatelessWidget {
                         minimumSize: Size(double.minPositive, 50)
                     ),
                     child: Text(
-                      'Save changes',
+                      AppLocalizations.of(context)!.saveChanges,
                       style: TextStyle(
                         fontSize: 18,
                         color: Colors.white
@@ -133,7 +134,7 @@ class _BirthdayInputState extends State<BirthdayInput> {
                   children: [
                     TextButton(
                       onPressed: () => Navigator.pop(context), // Đóng dialog khi hủy
-                      child: Text("Cancel", style: TextStyle(color: Colors.red, fontSize: 16)),
+                      child: Text(AppLocalizations.of(context)!.cancel, style: TextStyle(color: Colors.red, fontSize: 16)),
                     ),
                     TextButton(
                       onPressed: () {
@@ -143,7 +144,7 @@ class _BirthdayInputState extends State<BirthdayInput> {
                         Navigator.pop(context);
                       },
                       child: Text(
-                        "Save",
+                        AppLocalizations.of(context)!.save,
                         style: TextStyle(color: Colors.blue, fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -162,7 +163,7 @@ class _BirthdayInputState extends State<BirthdayInput> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Birthday'),
+        Text(AppLocalizations.of(context)!.birthday),
         SizedBox(height: 8),
         GestureDetector(
           onTap: () => _showDatePicker(context),
@@ -183,65 +184,4 @@ class _BirthdayInputState extends State<BirthdayInput> {
     );
   }
 }
-
-
-// class BirthdayDropdownPicker extends StatefulWidget {
-//   @override
-//   _BirthdayDropdownPickerState createState() => _BirthdayDropdownPickerState();
-// }
-//
-// class _BirthdayDropdownPickerState extends State<BirthdayDropdownPicker> {
-//   int selectedDay = 1;
-//   int selectedMonth = 1;
-//   int selectedYear = 2000;
-//
-//   List<int> days = List.generate(31, (index) => index + 1);
-//   List<int> months = List.generate(12, (index) => index + 1);
-//   List<int> years = List.generate(100, (index) => 1925 + index);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       children: [
-//         Text("Birthday", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-//         SizedBox(height: 8),
-//         Row(
-//           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//           children: [
-//             // Dropdown chọn Ngày
-//             Expanded(
-//               child: DropdownButtonFormField<int>(
-//                 value: selectedDay,
-//                 onChanged: (value) => setState(() => selectedDay = value!),
-//                 items: days.map((day) => DropdownMenuItem(value: day, child: Text("$day"))).toList(),
-//                 decoration: InputDecoration(border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
-//               ),
-//             ),
-//             SizedBox(width: 10),
-//             // Dropdown chọn Tháng
-//             Expanded(
-//               child: DropdownButtonFormField<int>(
-//                 value: selectedMonth,
-//                 onChanged: (value) => setState(() => selectedMonth = value!),
-//                 items: months.map((month) => DropdownMenuItem(value: month, child: Text("$month"))).toList(),
-//                 decoration: InputDecoration(border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
-//               ),
-//             ),
-//             SizedBox(width: 10),
-//             // Dropdown chọn Năm
-//             Expanded(
-//               child: DropdownButtonFormField<int>(
-//                 value: selectedYear,
-//                 onChanged: (value) => setState(() => selectedYear = value!),
-//                 items: years.map((year) => DropdownMenuItem(value: year, child: Text("$year"))).toList(),
-//                 decoration: InputDecoration(border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ],
-//     );
-//   }
-// }
 

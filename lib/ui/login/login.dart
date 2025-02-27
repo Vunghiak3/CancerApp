@@ -1,7 +1,9 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:testfile/ui/home/home.dart';
 import 'package:testfile/ui/register/register.dart';
 import 'package:testfile/ui/welcompage/welcome.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -50,16 +52,16 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   _buildHeader(),
                   const SizedBox(height: 10),
-                  _buildInputField("Email", TextInputType.emailAddress, false),
+                  _buildInputField(AppLocalizations.of(context)!.email, TextInputType.emailAddress, false),
                   const SizedBox(height: 20),
-                  _buildInputField("Password", TextInputType.visiblePassword, true),
+                  _buildInputField(AppLocalizations.of(context)!.password, TextInputType.visiblePassword, true),
                   const SizedBox(height: 10),
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: null,
                       child: Text(
-                        "Forgot Password?",
+                        AppLocalizations.of(context)!.forgotPassword,
                         style: TextStyle(
                           color: Color(0xFF104CE3),
                           fontWeight: FontWeight.bold,
@@ -81,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
                               borderRadius: BorderRadius.circular(10)),
                           minimumSize: Size(double.infinity, 50)),
                       child: Text(
-                        "Login",
+                        AppLocalizations.of(context)!.login,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 20,
@@ -91,7 +93,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    'or login with',
+                    AppLocalizations.of(context)!.orLoginWith,
                     style: TextStyle(
                       fontSize: 15,
                       color: Color(0xFF595959),
@@ -182,31 +184,37 @@ class _LoginPageState extends State<LoginPage> {
               )
             )),
         Text(
-          "Login",
+          AppLocalizations.of(context)!.login,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 32,
           ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "You don't have an account ?",
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          child: RichText(
+            textAlign: TextAlign.center,
+            text: TextSpan(
+              text: "${AppLocalizations.of(context)!.dontHaveAccount} ",
               style: TextStyle(
                 fontSize: 18,
+                color: Colors.black,
               ),
-            ),
-            TextButton(
-                onPressed: () {
-                  nextPage(context, RegisterPage());
-                },
-                child: Text(
-                  'Sign up',
+              children: [
+                TextSpan(
+                  text: AppLocalizations.of(context)!.signUp,
                   style: TextStyle(
-                      fontSize: 18, color: Color(0xFF0866FF)),
-                )),
-          ],
+                    fontSize: 18,
+                    color: Color(0xFF0866FF),
+                  ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      nextPage(context, RegisterPage());
+                    },
+                ),
+              ],
+            ),
+          ),
         ),
       ],
     );

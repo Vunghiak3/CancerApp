@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:testfile/ui/changelanguage/changelanguage.dart';
 import 'package:testfile/ui/welcompage/welcome.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SettingPage extends StatelessWidget {
   const SettingPage({super.key});
@@ -11,7 +12,7 @@ class SettingPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: Text('Setting'),
+        title: Text(AppLocalizations.of(context)!.setting),
         elevation: 0,
       ),
       backgroundColor: Colors.white,
@@ -33,7 +34,7 @@ class SettingPage extends StatelessWidget {
                     ),
                   ],
                 ),
-                margin: EdgeInsets.symmetric(vertical: 40),
+                margin: const EdgeInsets.symmetric(vertical: 40),
                 child: Column(
                   children: [
                     ElevatedButton(
@@ -68,14 +69,14 @@ class SettingPage extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Saved Beneficiary',
+                                    AppLocalizations.of(context)!.savedBeneficiary,
                                     style: TextStyle(
                                         color: Colors.black,
                                         fontSize: 18
                                     ),
                                   ),
                                   Text(
-                                    'Manage your saved account',
+                                    AppLocalizations.of(context)!.desSavedBeneficiary,
                                     style: TextStyle(
                                         color: Color(0xFFABABAB)
                                     ),
@@ -122,14 +123,14 @@ class SettingPage extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Delete account',
+                                      AppLocalizations.of(context)!.deleteAccount,
                                       style: TextStyle(
                                           color: Colors.red,
                                           fontSize: 18
                                       ),
                                     ),
                                     Text(
-                                      'Permanently delete your account and data.',
+                                      AppLocalizations.of(context)!.desDeleteAccount,
                                       style: TextStyle(
                                           color: Color(0xFFABABAB)
                                       ),
@@ -151,7 +152,7 @@ class SettingPage extends StatelessWidget {
                 child: Padding(
                   padding: EdgeInsets.only(left: 20),
                   child: Text(
-                    'More',
+                    AppLocalizations.of(context)!.more,
                     style: TextStyle(
                         color: Color(0xff181D27),
                       fontSize: 18
@@ -207,7 +208,7 @@ class SettingPage extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Help & Support',
+                                    AppLocalizations.of(context)!.helpSupport,
                                     style: TextStyle(
                                         color: Colors.black,
                                         fontSize: 18
@@ -257,7 +258,7 @@ class SettingPage extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Change Language',
+                                      AppLocalizations.of(context)!.changeLanguage,
                                       style: TextStyle(
                                           color: Colors.black,
                                           fontSize: 18
@@ -304,7 +305,7 @@ class SettingPage extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'About App',
+                                    AppLocalizations.of(context)!.aboutApp,
                                     style: TextStyle(
                                         color: Colors.black,
                                         fontSize: 18

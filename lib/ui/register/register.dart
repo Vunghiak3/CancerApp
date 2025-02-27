@@ -1,6 +1,8 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:testfile/ui/login/login.dart';
 import 'package:testfile/ui/welcompage/welcome.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -67,13 +69,13 @@ class _RegisterPageState extends State<RegisterPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildHeader(),
-                          _buildInputField('Name', TextInputType.text, false),
+                          _buildInputField(AppLocalizations.of(context)!.name, TextInputType.text, false),
                           const SizedBox(height: 10,),
-                          _buildInputField('Email', TextInputType.emailAddress, false),
+                          _buildInputField(AppLocalizations.of(context)!.email, TextInputType.emailAddress, false),
                           const SizedBox(height: 10,),
-                          _buildInputField('Password', TextInputType.visiblePassword, true),
+                          _buildInputField(AppLocalizations.of(context)!.password, TextInputType.visiblePassword, true),
                           const SizedBox(height: 10,),
-                          _buildInputField('Confirm Password', TextInputType.visiblePassword, true),
+                          _buildInputField(AppLocalizations.of(context)!.confirmPassword, TextInputType.visiblePassword, true),
                           const SizedBox(height: 20,),
                           ElevatedButton(
                             onPressed: (){
@@ -87,7 +89,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 )
                             ),
                             child: Text(
-                              'Sign up',
+                              AppLocalizations.of(context)!.signUp,
                               style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
@@ -97,8 +99,8 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
                           const SizedBox(height: 20,),
                           Center(
-                            child: const Text(
-                              'or sign up with',
+                            child: Text(
+                              AppLocalizations.of(context)!.orSignupWith,
                               style: TextStyle(
                                 fontSize: 15,
                                 color: Color(0xFF595959),
@@ -124,36 +126,40 @@ class _RegisterPageState extends State<RegisterPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Sign up",
+        Text(
+          AppLocalizations.of(context)!.signUp,
           textAlign: TextAlign.left,
           style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold
           ),
         ),
-        Row(
-          children: [
-            const Text(
-              'Already have an account?',
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5),
+          child: RichText(
+            textAlign: TextAlign.start,
+            text: TextSpan(
+              text: "${AppLocalizations.of(context)!.haveAccount} ",
               style: TextStyle(
-                  fontSize: 18
+                fontSize: 18,
+                color: Colors.black,
               ),
-            ),
-            TextButton(
-              onPressed: (){
-                nextPage(context, LoginPage());
-              },
-              child: const Text(
-                'Login',
-                style: TextStyle(
+              children: [
+                TextSpan(
+                  text: AppLocalizations.of(context)!.login,
+                  style: TextStyle(
+                    fontSize: 18,
                     color: Color(0xFF0866FF),
-                    fontSize: 18
+                  ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      nextPage(context, LoginPage());
+                    },
                 ),
-              ),
-            )
-          ],
-        )
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }

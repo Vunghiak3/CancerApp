@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:testfile/ui/home/home.dart';
 import 'package:testfile/ui/result/result.dart';
 import 'package:testfile/ui/welcompage/welcome.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ChooseCancerPage extends StatefulWidget {
   final File selectedImage;
@@ -18,17 +19,6 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
   int _selectedIndex = -1;
   late File _selectedImage;
 
-  final List<Map<String, String>> _cancer = [
-    {
-      "img": "https://via.placeholder.com/110",
-      "title": "Brain cancer",
-    },
-    {
-      "img": "https://via.placeholder.com/110",
-      "title": "Kidney cancer",
-    },
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -37,10 +27,21 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Map<String, String>> _cancer = [
+      {
+        "img": "https://via.placeholder.com/110",
+        "title": AppLocalizations.of(context)!.brainCancer,
+      },
+      {
+        "img": "https://via.placeholder.com/110",
+        "title": AppLocalizations.of(context)!.kidneyCancer,
+      },
+    ];
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Select cancer type'),
+        title: Text(AppLocalizations.of(context)!.selectCancerType),
         actions: [
           IconButton(
               onPressed: (){
@@ -96,7 +97,7 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
                 ),
               ),
               icon: Icon(Icons.photo_library_outlined, color: Color(0xFF0E70CB),),
-              label: Text('Select another photo'),
+              label: Text(AppLocalizations.of(context)!.selectAnotherPhoto),
             ),
             SizedBox(height: 10),
             Padding(
@@ -104,7 +105,7 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Select disease type:',
+                  AppLocalizations.of(context)!.selectDiseaseType,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -180,7 +181,7 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
                 ),
               ),
               child: Text(
-                'Diagnosis',
+                AppLocalizations.of(context)!.diagnosis,
                 style: TextStyle(fontSize: 18),
               ),
             ),
