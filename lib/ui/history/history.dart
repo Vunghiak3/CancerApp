@@ -96,17 +96,17 @@ class _HistoryTabState extends State<HistoryTab> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade200,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        centerTitle: true,
-        title: Text(AppLocalizations.of(context)!.history),
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(onPressed: (){}, icon: Icon(Icons.more_horiz_outlined, color: Colors.black, size: 30,))
         ],
       ),
       body: ListView.builder(
-          itemCount: _history.length,
-          itemBuilder: (context, index){
+            itemCount: _history.length,
+            itemBuilder: (context, index){
             bool isSelected = index == _selectedIndex;
             return GestureDetector(
               onTap: (){
@@ -115,19 +115,22 @@ class _HistoryTabState extends State<HistoryTab> {
                 });
               },
               child: Container(
-                margin: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                 decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.grey.shade300
+                  border: Border(
+                    bottom: BorderSide(
+                      color: Colors.grey.shade200,
+                      width: 1,
+                    ),
                   ),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(5),
                 ),
                 child: ElevatedButton(
                   onPressed: (){},
                   style: ElevatedButton.styleFrom(
                     elevation: 0,
+                    backgroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)
+                      borderRadius: BorderRadius.circular(5)
                     )
                   ),
                   child:  Padding(
@@ -164,7 +167,9 @@ class _HistoryTabState extends State<HistoryTab> {
                             Text(
                               _history[index]["content"] ?? "Unknow",
                               style: TextStyle(
-                                  color: Colors.black
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 13
                               ),
                             )
                           ],

@@ -42,25 +42,94 @@ class _MessageTabState extends State<MessageTab> {
     }
   }
 
+  void _showChatHistory() {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: "Close",
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (_, __, ___) {
+        return Align(
+          alignment: Alignment.centerLeft,
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.7,
+              height: MediaQuery.of(context).size.height,
+              padding: const EdgeInsets.all(10),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 30,),
+                  Text(
+                      AppLocalizations.of(context)!.chatHistory,
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const Divider(),
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        ListTile(
+                          title: const Text("Chat ngày 01/03/2025"),
+                          onTap: () {},
+                        ),
+                        ListTile(
+                          title: const Text("Chat ngày 28/02/2025"),
+                          onTap: () {},
+                        ),
+                        ListTile(
+                          title: const Text("Chat ngày 27/02/2025"),
+                          onTap: () {},
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (_, anim, __, child) {
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(-1, 0),
+            end: Offset.zero,
+          ).animate(anim),
+          child: child,
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
-        title: Text(
-          AppLocalizations.of(context)!.chat,
-          style: TextStyle(color: Colors.black),
+        centerTitle: false,
+        title: Transform.translate(
+          offset: Offset(-20, 0),
+          child: Text(
+            AppLocalizations.of(context)!.chat,
+            style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w500),
+          ),
         ),
         backgroundColor: Colors.white,
         elevation: 1,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black, size: 18,),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.more_horiz_outlined, color: Colors.black, size: 30),
+            onPressed: _showChatHistory,
+            icon: const Icon(Icons.short_text_rounded, color: Colors.black, size: 30),
           )
         ],
       ),

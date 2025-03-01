@@ -52,5 +52,13 @@
     "nickname": "별명",
     "region": "지역",
     "birthday": "생일",
-    "save": "구하다"
+    "save": "구하다",
+    "chatHistory": "채팅 기록",
+    "desPassword": "비밀번호를 변경하세요",
+    "changePassword": "비밀번호 변경",
+    "currentPassword": "현재 비밀번호",
+    "newPassword": "새 비밀번호",
+    "enterCurrentPassword": "현재 비밀번호 입력",
+    "enterNewPassword": "새 비밀번호 입력",
+    "reEnterNewPassword": "새 비밀번호 다시 입력"
 }

@@ -40,8 +40,21 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
 
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
-        title: Text(AppLocalizations.of(context)!.selectCancerType),
+        centerTitle: false,
+        title: Transform.translate(
+            offset: Offset(-20, 0),
+            child: Text(
+              AppLocalizations.of(context)!.selectCancerType,
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 18
+              ),
+            )
+        ),
+        leading: IconButton(
+            onPressed: (){Navigator.pop(context);},
+            icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black, size: 18,)
+        ),
         actions: [
           IconButton(
               onPressed: (){

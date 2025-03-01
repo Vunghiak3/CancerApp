@@ -29,6 +29,10 @@ class _ResultPageState extends State<ResultPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+            onPressed: (){Navigator.pop(context);},
+            icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black, size: 18,)
+        ),
         actions: [
           IconButton(
               onPressed: (){

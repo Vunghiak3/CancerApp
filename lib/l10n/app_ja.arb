@@ -52,5 +52,13 @@
     "nickname": "ニックネーム",
     "region": "地域",
     "birthday": "誕生日",
-    "save": "保存"
+    "save": "保存",
+    "chatHistory": "チャット履歴",
+    "desPassword": "パスワードを変更する",
+    "changePassword": "パスワードを変更する",
+    "currentPassword": "現在のパスワード",
+    "newPassword": "新しいパスワード",
+    "enterCurrentPassword": "現在のパスワードを入力してください",
+    "enterNewPassword": "新しいパスワードを入力してください",
+    "reEnterNewPassword": "新しいパスワードを再入力してください"
 }

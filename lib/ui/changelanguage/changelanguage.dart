@@ -43,9 +43,20 @@ class _ChangeLanguagePageState extends State<ChangeLanguagePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
-        title: Text(
-          AppLocalizations.of(context)!.changeLanguage
+        centerTitle: false,
+        title: Transform.translate(
+          offset: Offset(-20, 0),
+          child: Text(
+            AppLocalizations.of(context)!.changeLanguage,
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 18
+            ),
+          ),
+        ),
+        leading: IconButton(
+            onPressed: (){Navigator.pop(context);},
+            icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black, size: 18,)
         ),
         actions: [
           IconButton(
@@ -58,7 +69,7 @@ class _ChangeLanguagePageState extends State<ChangeLanguagePage> {
                 ? () {
               Locale selectedLocale = _languages[_selectedIndex]["locale"];
               CancerApp.setLocale(context, selectedLocale);
-              nextPage(context, WelcomePage());
+              Navigator.pop(context);
             }
                 : null, // Disable khi không chọn ngôn ngữ hoặc chọn trùng với ngôn ngữ hiện tại
           ),

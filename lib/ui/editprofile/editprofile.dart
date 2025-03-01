@@ -10,83 +10,88 @@ class EditProfilePage extends StatelessWidget {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        centerTitle: true,
-        title: Text(AppLocalizations.of(context)!.editProfile),
+        centerTitle: false,
+        title: Transform.translate(
+          offset: Offset(-20, 0),
+          child: Text(
+            AppLocalizations.of(context)!.editProfile,
+            style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500
+            ),
+          ),
+        ),
+        leading: IconButton(
+            onPressed: (){Navigator.pop(context);},
+            icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black, size: 18,)
+        ),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              AppLocalizations.of(context)!.nickname
+            _buildTextField(
+              label: AppLocalizations.of(context)!.nickname,
+              icon: Icons.person_outline,
             ),
-            TextField(
-              keyboardType: TextInputType.text,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10)
-                ),
-              ),
+            _buildTextField(
+              label: AppLocalizations.of(context)!.name,
+              icon: Icons.badge_outlined,
             ),
-            Text(
-              AppLocalizations.of(context)!.name
-            ),
-            TextField(
-              keyboardType: TextInputType.text,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10)
-                ),
-              ),
-            ),
-            Text(
-                AppLocalizations.of(context)!.email
-            ),
-            TextField(
+            _buildTextField(
+              label: AppLocalizations.of(context)!.email,
+              icon: Icons.email_outlined,
               keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10)
-                ),
-              ),
             ),
             BirthdayInput(),
-            Text(
-                AppLocalizations.of(context)!.region
-            ),
-            TextField(
-              keyboardType: TextInputType.text,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10)
-                ),
-              ),
-            ),
+            // _buildTextField(
+            //   label: AppLocalizations.of(context)!.region,
+            //   icon: Icons.location_on_outlined,
+            // ),
+            const SizedBox(height: 20),
             Align(
               alignment: Alignment.center,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10.0),
-                child: ElevatedButton(
-                    onPressed: (){},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF0E70CB),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)
-                      ),
-                        minimumSize: Size(double.minPositive, 50)
-                    ),
-                    child: Text(
-                      AppLocalizations.of(context)!.saveChanges,
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white
-                      ),
-                    )
+              child: ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF0E70CB),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 14, horizontal: 40),
+                ),
+                child: Text(
+                  AppLocalizations.of(context)!.saveChanges,
+                  style: TextStyle(fontSize: 18, color: Colors.white),
                 ),
               ),
-            )
+            ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required String label,
+    required IconData icon,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: TextField(
+        keyboardType: keyboardType,
+        decoration: InputDecoration(
+          labelText: label,
+          prefixIcon: Icon(icon, color: Colors.grey),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Color(0xFF0E70CB), width: 2),
+          ),
         ),
       ),
     );
@@ -110,7 +115,7 @@ class _BirthdayInputState extends State<BirthdayInput> {
       builder: (BuildContext builder) {
         return Dialog(
           backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -122,24 +127,27 @@ class _BirthdayInputState extends State<BirthdayInput> {
                   minimumDate: DateTime(1900),
                   maximumDate: DateTime.now(),
                   onDateTimeChanged: (DateTime newDate) {
-                    tempDate = newDate; // Lưu ngày tạm thời
+                    tempDate = newDate;
                   },
                 ),
               ),
-              Divider(),
+              Divider(height: 1, color: Colors.grey.shade300),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     TextButton(
-                      onPressed: () => Navigator.pop(context), // Đóng dialog khi hủy
-                      child: Text(AppLocalizations.of(context)!.cancel, style: TextStyle(color: Colors.red, fontSize: 16)),
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        AppLocalizations.of(context)!.cancel,
+                        style: TextStyle(color: Colors.red, fontSize: 16),
+                      ),
                     ),
                     TextButton(
                       onPressed: () {
                         setState(() {
-                          selectedDate = tempDate; // Cập nhật ngày đã chọn
+                          selectedDate = tempDate;
                         });
                         Navigator.pop(context);
                       },
@@ -160,28 +168,24 @@ class _BirthdayInputState extends State<BirthdayInput> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(AppLocalizations.of(context)!.birthday),
-        SizedBox(height: 8),
-        GestureDetector(
-          onTap: () => _showDatePicker(context),
-          child: Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(10),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: GestureDetector(
+        onTap: () => _showDatePicker(context),
+        child: InputDecorator(
+          decoration: InputDecoration(
+            labelText: AppLocalizations.of(context)!.birthday,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Text(
-              "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}",
-              style: TextStyle(fontSize: 16),
-            ),
+            prefixIcon: Icon(Icons.calendar_today_outlined, color: Colors.grey),
           ),
-        )
-      ],
+          child: Text(
+            "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}",
+            style: TextStyle(fontSize: 16),
+          ),
+        ),
+      ),
     );
   }
 }
-

@@ -52,5 +52,13 @@
     "nickname": "昵称",
     "region": "地区",
     "birthday": "生日",
-    "save": "节省"
+    "save": "节省",
+    "chatHistory": "聊天记录",
+    "desPassword": "更改您的密码",
+    "changePassword": "更改密码",
+    "currentPassword": "当前密码",
+    "newPassword": "新密码",
+    "enterCurrentPassword": "输入当前密码",
+    "enterNewPassword": "输入新密码",
+    "reEnterNewPassword": "重新输入新密码"
 }
