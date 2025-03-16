@@ -1,29 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:testfile/l10n/l10n.dart';
-import 'package:testfile/ui/welcompage/welcome.dart';
+import 'package:testfile/ui/login/login.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() => runApp(const CancerApp());
-
-// class CancerApp extends StatelessWidget {
-//   const CancerApp({super.key});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       title: 'Cancer App',
-//       theme: ThemeData(
-//         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
-//         useMaterial3: true,
-//       ),
-//       home: WelcomePage(),
-//       debugShowCheckedModeBanner: false,
-//       supportedLocales: L10n.all,
-//       locale: const Locale('en'),
-//       localizationsDelegates: AppLocalizations.localizationsDelegates,
-//     );
-//   }
-// }
 
 class CancerApp extends StatefulWidget {
   const CancerApp({super.key});
@@ -54,7 +34,7 @@ class _CancerAppState extends State<CancerApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         useMaterial3: true,
       ),
-      home: WelcomePage(),
+      home: LoginPage(),
       debugShowCheckedModeBanner: false,
       supportedLocales: L10n.all,
       locale: _locale,

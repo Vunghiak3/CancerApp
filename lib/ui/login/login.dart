@@ -34,8 +34,9 @@ class _LoginPageState extends State<LoginPage> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Container(
-              height: 633,
+              height: double.infinity,
               width: double.infinity,
+              margin: EdgeInsets.symmetric(vertical: 140),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
@@ -55,21 +56,21 @@ class _LoginPageState extends State<LoginPage> {
                   _buildInputField(AppLocalizations.of(context)!.email, TextInputType.emailAddress, false),
                   const SizedBox(height: 20),
                   _buildInputField(AppLocalizations.of(context)!.password, TextInputType.visiblePassword, true),
-                  const SizedBox(height: 10),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: null,
-                      child: Text(
-                        AppLocalizations.of(context)!.forgotPassword,
-                        style: TextStyle(
-                          color: Color(0xFF104CE3),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                      ),
-                    ),
-                  ),
+                  const SizedBox(height: 20),
+                  // Align(
+                  //   alignment: Alignment.centerRight,
+                  //   child: TextButton(
+                  //     onPressed: null,
+                  //     child: Text(
+                  //       AppLocalizations.of(context)!.forgotPassword,
+                  //       style: TextStyle(
+                  //         color: Color(0xFF104CE3),
+                  //         fontWeight: FontWeight.bold,
+                  //         fontSize: 15,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                   const SizedBox(height: 10),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -100,37 +101,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFFEEEEEE),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10))
-                        ),
-                        child: Image.asset(
-                            'assets/imgs/google.png',
-                          width: sizeLogo,
-                          height: sizeLogo,
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFFEEEEEE),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10))
-                        ),
-                        child: Image.asset(
-                          'assets/imgs/facebook.png',
-                          width: sizeLogo,
-                          height: sizeLogo,
-                        ),
-                      ),
-                    ],
-                  ),
+                  _buildSocialButtons(),
                 ],
               ),
             ),
@@ -173,21 +144,13 @@ class _LoginPageState extends State<LoginPage> {
     return Column(
       children: [
         Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: IconButton(
-                  onPressed: () {
-                    returnPage(context);
-                  },
-                  icon: Icon(Icons.arrow_back_rounded, color: Colors.black, size: 30,)
-              )
-            )),
-        Text(
-          AppLocalizations.of(context)!.login,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 32,
+          padding: const EdgeInsets.only(top: 40),
+          child: Text(
+            AppLocalizations.of(context)!.login,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 32,
+            ),
           ),
         ),
         Padding(
@@ -214,6 +177,41 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ],
             ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSocialButtons(){
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ElevatedButton(
+          onPressed: () {},
+          style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFFEEEEEE),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10))
+          ),
+          child: Image.asset(
+            'assets/imgs/google.png',
+            width: sizeLogo,
+            height: sizeLogo,
+          ),
+        ),
+        const SizedBox(width: 20,),
+        ElevatedButton(
+          onPressed: () {},
+          style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFFEEEEEE),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10))
+          ),
+          child: Image.asset(
+            'assets/imgs/facebook.png',
+            width: sizeLogo,
+            height: sizeLogo,
           ),
         ),
       ],

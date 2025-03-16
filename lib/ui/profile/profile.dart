@@ -158,65 +158,65 @@ class ProfileTab extends StatelessWidget {
                             ),
                           )
                       ),
-                      ElevatedButton(
-                          onPressed: (){
-                            nextPage(context, PremiumPage());
-                          },
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(0)
-                            ),
-                            backgroundColor: Colors.white,
-                            elevation: 0,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 20.0),
-                            child: Row(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFFF2F2FB),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  margin: EdgeInsets.only(right: 20),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Icon(
-                                      Icons.workspace_premium,
-                                      color: Color(0xFFFF00C8),
-                                      size: 30,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 10,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        AppLocalizations.of(context)!.premiumPlans,
-                                        style: TextStyle(
-                                          color: Color(0xFFFF00C8),
-                                          fontSize: 18
-                                        ),
-                                      ),
-                                      Text(
-                                        AppLocalizations.of(context)!.desPremiumPlans,
-                                        style: TextStyle(
-                                          color: Color(0xFFABABAB)
-                                        ),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                const Spacer(),
-                                const Icon(Icons.arrow_forward_ios_rounded, color: Colors.black,)
-                              ],
-                            ),
-                          )
-                      ),
+                      // ElevatedButton(
+                      //     onPressed: (){
+                      //       nextPage(context, PremiumPage());
+                      //     },
+                      //     style: ElevatedButton.styleFrom(
+                      //       shape: RoundedRectangleBorder(
+                      //           borderRadius: BorderRadius.circular(0)
+                      //       ),
+                      //       backgroundColor: Colors.white,
+                      //       elevation: 0,
+                      //     ),
+                      //     child: Padding(
+                      //       padding: const EdgeInsets.symmetric(vertical: 20.0),
+                      //       child: Row(
+                      //         children: [
+                      //           Container(
+                      //             decoration: BoxDecoration(
+                      //               color: Color(0xFFF2F2FB),
+                      //               shape: BoxShape.circle,
+                      //             ),
+                      //             margin: EdgeInsets.only(right: 20),
+                      //             child: Padding(
+                      //               padding: const EdgeInsets.all(8.0),
+                      //               child: Icon(
+                      //                 Icons.workspace_premium,
+                      //                 color: Color(0xFFFF00C8),
+                      //                 size: 30,
+                      //               ),
+                      //             ),
+                      //           ),
+                      //           Expanded(
+                      //             flex: 10,
+                      //             child: Column(
+                      //               crossAxisAlignment: CrossAxisAlignment.start,
+                      //               children: [
+                      //                 Text(
+                      //                   AppLocalizations.of(context)!.premiumPlans,
+                      //                   style: TextStyle(
+                      //                     color: Color(0xFFFF00C8),
+                      //                     fontSize: 18
+                      //                   ),
+                      //                 ),
+                      //                 Text(
+                      //                   AppLocalizations.of(context)!.desPremiumPlans,
+                      //                   style: TextStyle(
+                      //                     color: Color(0xFFABABAB)
+                      //                   ),
+                      //                   maxLines: 2,
+                      //                   overflow: TextOverflow.ellipsis,
+                      //                 )
+                      //               ],
+                      //             ),
+                      //           ),
+                      //           const Spacer(),
+                      //           const Icon(Icons.arrow_forward_ios_rounded, color: Colors.black,)
+                      //         ],
+                      //       ),
+                      //     )
+                      // ),
                       ElevatedButton(
                           onPressed: (){
                             nextPage(context, ChangePasswordPage());

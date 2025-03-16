@@ -36,7 +36,7 @@ class _RegisterPageState extends State<RegisterPage> {
             padding: EdgeInsets.symmetric(horizontal: 20),
             child: Container(
               height: double.infinity,
-              margin: EdgeInsets.symmetric(vertical: 70),
+              margin: EdgeInsets.symmetric(vertical: 90),
               width: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -55,20 +55,13 @@ class _RegisterPageState extends State<RegisterPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    IconButton(
-                      onPressed: ()=>returnPage(context),
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: 30,
-                      ),
-                    ),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildHeader(),
+                          const SizedBox(height: 10,),
                           _buildInputField(AppLocalizations.of(context)!.name, TextInputType.text, false),
                           const SizedBox(height: 10,),
                           _buildInputField(AppLocalizations.of(context)!.email, TextInputType.emailAddress, false),
@@ -123,44 +116,45 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Widget _buildHeader(){
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          AppLocalizations.of(context)!.signUp,
-          textAlign: TextAlign.left,
-          style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5),
-          child: RichText(
-            textAlign: TextAlign.start,
-            text: TextSpan(
-              text: "${AppLocalizations.of(context)!.haveAccount} ",
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.black,
-              ),
-              children: [
-                TextSpan(
-                  text: AppLocalizations.of(context)!.login,
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Color(0xFF0866FF),
-                  ),
-                  recognizer: TapGestureRecognizer()
-                    ..onTap = () {
-                      nextPage(context, LoginPage());
-                    },
-                ),
-              ],
+    return Center(
+      child: Column(
+        children: [
+          Text(
+            AppLocalizations.of(context)!.signUp,
+            textAlign: TextAlign.left,
+            style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold
             ),
           ),
-        ),
-      ],
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5),
+            child: RichText(
+              textAlign: TextAlign.start,
+              text: TextSpan(
+                text: "${AppLocalizations.of(context)!.haveAccount} ",
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.black,
+                ),
+                children: [
+                  TextSpan(
+                    text: AppLocalizations.of(context)!.login,
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Color(0xFF0866FF),
+                    ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        nextPage(context, LoginPage());
+                      },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -192,7 +186,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Widget _buildSocialButtons(){
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         ElevatedButton(
           onPressed: () {},
@@ -206,6 +200,7 @@ class _RegisterPageState extends State<RegisterPage> {
             height: sizeLogo,
           ),
         ),
+        const SizedBox(width: 20,),
         ElevatedButton(
           onPressed: () {},
           style: ElevatedButton.styleFrom(
