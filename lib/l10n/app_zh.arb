@@ -60,5 +60,6 @@
     "newPassword": "新密码",
     "enterCurrentPassword": "输入当前密码",
     "enterNewPassword": "输入新密码",
-    "reEnterNewPassword": "重新输入新密码"
+    "reEnterNewPassword": "重新输入新密码",
+    "diagnose": "诊断"
 }

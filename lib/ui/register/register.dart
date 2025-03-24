@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:testfile/ui/login/login.dart';
 import 'package:testfile/ui/welcompage/welcome.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:testfile/utils/navigation_helper.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -72,7 +73,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           const SizedBox(height: 20,),
                           ElevatedButton(
                             onPressed: (){
-                              nextPage(context, LoginPage());
+                              NavigationHelper.nextPageRemoveUntil(context, LoginPage());
                             },
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: Color(0xFF0E70CB),
@@ -146,7 +147,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
-                        nextPage(context, LoginPage());
+                        NavigationHelper.nextPage(context, LoginPage());
                       },
                   ),
                 ],

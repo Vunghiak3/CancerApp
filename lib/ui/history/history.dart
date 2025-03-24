@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class HistoryTab extends StatefulWidget {
-  const HistoryTab({super.key});
+class HistoryPage extends StatefulWidget {
+  const HistoryPage({super.key});
 
   @override
-  State<HistoryTab> createState() => _HistoryTabState();
+  State<HistoryPage> createState() => _HistoryPageState();
 }
 
-class _HistoryTabState extends State<HistoryTab> {
+class _HistoryPageState extends State<HistoryPage> {
   int _selectedIndex = 0;
 
   final List<Map<String, String>> _history = [
@@ -100,6 +100,8 @@ class _HistoryTabState extends State<HistoryTab> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
+        title: Text('Lịch sử chẩn đoán', style: TextStyle(fontSize: 20),),
+        centerTitle: true,
         actions: [
           IconButton(onPressed: (){}, icon: Icon(Icons.more_horiz_outlined, color: Colors.black, size: 30,))
         ],
@@ -138,7 +140,7 @@ class _HistoryTabState extends State<HistoryTab> {
                     child: Row(
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(15),
+                          borderRadius: BorderRadius.circular(5),
                           child: Image.network(
                             _history[index]["img"] ?? "https://via.placeholder.com/110",
                             width:70,

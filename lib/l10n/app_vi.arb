@@ -61,5 +61,6 @@
     "newPassword": "Mật khẩu mới",
     "enterCurrentPassword": "Nhập mật khẩu hiện tại",
     "enterNewPassword": "Nhập mật khẩu mới",
-    "reEnterNewPassword": "Nhập lại mật khẩu mới"
+    "reEnterNewPassword": "Nhập lại mật khẩu mới",
+    "diagnose": "Chẩn đoán"
 }

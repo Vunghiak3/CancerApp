@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:testfile/presentation/widgets/InputText.dart';
 
 class ChangePasswordPage extends StatefulWidget {
   const ChangePasswordPage({super.key});
@@ -44,13 +45,23 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildLabel(AppLocalizations.of(context)!.currentPassword),
-            _buildTextField(controller: currentPasswordController, label: AppLocalizations.of(context)!.enterCurrentPassword),
-
-            _buildLabel(AppLocalizations.of(context)!.newPassword),
-            _buildTextField(controller: newPasswordController, label: AppLocalizations.of(context)!.enterNewPassword),
-
-            _buildTextField(controller: confirmPasswordController, label: AppLocalizations.of(context)!.reEnterNewPassword),
+            InputText(
+              label: AppLocalizations.of(context)!.currentPassword,
+              placeholder: AppLocalizations.of(context)!.enterCurrentPassword,
+              hideText: true,
+              controller: currentPasswordController,
+            ),
+            InputText(
+              label: AppLocalizations.of(context)!.newPassword,
+              placeholder: AppLocalizations.of(context)!.enterNewPassword,
+              hideText: true,
+              controller: newPasswordController,
+            ),
+            InputText(
+              placeholder: AppLocalizations.of(context)!.reEnterNewPassword,
+              hideText: true,
+              controller: confirmPasswordController,
+            ),
 
             const SizedBox(height: 20),
             Align(
@@ -74,47 +85,37 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     );
   }
 
-  Widget _buildLabel(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 5),
-      child: Text(
-        text,
-        style: TextStyle(color: Color(0xFF0E70CB), fontWeight: FontWeight.w500),
-      ),
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: TextField(
-        controller: controller,
-        obscureText: true,
-        decoration: InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Color(0xFF0E70CB), width: 2),
-          ),
-          suffixIcon: controller.text.isNotEmpty
-              ? IconButton(
-            icon: Icon(Icons.clear),
-            onPressed: () {
-              setState(() {
-                controller.clear();
-              });
-            },
-          )
-              : null,
-        ),
-        onChanged: (text) {
-          setState(() {});
-        },
-      ),
-    );
-  }
+  // Widget _buildTextField({
+  //   required TextEditingController controller,
+  //   required String label,
+  // }) {
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(vertical: 10),
+  //     child: TextField(
+  //       controller: controller,
+  //       obscureText: true,
+  //       decoration: InputDecoration(
+  //         labelText: label,
+  //         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+  //         focusedBorder: OutlineInputBorder(
+  //           borderRadius: BorderRadius.circular(12),
+  //           borderSide: BorderSide(color: Color(0xFF0E70CB), width: 2),
+  //         ),
+  //         suffixIcon: controller.text.isNotEmpty
+  //             ? IconButton(
+  //           icon: Icon(Icons.clear),
+  //           onPressed: () {
+  //             setState(() {
+  //               controller.clear();
+  //             });
+  //           },
+  //         )
+  //             : null,
+  //       ),
+  //       onChanged: (text) {
+  //         setState(() {});
+  //       },
+  //     ),
+  //   );
+  // }
 }

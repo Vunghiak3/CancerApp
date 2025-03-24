@@ -60,5 +60,6 @@
     "newPassword": "새 비밀번호",
     "enterCurrentPassword": "현재 비밀번호 입력",
     "enterNewPassword": "새 비밀번호 입력",
-    "reEnterNewPassword": "새 비밀번호 다시 입력"
+    "reEnterNewPassword": "새 비밀번호 다시 입력",
+    "diagnose": "진단하다"
 }

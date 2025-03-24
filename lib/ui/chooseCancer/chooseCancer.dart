@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:testfile/ui/home/home.dart';
 import 'package:testfile/ui/result/result.dart';
-import 'package:testfile/ui/welcompage/welcome.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:testfile/utils/navigation_helper.dart';
 
 class ChooseCancerPage extends StatefulWidget {
   final File selectedImage;
@@ -58,7 +58,7 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
         actions: [
           IconButton(
               onPressed: (){
-                nextPage(context, CancerHomePage());
+                NavigationHelper.nextPageRemoveUntil(context, HomeScreen());
               },
               icon: Icon(Icons.home, color: Colors.black,)
           )

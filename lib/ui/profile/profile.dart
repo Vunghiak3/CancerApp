@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:testfile/presentation/widgets/MenuWidget.dart';
 import 'package:testfile/ui/changePassword/changePassword.dart';
 import 'package:testfile/ui/editprofile/editprofile.dart';
-import 'package:testfile/ui/premium/premium.dart';
+import 'package:testfile/ui/login/login.dart';
 import 'package:testfile/ui/setting/setting.dart';
-import 'package:testfile/ui/welcompage/welcome.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:testfile/utils/navigation_helper.dart';
 
-class ProfileTab extends StatelessWidget {
-  const ProfileTab({super.key});
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +20,7 @@ class ProfileTab extends StatelessWidget {
         actions: [
           IconButton(
               onPressed: (){
-                nextPage(context, SettingPage());
+                NavigationHelper.nextPage(context, SettingPage());
               },
               icon: Icon(Icons.settings, color: Colors.black)
           )
@@ -85,250 +86,35 @@ class ProfileTab extends StatelessWidget {
                     )
                   ],
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(5),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 10,
-                        spreadRadius: 2,
-                        offset: Offset(0, 4),
+                const SizedBox(height: 30,),
+                MenuWidget(
+                    items: [
+                      MenuItem(
+                          text: AppLocalizations.of(context)!.myAccount,
+                          subText: AppLocalizations.of(context)!.desMyAccount,
+                          icon: Icons.person_outline_rounded,
+                          onTap: (){
+                            NavigationHelper.nextPage(context, EditProfilePage());
+                          }
                       ),
-                    ],
-                  ),
-                  margin: const EdgeInsets.symmetric(vertical: 40),
-                  child: Column(
-                    children: [
-                      ElevatedButton(
-                          onPressed: (){
-                            nextPage(context, EditProfilePage());
-                          },
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(0)
-                            ),
-                            backgroundColor: Colors.white,
-                            elevation: 0,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 20.0),
-                            child: Row(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFFF2F2FB),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  margin: EdgeInsets.only(right: 20),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Icon(
-                                      Icons.person_outline,
-                                      color: Color(0xFF0601B4),
-                                      size: 30,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 10,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        AppLocalizations.of(context)!.myAccount,
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 18
-                                        ),
-                                      ),
-                                      Text(
-                                        AppLocalizations.of(context)!.desMyAccount,
-                                        style: TextStyle(
-                                          color: Color(0xFFABABAB)
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                const Spacer(),
-                                const Icon(Icons.arrow_forward_ios_rounded, color: Colors.black,)
-                              ],
-                            ),
-                          )
+                      MenuItem(
+                          text: AppLocalizations.of(context)!.changePassword,
+                          subText: AppLocalizations.of(context)!.desPassword,
+                          icon: Icons.key_rounded,
+                          onTap: (){
+                            NavigationHelper.nextPage(context, ChangePasswordPage());
+                          }
                       ),
-                      // ElevatedButton(
-                      //     onPressed: (){
-                      //       nextPage(context, PremiumPage());
-                      //     },
-                      //     style: ElevatedButton.styleFrom(
-                      //       shape: RoundedRectangleBorder(
-                      //           borderRadius: BorderRadius.circular(0)
-                      //       ),
-                      //       backgroundColor: Colors.white,
-                      //       elevation: 0,
-                      //     ),
-                      //     child: Padding(
-                      //       padding: const EdgeInsets.symmetric(vertical: 20.0),
-                      //       child: Row(
-                      //         children: [
-                      //           Container(
-                      //             decoration: BoxDecoration(
-                      //               color: Color(0xFFF2F2FB),
-                      //               shape: BoxShape.circle,
-                      //             ),
-                      //             margin: EdgeInsets.only(right: 20),
-                      //             child: Padding(
-                      //               padding: const EdgeInsets.all(8.0),
-                      //               child: Icon(
-                      //                 Icons.workspace_premium,
-                      //                 color: Color(0xFFFF00C8),
-                      //                 size: 30,
-                      //               ),
-                      //             ),
-                      //           ),
-                      //           Expanded(
-                      //             flex: 10,
-                      //             child: Column(
-                      //               crossAxisAlignment: CrossAxisAlignment.start,
-                      //               children: [
-                      //                 Text(
-                      //                   AppLocalizations.of(context)!.premiumPlans,
-                      //                   style: TextStyle(
-                      //                     color: Color(0xFFFF00C8),
-                      //                     fontSize: 18
-                      //                   ),
-                      //                 ),
-                      //                 Text(
-                      //                   AppLocalizations.of(context)!.desPremiumPlans,
-                      //                   style: TextStyle(
-                      //                     color: Color(0xFFABABAB)
-                      //                   ),
-                      //                   maxLines: 2,
-                      //                   overflow: TextOverflow.ellipsis,
-                      //                 )
-                      //               ],
-                      //             ),
-                      //           ),
-                      //           const Spacer(),
-                      //           const Icon(Icons.arrow_forward_ios_rounded, color: Colors.black,)
-                      //         ],
-                      //       ),
-                      //     )
-                      // ),
-                      ElevatedButton(
-                          onPressed: (){
-                            nextPage(context, ChangePasswordPage());
-                          },
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(0)
-                            ),
-                            backgroundColor: Colors.white,
-                            elevation: 0,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 20.0),
-                            child: Row(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFFF2F2FB),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  margin: EdgeInsets.only(right: 20),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Icon(
-                                      Icons.key_rounded,
-                                      color: Color(0xFF0601B4),
-                                      size: 30,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 10,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        AppLocalizations.of(context)!.password,
-                                        style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 18
-                                        ),
-                                      ),
-                                      Text(
-                                        AppLocalizations.of(context)!.desPassword,
-                                        style: TextStyle(
-                                            color: Color(0xFFABABAB)
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                const Spacer(),
-                                const Icon(Icons.arrow_forward_ios_rounded, color: Colors.black,)
-                              ],
-                            ),
-                          )
+                      MenuItem(
+                          text: AppLocalizations.of(context)!.logout,
+                          subText: AppLocalizations.of(context)!.desLogout,
+                          icon: Icons.logout,
+                          colorIcon: Colors.red,
+                          onTap: (){
+                            NavigationHelper.nextPageRemoveUntil(context, LoginPage());
+                          }
                       ),
-                      ElevatedButton(
-                          onPressed: (){
-                            nextPage(context, WelcomePage());
-                          },
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(0)
-                            ),
-                            backgroundColor: Colors.white,
-                            elevation: 0,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 20.0),
-                            child: Row(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFFF2F2FB),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  margin: EdgeInsets.only(right: 10),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Icon(Icons.logout, color: Color(0xFF0601B4), size: 30,),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 5,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        AppLocalizations.of(context)!.logout,
-                                        style: TextStyle(
-                                          color: Color(0xff555555),
-                                          fontSize: 18
-                                        ),
-                                      ),
-                                      Text(
-                                        AppLocalizations.of(context)!.desLogout,
-                                        style: TextStyle(
-                                          color: Color(0xFFABABAB)
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                const Spacer(),
-                                const Icon(Icons.arrow_forward_ios_rounded, color: Colors.black,)
-                              ],
-                            ),
-                          )
-                      ),
-                    ],
-                  ),
+                    ]
                 )
               ],
             ),

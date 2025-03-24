@@ -61,5 +61,6 @@
     "newPassword": "New Password",
     "enterCurrentPassword": "Enter current password",
     "enterNewPassword": "Enter new password",
-    "reEnterNewPassword": "Re-enter new password"
+    "reEnterNewPassword": "Re-enter new password",
+    "diagnose": "Diagnose"
 }

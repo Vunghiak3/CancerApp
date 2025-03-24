@@ -60,5 +60,6 @@
     "newPassword": "新しいパスワード",
     "enterCurrentPassword": "現在のパスワードを入力してください",
     "enterNewPassword": "新しいパスワードを入力してください",
-    "reEnterNewPassword": "新しいパスワードを再入力してください"
+    "reEnterNewPassword": "新しいパスワードを再入力してください",
+    "diagnose": "診断"
 }

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class MessageTab extends StatefulWidget {
-  const MessageTab({super.key});
+class MessagePage extends StatefulWidget {
+  const MessagePage({super.key});
 
   @override
-  _MessageTabState createState() => _MessageTabState();
+  _MessagePageState createState() => _MessagePageState();
 }
 
-class _MessageTabState extends State<MessageTab> {
+class _MessagePageState extends State<MessagePage> {
   final TextEditingController _messageController = TextEditingController();
   final List<Map<String, dynamic>> _messages = [
     {

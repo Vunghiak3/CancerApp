@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:testfile/ui/home/home.dart';
 import 'package:testfile/ui/welcompage/welcome.dart';
+import 'package:testfile/utils/navigation_helper.dart';
 
 class ResultPage extends StatefulWidget {
   final File image;
@@ -36,7 +37,7 @@ class _ResultPageState extends State<ResultPage> {
         actions: [
           IconButton(
               onPressed: (){
-                nextPage(context, CancerHomePage());
+                NavigationHelper.nextPageRemoveUntil(context, HomeScreen());
               },
               icon: Icon(Icons.home, color: Colors.black,)
           )

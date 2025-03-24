@@ -4,6 +4,7 @@ import 'package:testfile/ui/home/home.dart';
 import 'package:testfile/ui/register/register.dart';
 import 'package:testfile/ui/welcompage/welcome.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:testfile/utils/navigation_helper.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -76,7 +77,7 @@ class _LoginPageState extends State<LoginPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: ElevatedButton(
                       onPressed: () {
-                        nextPage(context, CancerHomePage());
+                        NavigationHelper.nextPageReplace(context, HomeScreen());
                       },
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFF0E70CB),
@@ -172,7 +173,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   recognizer: TapGestureRecognizer()
                     ..onTap = () {
-                      nextPage(context, RegisterPage());
+                      NavigationHelper.nextPage(context, RegisterPage());
                     },
                 ),
               ],
