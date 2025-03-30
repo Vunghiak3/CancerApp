@@ -1,8 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:testfile/presentation/widgets/BirthdayInput.dart';
-import 'package:testfile/presentation/widgets/InputText.dart';
+import 'package:testfile/presentation/widgets/InputTextField.dart';
+import 'package:testfile/theme/text_styles.dart';
 
 class EditProfilePage extends StatelessWidget {
   const EditProfilePage({super.key});
@@ -17,15 +17,12 @@ class EditProfilePage extends StatelessWidget {
           offset: Offset(-20, 0),
           child: Text(
             AppLocalizations.of(context)!.editProfile,
-            style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500
-            ),
+            style: AppTextStyles.title,
           ),
         ),
         leading: IconButton(
             onPressed: (){Navigator.pop(context);},
-            icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black, size: 18,)
+            icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black, size: AppTextStyles.sizeIconSmall,)
         ),
       ),
       body: SingleChildScrollView(
@@ -33,15 +30,15 @@ class EditProfilePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            InputText(
+            InputTextField(
               placeholder: AppLocalizations.of(context)!.nickname,
               icon: Icons.person_outline_rounded,
             ),
-            InputText(
+            InputTextField(
               placeholder: AppLocalizations.of(context)!.name,
               icon: Icons.badge_outlined,
             ),
-            InputText(
+            InputTextField(
               placeholder: AppLocalizations.of(context)!.email,
               icon: Icons.email_outlined,
               keyboardType: TextInputType.emailAddress,
@@ -61,7 +58,7 @@ class EditProfilePage extends StatelessWidget {
                 ),
                 child: Text(
                   AppLocalizations.of(context)!.saveChanges,
-                  style: TextStyle(fontSize: 18, color: Colors.white),
+                  style: TextStyle(fontSize: AppTextStyles.sizeContent, color: Colors.white,),
                 ),
               ),
             ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:testfile/presentation/widgets/InputText.dart';
+import 'package:testfile/presentation/widgets/InputTextField.dart';
+import 'package:testfile/theme/text_styles.dart';
 
 class ChangePasswordPage extends StatefulWidget {
   const ChangePasswordPage({super.key});
@@ -32,12 +33,12 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           offset: Offset(-20, 0),
           child: Text(
             AppLocalizations.of(context)!.changePassword,
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+            style: AppTextStyles.title,
           ),
         ),
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black, size: 18),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black, size: AppTextStyles.sizeIconSmall),
         ),
       ),
       body: SingleChildScrollView(
@@ -45,19 +46,19 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            InputText(
+            InputTextField(
               label: AppLocalizations.of(context)!.currentPassword,
               placeholder: AppLocalizations.of(context)!.enterCurrentPassword,
               hideText: true,
               controller: currentPasswordController,
             ),
-            InputText(
+            InputTextField(
               label: AppLocalizations.of(context)!.newPassword,
               placeholder: AppLocalizations.of(context)!.enterNewPassword,
               hideText: true,
               controller: newPasswordController,
             ),
-            InputText(
+            InputTextField(
               placeholder: AppLocalizations.of(context)!.reEnterNewPassword,
               hideText: true,
               controller: confirmPasswordController,
@@ -75,7 +76,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 ),
                 child: Text(
                   AppLocalizations.of(context)!.saveChanges,
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+                  style: TextStyle(fontSize: AppTextStyles.sizeContent, color: Colors.white),
                 ),
               ),
             ),
@@ -84,38 +85,4 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       ),
     );
   }
-
-  // Widget _buildTextField({
-  //   required TextEditingController controller,
-  //   required String label,
-  // }) {
-  //   return Padding(
-  //     padding: const EdgeInsets.symmetric(vertical: 10),
-  //     child: TextField(
-  //       controller: controller,
-  //       obscureText: true,
-  //       decoration: InputDecoration(
-  //         labelText: label,
-  //         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-  //         focusedBorder: OutlineInputBorder(
-  //           borderRadius: BorderRadius.circular(12),
-  //           borderSide: BorderSide(color: Color(0xFF0E70CB), width: 2),
-  //         ),
-  //         suffixIcon: controller.text.isNotEmpty
-  //             ? IconButton(
-  //           icon: Icon(Icons.clear),
-  //           onPressed: () {
-  //             setState(() {
-  //               controller.clear();
-  //             });
-  //           },
-  //         )
-  //             : null,
-  //       ),
-  //       onChanged: (text) {
-  //         setState(() {});
-  //       },
-  //     ),
-  //   );
-  // }
 }

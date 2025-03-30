@@ -1,9 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:testfile/ui/home/home.dart';
-import 'package:testfile/ui/register/register.dart';
-import 'package:testfile/ui/welcompage/welcome.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:testfile/presentation/screens/home/home.dart';
+import 'package:testfile/presentation/screens/register/register.dart';
+import 'package:testfile/presentation/widgets/InputTextField.dart';
+import 'package:testfile/theme/text_styles.dart';
 import 'package:testfile/utils/navigation_helper.dart';
 
 class LoginPage extends StatefulWidget {
@@ -50,60 +51,49 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ],
               ),
-              child: Column(
-                children: [
-                  _buildHeader(),
-                  const SizedBox(height: 10),
-                  _buildInputField(AppLocalizations.of(context)!.email, TextInputType.emailAddress, false),
-                  const SizedBox(height: 20),
-                  _buildInputField(AppLocalizations.of(context)!.password, TextInputType.visiblePassword, true),
-                  const SizedBox(height: 20),
-                  // Align(
-                  //   alignment: Alignment.centerRight,
-                  //   child: TextButton(
-                  //     onPressed: null,
-                  //     child: Text(
-                  //       AppLocalizations.of(context)!.forgotPassword,
-                  //       style: TextStyle(
-                  //         color: Color(0xFF104CE3),
-                  //         fontWeight: FontWeight.bold,
-                  //         fontSize: 15,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        NavigationHelper.nextPageReplace(context, HomeScreen());
-                      },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF0E70CB),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                          minimumSize: Size(double.infinity, 50)),
-                      child: Text(
-                        AppLocalizations.of(context)!.login,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Column(
+                  children: [
+                    _buildHeader(),
+                    const SizedBox(height: 10),
+                    _buildInputField(AppLocalizations.of(context)!.email, TextInputType.emailAddress, false),
+                    const SizedBox(height: 20),
+                    _buildInputField(AppLocalizations.of(context)!.password, TextInputType.visiblePassword, true),
+                    const SizedBox(height: 30),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          NavigationHelper.nextPageReplace(context, HomeScreen());
+                        },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFF0E70CB),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                            minimumSize: Size(double.infinity, 50)),
+                        child: Text(
+                          AppLocalizations.of(context)!.login,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: AppTextStyles.sizeTitle,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    AppLocalizations.of(context)!.orLoginWith,
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Color(0xFF595959),
+                    const SizedBox(height: 20),
+                    Text(
+                      AppLocalizations.of(context)!.orLoginWith,
+                      style: TextStyle(
+                        fontSize: AppTextStyles.sizeContent,
+                        color: Color(0xFF595959),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  _buildSocialButtons(),
-                ],
+                    const SizedBox(height: 20),
+                    _buildSocialButtons(),
+                  ],
+                ),
               ),
             ),
           ),
@@ -118,9 +108,13 @@ class _LoginPageState extends State<LoginPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label),
+          Text(
+            label,
+            style: AppTextStyles.content,
+          ),
           TextField(
             obscureText: isPassword && !_isPasswordVisible,
+            style: AppTextStyles.content,
             keyboardType: inputType,
             decoration: InputDecoration(
               border: const OutlineInputBorder(),
@@ -129,6 +123,7 @@ class _LoginPageState extends State<LoginPage> {
                   _isPasswordVisible
                       ? Icons.visibility
                       : Icons.visibility_off,
+                  size: AppTextStyles.sizeIcon,
                 ),
                 onPressed: () => setState(() {
                   _isPasswordVisible = !_isPasswordVisible;
@@ -161,14 +156,14 @@ class _LoginPageState extends State<LoginPage> {
             text: TextSpan(
               text: "${AppLocalizations.of(context)!.dontHaveAccount} ",
               style: TextStyle(
-                fontSize: 18,
+                fontSize: AppTextStyles.sizeTitle,
                 color: Colors.black,
               ),
               children: [
                 TextSpan(
                   text: AppLocalizations.of(context)!.signUp,
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: AppTextStyles.sizeTitle,
                     color: Color(0xFF0866FF),
                   ),
                   recognizer: TapGestureRecognizer()

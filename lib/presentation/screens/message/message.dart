@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:testfile/theme/text_styles.dart';
 
 class MessagePage extends StatefulWidget {
   const MessagePage({super.key});
@@ -43,6 +44,12 @@ class _MessagePageState extends State<MessagePage> {
   }
 
   void _showChatHistory() {
+    List<String> chatHistory = [
+      "Chat ngày 01/03/2025",
+      "Chat ngày 28/02/2025",
+      "Chat ngày 27/02/2025",
+    ];
+
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -70,24 +77,33 @@ class _MessagePageState extends State<MessagePage> {
                   SizedBox(height: 30,),
                   Text(
                       AppLocalizations.of(context)!.chatHistory,
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      style: AppTextStyles.title,
+                  ),
                   const Divider(),
                   Expanded(
-                    child: ListView(
-                      children: [
-                        ListTile(
-                          title: const Text("Chat ngày 01/03/2025"),
-                          onTap: () {},
-                        ),
-                        ListTile(
-                          title: const Text("Chat ngày 28/02/2025"),
-                          onTap: () {},
-                        ),
-                        ListTile(
-                          title: const Text("Chat ngày 27/02/2025"),
-                          onTap: () {},
-                        ),
-                      ],
+                    child: ListView.separated(
+                        itemBuilder: (context, index){
+                          return ListTile(
+                            title: Text(
+                              chatHistory[index],
+                              style: AppTextStyles.content,
+                            ),
+                            trailing: IconButton(
+                                onPressed: (){},
+                                icon: Icon(Icons.more_horiz_rounded, color: Colors.black, size: AppTextStyles.sizeIcon,)
+                            ),
+                            onTap: () {},
+                          );
+                        },
+                        separatorBuilder: (context, index){
+                          return const Divider(
+                            color: Colors.grey,
+                            thickness: 1,
+                            indent: 15,
+                            endIndent: 15,
+                          );
+                        },
+                        itemCount: chatHistory.length
                     ),
                   ),
                 ],
@@ -117,19 +133,19 @@ class _MessagePageState extends State<MessagePage> {
           offset: Offset(-20, 0),
           child: Text(
             AppLocalizations.of(context)!.chat,
-            style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w500),
+            style: AppTextStyles.title,
           ),
         ),
         backgroundColor: Colors.white,
         elevation: 1,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black, size: 18,),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black, size: AppTextStyles.sizeIconSmall,),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(
             onPressed: _showChatHistory,
-            icon: const Icon(Icons.short_text_rounded, color: Colors.black, size: 30),
+            icon: const Icon(Icons.short_text_rounded, color: Colors.black, size: AppTextStyles.sizeIcon),
           )
         ],
       ),
@@ -173,6 +189,7 @@ class _MessagePageState extends State<MessagePage> {
                           message['text'],
                           style: TextStyle(
                             color: message['isBot'] ? Colors.black : Colors.white,
+                            fontSize: AppTextStyles.sizeContent
                           ),
                         ),
                       ),
@@ -195,12 +212,13 @@ class _MessagePageState extends State<MessagePage> {
                     controller: _messageController,
                     decoration: const InputDecoration(
                       hintText: "Write a message",
+                      hintStyle: AppTextStyles.content,
                       border: InputBorder.none,
                     ),
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.send, color: Colors.blue),
+                  icon: const Icon(Icons.send, color: Colors.blue, size: AppTextStyles.sizeIcon,),
                   onPressed: _sendMessage,
                 ),
               ],

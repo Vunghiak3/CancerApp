@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:testfile/theme/text_styles.dart';
 
 class MenuWidget extends StatelessWidget {
   final String? title;
@@ -18,15 +19,12 @@ class MenuWidget extends StatelessWidget {
         if(title != null && title!.isNotEmpty)...[
           Text(
             title!,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
+            style: AppTextStyles.content,
           ),
           const SizedBox(height: 10,),
         ],
         Card(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           elevation: 1,
           color: Colors.white,
           clipBehavior: Clip.hardEdge,
@@ -39,17 +37,20 @@ class MenuWidget extends StatelessWidget {
                     children: [
                       ListTile(
                         dense: true,
-                        leading: Icon(items[index].icon, color: items[index].colorIcon ?? Colors.blue),
+                        leading: Icon(items[index].icon, color: items[index].colorIcon ?? Colors.blue, size: AppTextStyles.sizeIcon,),
                         title: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 5.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(items[index].text),
+                              Text(
+                                items[index].text,
+                                style: AppTextStyles.content,
+                              ),
                               if (items[index].subText?.isNotEmpty ?? false)
                                 Text(
                                   items[index].subText!,
-                                  style: TextStyle(fontSize: 11, color: Colors.grey),
+                                  style: AppTextStyles.subtitle,
                                 )
                             ],
                           ),

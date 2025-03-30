@@ -1,8 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:testfile/ui/login/login.dart';
-import 'package:testfile/ui/welcompage/welcome.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:testfile/presentation/screens/login/login.dart';
+import 'package:testfile/theme/text_styles.dart';
 import 'package:testfile/utils/navigation_helper.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -85,7 +85,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             child: Text(
                               AppLocalizations.of(context)!.signUp,
                               style: TextStyle(
-                                  fontSize: 20,
+                                  fontSize: AppTextStyles.sizeTitle,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white
                               ),
@@ -96,7 +96,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             child: Text(
                               AppLocalizations.of(context)!.orSignupWith,
                               style: TextStyle(
-                                fontSize: 15,
+                                fontSize: AppTextStyles.sizeContent,
                                 color: Color(0xFF595959),
                               ),
                             ),
@@ -135,14 +135,14 @@ class _RegisterPageState extends State<RegisterPage> {
               text: TextSpan(
                 text: "${AppLocalizations.of(context)!.haveAccount} ",
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: AppTextStyles.sizeTitle,
                   color: Colors.black,
                 ),
                 children: [
                   TextSpan(
                     text: AppLocalizations.of(context)!.login,
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: AppTextStyles.sizeTitle,
                       color: Color(0xFF0866FF),
                     ),
                     recognizer: TapGestureRecognizer()
@@ -163,9 +163,13 @@ class _RegisterPageState extends State<RegisterPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label),
+        Text(
+          label,
+          style: AppTextStyles.content,
+        ),
         TextField(
           obscureText: isPassword && !_isPasswordVisible,
+          style: AppTextStyles.content,
           keyboardType: inputType,
           decoration: InputDecoration(
             border: const OutlineInputBorder(),
@@ -174,6 +178,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 _isPasswordVisible
                     ? Icons.visibility
                     : Icons.visibility_off,
+                size: AppTextStyles.sizeIcon,
               ),
               onPressed: () => setState(() {
                 _isPasswordVisible = !_isPasswordVisible;

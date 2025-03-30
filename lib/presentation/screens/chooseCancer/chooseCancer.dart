@@ -1,9 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:testfile/ui/home/home.dart';
-import 'package:testfile/ui/result/result.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:testfile/presentation/screens/home/home.dart';
+import 'package:testfile/presentation/screens/result/result.dart';
+import 'package:testfile/theme/text_styles.dart';
 import 'package:testfile/utils/navigation_helper.dart';
 
 class ChooseCancerPage extends StatefulWidget {
@@ -45,29 +46,26 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
             offset: Offset(-20, 0),
             child: Text(
               AppLocalizations.of(context)!.selectCancerType,
-              style: TextStyle(
-                fontWeight: FontWeight.w500,
-                fontSize: 18
-              ),
+              style: AppTextStyles.title,
             )
         ),
         leading: IconButton(
             onPressed: (){Navigator.pop(context);},
-            icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black, size: 18,)
+            icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black, size: AppTextStyles.sizeIconSmall,)
         ),
         actions: [
           IconButton(
               onPressed: (){
                 NavigationHelper.nextPageRemoveUntil(context, HomeScreen());
               },
-              icon: Icon(Icons.home, color: Colors.black,)
+              icon: Icon(Icons.home_rounded, color: Colors.black, size: AppTextStyles.sizeIcon,)
           )
         ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            SizedBox(height: 20),
+            SizedBox(height: 10),
             Container(
               margin: EdgeInsets.symmetric(horizontal: 20),
               decoration: BoxDecoration(
@@ -81,7 +79,7 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
                 ],
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.circular(12),
                 child: Image.file(
                   _selectedImage,
                   fit: BoxFit.cover,
@@ -109,8 +107,13 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
                   side: BorderSide(color: Color(0xFF0E70CB)),
                 ),
               ),
-              icon: Icon(Icons.photo_library_outlined, color: Color(0xFF0E70CB),),
-              label: Text(AppLocalizations.of(context)!.selectAnotherPhoto),
+              icon: Icon(Icons.photo_library_outlined, color: Color(0xFF0E70CB), size: AppTextStyles.sizeIconSmall,),
+              label: Text(
+                AppLocalizations.of(context)!.selectAnotherPhoto,
+                style: TextStyle(
+                  fontSize: AppTextStyles.sizeContent,
+                ),
+              ),
             ),
             SizedBox(height: 10),
             Padding(
@@ -120,7 +123,7 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
                 child: Text(
                   AppLocalizations.of(context)!.selectDiseaseType,
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: AppTextStyles.sizeTitle,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF0E70CB),
                   ),
@@ -143,7 +146,7 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
                     margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     decoration: BoxDecoration(
                       color: isSelected ? Color(0xffe7f1fa) : Colors.white,
-                      borderRadius: BorderRadius.circular(15),
+                      borderRadius: BorderRadius.circular(8),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black12,
@@ -160,8 +163,9 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
                       title: Text(
                         _cancer[index]["title"]!,
                         style: TextStyle(
+                          fontSize: AppTextStyles.sizeContent,
                           color: Colors.black,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                       trailing: Icon(
@@ -169,6 +173,7 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
                             ? Icons.radio_button_checked
                             : Icons.radio_button_unchecked,
                         color: isSelected ? Color(0xFF0E70CB) : Colors.grey,
+                        size: AppTextStyles.sizeIconSmall,
                       ),
                     ),
                   ),
@@ -195,7 +200,7 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
               ),
               child: Text(
                 AppLocalizations.of(context)!.diagnosis,
-                style: TextStyle(fontSize: 18),
+                style: TextStyle(fontSize: AppTextStyles.sizeContent),
               ),
             ),
             SizedBox(height: 20),

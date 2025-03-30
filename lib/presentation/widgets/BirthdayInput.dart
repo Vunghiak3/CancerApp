@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:testfile/theme/text_styles.dart';
 
 class BirthdayInput extends StatefulWidget {
   const BirthdayInput({super.key});
@@ -19,20 +20,30 @@ class _BirthdayInputState extends State<BirthdayInput> {
       builder: (BuildContext builder) {
         return Dialog(
           backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               SizedBox(
                 height: 200,
-                child: CupertinoDatePicker(
-                  mode: CupertinoDatePickerMode.date,
-                  initialDateTime: selectedDate,
-                  minimumDate: DateTime(1900),
-                  maximumDate: DateTime.now(),
-                  onDateTimeChanged: (DateTime newDate) {
-                    tempDate = newDate;
-                  },
+                child: CupertinoTheme(
+                  data: CupertinoThemeData(
+                    textTheme: CupertinoTextThemeData(
+                      dateTimePickerTextStyle: TextStyle(
+                        fontSize: AppTextStyles.sizeContent,
+                        color: Colors.black,
+                      )
+                    )
+                  ),
+                  child: CupertinoDatePicker(
+                    mode: CupertinoDatePickerMode.date,
+                    initialDateTime: selectedDate,
+                    minimumDate: DateTime(1900),
+                    maximumDate: DateTime.now(),
+                    onDateTimeChanged: (DateTime newDate) {
+                      tempDate = newDate;
+                    },
+                  ),
                 ),
               ),
               Divider(height: 1, color: Colors.grey.shade300),
@@ -45,7 +56,7 @@ class _BirthdayInputState extends State<BirthdayInput> {
                       onPressed: () => Navigator.pop(context),
                       child: Text(
                         AppLocalizations.of(context)!.cancel,
-                        style: TextStyle(color: Colors.red, fontSize: 16),
+                        style: TextStyle(color: Colors.red, fontSize: AppTextStyles.sizeContent),
                       ),
                     ),
                     TextButton(
@@ -57,7 +68,7 @@ class _BirthdayInputState extends State<BirthdayInput> {
                       },
                       child: Text(
                         AppLocalizations.of(context)!.save,
-                        style: TextStyle(color: Colors.blue, fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(color: Colors.blue, fontSize: AppTextStyles.sizeContent, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
@@ -79,6 +90,9 @@ class _BirthdayInputState extends State<BirthdayInput> {
         child: InputDecorator(
           decoration: InputDecoration(
             labelText: AppLocalizations.of(context)!.birthday,
+            labelStyle: TextStyle(
+              fontSize: AppTextStyles.sizeContent
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -86,7 +100,7 @@ class _BirthdayInputState extends State<BirthdayInput> {
           ),
           child: Text(
             "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}",
-            style: TextStyle(fontSize: 16),
+            style: TextStyle(fontSize: AppTextStyles.sizeContent),
           ),
         ),
       ),

@@ -68,6 +68,7 @@ flutter:
     - assets/imgs/facebook.png
     - assets/imgs/logowelcome.png
     - assets/imgs/logowelcome2.png
+    - assets/imgs/placeholder.png
     - assets/modelsAi/model_final.tflite
     - assets/modelsAi/labels.txt
   #   - images/a_dot_ham.jpeg

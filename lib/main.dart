@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:testfile/l10n/l10n.dart';
-import 'package:testfile/ui/login/login.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:testfile/presentation/screens/login/login.dart';
 
 void main() => runApp(const CancerApp());
 
@@ -33,6 +33,11 @@ class _CancerAppState extends State<CancerApp> {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         useMaterial3: true,
+        textTheme: TextTheme(
+          bodyMedium: TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.normal),
+          bodySmall: TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.normal),
+          titleLarge: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
+        )
       ),
       home: LoginPage(),
       debugShowCheckedModeBanner: false,

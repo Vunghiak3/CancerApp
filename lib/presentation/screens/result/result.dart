@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:testfile/ui/home/home.dart';
-import 'package:testfile/ui/welcompage/welcome.dart';
+import 'package:testfile/presentation/screens/home/home.dart';
+import 'package:testfile/theme/text_styles.dart';
 import 'package:testfile/utils/navigation_helper.dart';
 
 class ResultPage extends StatefulWidget {
@@ -32,14 +32,14 @@ class _ResultPageState extends State<ResultPage> {
       appBar: AppBar(
         leading: IconButton(
             onPressed: (){Navigator.pop(context);},
-            icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black, size: 18,)
+            icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black, size: AppTextStyles.sizeIconSmall,)
         ),
         actions: [
           IconButton(
               onPressed: (){
                 NavigationHelper.nextPageRemoveUntil(context, HomeScreen());
               },
-              icon: Icon(Icons.home, color: Colors.black,)
+              icon: Icon(Icons.home_rounded, color: Colors.black, size: AppTextStyles.sizeIcon,)
           )
         ],
       ),
@@ -51,11 +51,11 @@ class _ResultPageState extends State<ResultPage> {
               child: Column(
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(15),
                     child: Image.file(
                       _image,
                       width: double.infinity,
-                      height: 300,
+                      height: 350,
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -82,17 +82,14 @@ class _ResultPageState extends State<ResultPage> {
                       children: [
                         Text(
                           "Giải pháp:",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                          ),
+                          style: AppTextStyles.title,
                         ),
                         SizedBox(height: 10),
                         Text(
                           "• Tư vấn bác sĩ chuyên khoa.\n"
                               "• Làm xét nghiệm chuyên sâu.\n"
                               "• Tuân thủ phác đồ điều trị.",
-                          style: TextStyle(fontSize: 16),
+                          style: AppTextStyles.content,
                         ),
                       ],
                     ),
@@ -121,10 +118,10 @@ class _ResultPageState extends State<ResultPage> {
                 children: [
                   Text(
                     AppLocalizations.of(context)!.askAi,
-                    style: TextStyle(fontSize: 18, color: Colors.white),
+                    style: TextStyle(fontSize: AppTextStyles.sizeContent, color: Colors.white),
                   ),
-                  SizedBox(width: 5),
-                  Icon(Icons.send, color: Colors.white),
+                  SizedBox(width: 10),
+                  Icon(Icons.send, color: Colors.white, size: AppTextStyles.sizeIconSmall,),
                 ],
               ),
             ),
