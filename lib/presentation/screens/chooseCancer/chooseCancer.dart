@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:testfile/presentation/screens/home/home.dart';
@@ -42,23 +44,33 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        title: Transform.translate(
-            offset: Offset(-20, 0),
-            child: Text(
-              AppLocalizations.of(context)!.selectCancerType,
-              style: AppTextStyles.title,
-            )
+        title: Padding(
+          padding: const EdgeInsets.only(left: 20),
+          child: Text(
+            AppLocalizations.of(context)!.selectCancerType,
+            style: AppTextStyles.title,
+          ),
         ),
         leading: IconButton(
-            onPressed: (){Navigator.pop(context);},
-            icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black, size: AppTextStyles.sizeIconSmall,)
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.black,
+            size: AppTextStyles.sizeIconSmall,
+          ),
         ),
         actions: [
           IconButton(
-              onPressed: (){
-                NavigationHelper.nextPageRemoveUntil(context, HomeScreen());
-              },
-              icon: Icon(Icons.home_rounded, color: Colors.black, size: AppTextStyles.sizeIcon,)
+            onPressed: () {
+              NavigationHelper.nextPageRemoveUntil(context, HomeScreen());
+            },
+            icon: Icon(
+              Icons.home_rounded,
+              color: Colors.black,
+              size: AppTextStyles.sizeIcon,
+            ),
           )
         ],
       ),
@@ -107,7 +119,11 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
                   side: BorderSide(color: Color(0xFF0E70CB)),
                 ),
               ),
-              icon: Icon(Icons.photo_library_outlined, color: Color(0xFF0E70CB), size: AppTextStyles.sizeIconSmall,),
+              icon: Icon(
+                Icons.photo_library_outlined,
+                color: Color(0xFF0E70CB),
+                size: AppTextStyles.sizeIconSmall,
+              ),
               label: Text(
                 AppLocalizations.of(context)!.selectAnotherPhoto,
                 style: TextStyle(
@@ -155,7 +171,8 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
                         ),
                       ],
                       border: Border.all(
-                        color: isSelected ? Color(0xFF0E70CB) : Colors.transparent,
+                        color:
+                            isSelected ? Color(0xFF0E70CB) : Colors.transparent,
                         width: 2,
                       ),
                     ),
@@ -184,11 +201,10 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
             ElevatedButton(
               onPressed: _selectedIndex != -1
                   ? () {
-                checkCancer(
-                  _cancer[_selectedIndex]["title"]!,
-                  _selectedImage,
-                );
-              }
+                      // Instead of directly using the selected cancer type,
+                      // we send the image to the API for prediction.
+                      checkCancer(_selectedImage);
+                    }
                   : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF0E70CB),
@@ -211,19 +227,47 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
   }
 
   Future<File?> _pickImageFromGallery() async {
-    final returnImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final returnImage =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (returnImage != null) {
       return File(returnImage.path);
     }
     return null;
   }
 
-  void checkCancer(String cancer, File image) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ResultPage(cancer: cancer, image: image),
-      ),
+  Future<void> checkCancer(File image) async {
+    // Show a loading indicator while waiting for API response
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(child: CircularProgressIndicator()),
     );
+
+    try {
+      var uri = Uri.parse("http://127.0.0.1:8000/cnn/predict");
+      var request = http.MultipartRequest('POST', uri);
+      request.files.add(await http.MultipartFile.fromPath('image', image.path));
+      var response = await request.send();
+
+      // Dismiss the loading indicator
+      Navigator.of(context).pop();
+
+      if (response.statusCode == 200) {
+        var responseData = await response.stream.bytesToString();
+        var jsonResponse = jsonDecode(responseData);
+        String prediction = jsonResponse["prediction"];
+        NavigationHelper.nextPage(
+            context, ResultPage(image: image, cancer: prediction));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("API Error: ${response.reasonPhrase}")),
+        );
+      }
+    } catch (e) {
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    }
   }
 }
