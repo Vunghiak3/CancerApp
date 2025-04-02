@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:testfile/theme/text_styles.dart';
 
@@ -11,117 +13,56 @@ class MessagePage extends StatefulWidget {
 
 class _MessagePageState extends State<MessagePage> {
   final TextEditingController _messageController = TextEditingController();
-  final List<Map<String, dynamic>> _messages = [
-    {
-      'isBot': true,
-      'text': 'Hello John',
-    },
-    {
-      'isBot': true,
-      'text':
-      'Welcome to HealthAssist Chat!\nI\'m here to help. Choose a topic from the list or type your question below!',
-    },
-    {
-      'isBot': true,
-      'text': '1. General Information about Cancer\n'
-          '2. Symptoms and Early Detection\n'
-          '3. Treatment Options\n'
-          '4. Coping and Support\n'
-          '5. Prevention Tips',
-    },
-  ];
+  final List<Map<String, dynamic>> _messages = [];
 
-  void _sendMessage() {
-    if (_messageController.text.isNotEmpty) {
-      setState(() {
-        _messages.add({
-          'isBot': false,
-          'text': _messageController.text,
+  bool _isLoading = false;
+
+  Future<void> _sendMessage() async {
+    if (_messageController.text.isEmpty) return;
+
+    String userMessage = _messageController.text;
+
+    setState(() {
+      _messages.add({'isBot': false, 'text': userMessage});
+      _isLoading = true;
+    });
+
+    _messageController.clear();
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://localhost:8000/llm/generate'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'prompt': userMessage}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        String botResponse =
+            data['response'] ?? 'Sorry, I could not understand that.';
+        botResponse = botResponse.replaceAll(RegExp(r'<.*?>'), '').trim();
+
+        setState(() {
+          _messages.add({'isBot': true, 'text': botResponse});
         });
+      } else {
+        setState(() {
+          _messages.add({
+            'isBot': true,
+            'text': 'Sorry, something went wrong. Please try again later.'
+          });
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _messages
+            .add({'isBot': true, 'text': 'Error connecting to the server.'});
       });
-      _messageController.clear();
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
-  }
-
-  void _showChatHistory() {
-    List<String> chatHistory = [
-      "Chat ngày 01/03/2025",
-      "Chat ngày 28/02/2025",
-      "Chat ngày 27/02/2025",
-    ];
-
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: "Close",
-      transitionDuration: const Duration(milliseconds: 300),
-      pageBuilder: (_, __, ___) {
-        return Align(
-          alignment: Alignment.centerLeft,
-          child: Material(
-            color: Colors.transparent,
-            child: Container(
-              width: MediaQuery.of(context).size.width * 0.7,
-              height: MediaQuery.of(context).size.height,
-              padding: const EdgeInsets.all(10),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 30,),
-                  Text(
-                      AppLocalizations.of(context)!.chatHistory,
-                      style: AppTextStyles.title,
-                  ),
-                  const Divider(),
-                  Expanded(
-                    child: ListView.separated(
-                        itemBuilder: (context, index){
-                          return ListTile(
-                            title: Text(
-                              chatHistory[index],
-                              style: AppTextStyles.content,
-                            ),
-                            trailing: IconButton(
-                                onPressed: (){},
-                                icon: Icon(Icons.more_horiz_rounded, color: Colors.black, size: AppTextStyles.sizeIcon,)
-                            ),
-                            onTap: () {},
-                          );
-                        },
-                        separatorBuilder: (context, index){
-                          return const Divider(
-                            color: Colors.grey,
-                            thickness: 1,
-                            indent: 15,
-                            endIndent: 15,
-                          );
-                        },
-                        itemCount: chatHistory.length
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-      transitionBuilder: (_, anim, __, child) {
-        return SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(-1, 0),
-            end: Offset.zero,
-          ).animate(anim),
-          child: child,
-        );
-      },
-    );
   }
 
   @override
@@ -130,7 +71,7 @@ class _MessagePageState extends State<MessagePage> {
       appBar: AppBar(
         centerTitle: false,
         title: Transform.translate(
-          offset: Offset(-20, 0),
+          offset: const Offset(-20, 0),
           child: Text(
             AppLocalizations.of(context)!.chat,
             style: AppTextStyles.title,
@@ -139,23 +80,37 @@ class _MessagePageState extends State<MessagePage> {
         backgroundColor: Colors.white,
         elevation: 1,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black, size: AppTextStyles.sizeIconSmall,),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded,
+              color: Colors.black, size: AppTextStyles.sizeIconSmall),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          IconButton(
-            onPressed: _showChatHistory,
-            icon: const Icon(Icons.short_text_rounded, color: Colors.black, size: AppTextStyles.sizeIcon),
-          )
-        ],
       ),
       body: Column(
         children: [
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(10),
-              itemCount: _messages.length,
+              itemCount: _messages.length + (_isLoading ? 1 : 0),
               itemBuilder: (context, index) {
+                if (_isLoading && index == _messages.length) {
+                  return Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          Image.asset(
+                            'assets/imgs/logowelcome.png',
+                            width: 30,
+                          ),
+                          const SizedBox(width: 10),
+                          const CircularProgressIndicator(),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+
                 final message = _messages[index];
                 return Align(
                   alignment: message['isBot']
@@ -167,7 +122,7 @@ class _MessagePageState extends State<MessagePage> {
                         : MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (message['isBot']) // Chỉ hiện ảnh khi là tin nhắn của bot
+                      if (message['isBot'])
                         Padding(
                           padding: const EdgeInsets.only(right: 8.0),
                           child: Image.asset(
@@ -177,20 +132,22 @@ class _MessagePageState extends State<MessagePage> {
                         ),
                       Container(
                         constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * 0.8, // Chiều rộng tối đa là 80% màn hình
+                          maxWidth: MediaQuery.of(context).size.width * 0.8,
                         ),
                         padding: const EdgeInsets.all(12),
                         margin: const EdgeInsets.symmetric(vertical: 5),
                         decoration: BoxDecoration(
-                          color: message['isBot'] ? Colors.grey[200] : Colors.blue,
+                          color:
+                              message['isBot'] ? Colors.grey[200] : Colors.blue,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
                           message['text'],
                           style: TextStyle(
-                            color: message['isBot'] ? Colors.black : Colors.white,
-                            fontSize: AppTextStyles.sizeContent
-                          ),
+                              color: message['isBot']
+                                  ? Colors.black
+                                  : Colors.white,
+                              fontSize: AppTextStyles.sizeContent),
                         ),
                       ),
                     ],
@@ -218,7 +175,8 @@ class _MessagePageState extends State<MessagePage> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.send, color: Colors.blue, size: AppTextStyles.sizeIcon,),
+                  icon: const Icon(Icons.send,
+                      color: Colors.blue, size: AppTextStyles.sizeIcon),
                   onPressed: _sendMessage,
                 ),
               ],
