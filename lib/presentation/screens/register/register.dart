@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:testfile/presentation/screens/login/login.dart';
+import 'package:testfile/presentation/widgets/InputInfor.dart';
+import 'package:testfile/services/auth.dart';
 import 'package:testfile/theme/text_styles.dart';
 import 'package:testfile/utils/navigation_helper.dart';
 
@@ -13,9 +17,76 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  bool _isPasswordVisible = false;
-  bool _isConfirmPasswordVisible = false;
-  double sizeLogo = 20;
+  bool _isLoading = false;
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
+
+  Map<String, String> errors = {
+    'name': '',
+    'email': '',
+    'password': '',
+    'confirm_password': '',
+  };
+
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+
+    super.dispose();
+  }
+
+  void register() async{
+    setState(() {
+      _isLoading = true;
+      errors = {'name': '', 'email': '', 'password': '', 'confirm_password': ''};
+    });
+
+    try{
+      final authService = AuthService();
+      await authService.register(
+        nameController.text.trim(),
+        emailController.text.trim(),
+        passwordController.text.trim(),
+        confirmPasswordController.text.trim(),
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Đăng ký thành công!')),
+      );
+
+      NavigationHelper.nextPageRemoveUntil(context, LoginPage());
+    }catch(e){
+      print(e);
+      final errorResponse = jsonDecode(e.toString())['detail'];
+      handleError(errorResponse);
+    }finally{
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void handleError(dynamic errorResponse){
+    String error = '';
+    if(errorResponse is List){
+      error = errorResponse[0]['msg'];
+      final field = errorResponse[0]['loc'][1];
+      setState(() {
+        errors[field] = '$error!';
+      });
+    }else{
+      error = errorResponse.toString();
+      setState(() {
+        errors['email'] = '$error!';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,9 +107,6 @@ class _RegisterPageState extends State<RegisterPage> {
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 20),
             child: Container(
-              height: double.infinity,
-              margin: EdgeInsets.symmetric(vertical: 90),
-              width: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
@@ -54,6 +122,7 @@ class _RegisterPageState extends State<RegisterPage> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
@@ -61,20 +130,42 @@ class _RegisterPageState extends State<RegisterPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildHeader(),
+                          getHeader(),
                           const SizedBox(height: 10,),
-                          _buildInputField(AppLocalizations.of(context)!.name, TextInputType.text, false),
+                          InputInfor(
+                            label: AppLocalizations.of(context)!.name,
+                            inputType: TextInputType.text,
+                            controller: nameController,
+                            textError: errors['name'],
+                          ),
                           const SizedBox(height: 10,),
-                          _buildInputField(AppLocalizations.of(context)!.email, TextInputType.emailAddress, false),
+                          InputInfor(
+                            label: AppLocalizations.of(context)!.email,
+                            inputType: TextInputType.emailAddress,
+                            controller: emailController,
+                            textError: errors['email'],
+                          ),
                           const SizedBox(height: 10,),
-                          _buildInputField(AppLocalizations.of(context)!.password, TextInputType.visiblePassword, true),
+                          InputInfor(
+                            label: AppLocalizations.of(context)!.password,
+                            inputType: TextInputType.visiblePassword,
+                            isPassword: true,
+                            controller: passwordController,
+                            textError: errors['password'],
+                          ),
                           const SizedBox(height: 10,),
-                          _buildInputField(AppLocalizations.of(context)!.confirmPassword, TextInputType.visiblePassword, true),
+                          InputInfor(
+                            label: AppLocalizations.of(context)!.confirmPassword,
+                            inputType: TextInputType.visiblePassword,
+                            isPassword: true,
+                            controller: confirmPasswordController,
+                            textError: errors['confirm_password'],
+                          ),
                           const SizedBox(height: 20,),
-                          ElevatedButton(
-                            onPressed: (){
-                              NavigationHelper.nextPageRemoveUntil(context, LoginPage());
-                            },
+                          _isLoading
+                            ? Center(child: CircularProgressIndicator(),)
+                            : ElevatedButton(
+                            onPressed: register,
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: Color(0xFF0E70CB),
                                 minimumSize: Size(double.infinity, 50),
@@ -105,7 +196,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ],
                       ),
                     ),
-                    _buildSocialButtons(),
+                    getSocialButtons(),
                   ],
                 ),
               ),
@@ -116,7 +207,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildHeader(){
+  Widget getHeader(){
     return Center(
       child: Column(
         children: [
@@ -159,38 +250,9 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildInputField(String label, TextInputType inputType, bool isPassword){
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: AppTextStyles.content,
-        ),
-        TextField(
-          obscureText: isPassword && !_isPasswordVisible,
-          style: AppTextStyles.content,
-          keyboardType: inputType,
-          decoration: InputDecoration(
-            border: const OutlineInputBorder(),
-            suffixIcon: isPassword ? IconButton(
-              icon: Icon(
-                _isPasswordVisible
-                    ? Icons.visibility
-                    : Icons.visibility_off,
-                size: AppTextStyles.sizeIcon,
-              ),
-              onPressed: () => setState(() {
-                _isPasswordVisible = !_isPasswordVisible;
-              }),
-            ) : null,
-          ),
-        )
-      ],
-    );
-  }
+  Widget getSocialButtons(){
+    double sizeLogo = 20;
 
-  Widget _buildSocialButtons(){
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [

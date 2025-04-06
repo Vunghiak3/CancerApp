@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:testfile/presentation/screens/home/home.dart';
 import 'package:testfile/presentation/screens/register/register.dart';
-import 'package:testfile/presentation/widgets/InputTextField.dart';
+import 'package:testfile/presentation/widgets/InputInfor.dart';
+import 'package:testfile/services/auth.dart';
 import 'package:testfile/theme/text_styles.dart';
 import 'package:testfile/utils/navigation_helper.dart';
 
@@ -15,8 +18,62 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  bool _isPasswordVisible = false;
-  double sizeLogo = 20;
+  bool _isLoading = false;
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
+  Map<String, String> errors = {
+    'email': '',
+    'password': '',
+  };
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+
+    super.dispose();
+  }
+
+  void login() async{
+    setState(() {
+      _isLoading = true;
+      errors = {'email': '', 'password': ''};
+    });
+
+    String email = emailController.text.trim();
+    String password = passwordController.text.trim();
+
+    try{
+      final authService = AuthService();
+      await authService.login(email, password);
+
+      NavigationHelper.nextPageReplace(context, HomeScreen());
+    }catch(e){
+      final errorResponse = jsonDecode(e.toString())['detail'];
+      handleError(errorResponse);
+    }finally{
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void handleError(dynamic errorResponse){
+    String error= '';
+    if(errorResponse is List){
+      error = errorResponse[0]['msg'];
+      final field = errorResponse[0]['loc'][1];
+      setState(() {
+        errors[field] = '$error!';
+      });
+    }else{
+      error = errorResponse.toString();
+      setState(() {
+        errors['password'] = '$error!';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,33 +109,41 @@ class _LoginPageState extends State<LoginPage> {
                 ],
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   children: [
                     _buildHeader(),
                     const SizedBox(height: 10),
-                    _buildInputField(AppLocalizations.of(context)!.email, TextInputType.emailAddress, false),
+                    InputInfor(
+                      label: AppLocalizations.of(context)!.email,
+                      inputType: TextInputType.emailAddress,
+                      controller: emailController,
+                      textError: errors['email'],
+                    ),
                     const SizedBox(height: 20),
-                    _buildInputField(AppLocalizations.of(context)!.password, TextInputType.visiblePassword, true),
+                    InputInfor(
+                      label: AppLocalizations.of(context)!.password,
+                      inputType: TextInputType.visiblePassword,
+                      isPassword: true,
+                      controller: passwordController,
+                      textError: errors['password'],
+                    ),
                     const SizedBox(height: 30),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          NavigationHelper.nextPageReplace(context, HomeScreen());
-                        },
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF0E70CB),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)),
-                            minimumSize: Size(double.infinity, 50)),
-                        child: Text(
-                          AppLocalizations.of(context)!.login,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: AppTextStyles.sizeTitle,
-                            fontWeight: FontWeight.bold,
-                          ),
+                    _isLoading
+                      ? Center(child: CircularProgressIndicator(),)
+                      : ElevatedButton(
+                      onPressed: login,
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF0E70CB),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                          minimumSize: Size(double.infinity, 50)),
+                      child: Text(
+                        AppLocalizations.of(context)!.login,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: AppTextStyles.sizeTitle,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
@@ -98,40 +163,6 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildInputField(String label, TextInputType inputType, bool isPassword){
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: AppTextStyles.content,
-          ),
-          TextField(
-            obscureText: isPassword && !_isPasswordVisible,
-            style: AppTextStyles.content,
-            keyboardType: inputType,
-            decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              suffixIcon: isPassword ? IconButton(
-                icon: Icon(
-                  _isPasswordVisible
-                      ? Icons.visibility
-                      : Icons.visibility_off,
-                  size: AppTextStyles.sizeIcon,
-                ),
-                onPressed: () => setState(() {
-                  _isPasswordVisible = !_isPasswordVisible;
-                }),
-              ) : null,
-            ),
-          )
-        ],
       ),
     );
   }
@@ -180,6 +211,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildSocialButtons(){
+    double sizeLogo = 20;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -213,8 +246,4 @@ class _LoginPageState extends State<LoginPage> {
       ],
     );
   }
-}
-
-void returnPage(BuildContext context) {
-  Navigator.pop(context);
 }
