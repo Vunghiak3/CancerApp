@@ -41,7 +41,7 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
-  void register() async{
+  void fetchRegister() async{
     setState(() {
       _isLoading = true;
       errors = {'name': '', 'email': '', 'password': '', 'confirm_password': ''};
@@ -165,7 +165,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           _isLoading
                             ? Center(child: CircularProgressIndicator(),)
                             : ElevatedButton(
-                            onPressed: register,
+                            onPressed: fetchRegister,
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: Color(0xFF0E70CB),
                                 minimumSize: Size(double.infinity, 50),

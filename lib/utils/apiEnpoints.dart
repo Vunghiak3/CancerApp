@@ -1,14 +1,17 @@
 class ApiEndpoints {
   static final String baseUrl = 'http://10.0.2.2:8000';
-  static final _AuthEndpoints auth = _AuthEndpoints();
-  static final _Userenpoints user = _Userenpoints();
+  static final AuthEndpoints auth = AuthEndpoints();
+  static final Userendpoints user = Userendpoints();
 }
 
-class _AuthEndpoints {
-  final String register = '/auths/register';
-  final String login = '/auths/login';
+class AuthEndpoints {
+  final String register = '/auth/register';
+  final String login = '/auth/login';
+  final String loginGoogle = '/auth/login-google';
 }
 
-class _Userenpoints {
+class Userendpoints {
   final String logout = '/users/logout';
+  final String updatePassword = '/users/update_password';
+  final String getUser = '/users/get-user';
 }

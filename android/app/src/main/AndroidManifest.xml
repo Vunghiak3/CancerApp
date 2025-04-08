@@ -11,7 +11,7 @@
 
 
     <application
-        android:label="testfile"
+        android:label="Curely"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

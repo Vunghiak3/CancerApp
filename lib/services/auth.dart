@@ -27,7 +27,7 @@ class AuthService{
         throw (response.body);
       }
     }catch(e){
-      rethrow; (e);
+      rethrow;
     }
   }
 
@@ -53,7 +53,7 @@ class AuthService{
         throw (response.body);
       }
     }catch(e){
-      rethrow; (e);
+      rethrow;
     }
   }
 
@@ -71,6 +71,35 @@ class AuthService{
   // Hàm để xóa User và idToken khỏi Secure Storage
   Future<void> deleteUser() async {
     await _storage.delete(key: 'user');
+  }
+
+  Future<void> loginGoogle(String idToken) async{
+    final url = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.auth.loginGoogle);
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+        "id_token": idToken,
+        }),
+      );
+
+      if(response.statusCode == 200){
+        final responseBody = jsonDecode(response.body);
+        await saveUser(responseBody);
+
+        return responseBody;
+      }else{
+        throw response.body;
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+  
+  Future<void> loginFacebook() async{
+
   }
 
   Future<void> logout() async{

@@ -23,6 +23,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     super.dispose();
   }
 
+  void changePassword() async {
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,7 +72,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             Align(
               alignment: Alignment.center,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: changePassword,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF0E70CB),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

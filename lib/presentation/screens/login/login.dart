@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:testfile/presentation/screens/home/home.dart';
 import 'package:testfile/presentation/screens/register/register.dart';
 import 'package:testfile/presentation/widgets/InputInfor.dart';
@@ -35,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void login() async{
+  void fetchLogin() async{
     setState(() {
       _isLoading = true;
       errors = {'email': '', 'password': ''};
@@ -56,6 +57,41 @@ class _LoginPageState extends State<LoginPage> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  void fetchLoginGoogle() async{
+    final GoogleSignIn googleSignIn = GoogleSignIn(
+      scopes: ['email', 'profile'],
+      serverClientId: '968583952916-4viga6hcqn696fa3devfo0f7rt05s5p3.apps.googleusercontent.com'
+    );
+    await googleSignIn.signOut();
+    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+    if(googleUser == null){
+      print('Dang nhap bi huy!');
+      return;
+    }
+
+    final GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
+    final idToken = googleAuth.idToken;
+
+    if(idToken == null){
+      print('Khong lay duoc token id!');
+      return;
+    }
+
+    try {
+      final authService = AuthService();
+      await authService.loginGoogle(idToken!);
+      NavigationHelper.nextPageReplace(context, HomeScreen());
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Đăng nhập thất bại!'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -132,7 +168,7 @@ class _LoginPageState extends State<LoginPage> {
                     _isLoading
                       ? Center(child: CircularProgressIndicator(),)
                       : ElevatedButton(
-                      onPressed: login,
+                      onPressed: fetchLogin,
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFF0E70CB),
                           shape: RoundedRectangleBorder(
@@ -217,7 +253,7 @@ class _LoginPageState extends State<LoginPage> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         ElevatedButton(
-          onPressed: () {},
+          onPressed: fetchLoginGoogle,
           style: ElevatedButton.styleFrom(
               backgroundColor: Color(0xFFEEEEEE),
               shape: RoundedRectangleBorder(
