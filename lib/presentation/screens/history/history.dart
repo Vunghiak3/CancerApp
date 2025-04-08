@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:testfile/data/model/HistoryDiagnose.dart';
 import 'package:testfile/presentation/widgets/GetProgressBar.dart';
-import 'package:http/http.dart' as http;
+import 'package:testfile/services/auth.dart';
+import 'package:testfile/services/user.dart';
 import 'package:testfile/theme/text_styles.dart';
 
 class HistoryPage extends StatefulWidget {
@@ -14,82 +14,37 @@ class HistoryPage extends StatefulWidget {
   State<HistoryPage> createState() => _HistoryPageState();
 }
 
-class _HistoryPageState extends State<HistoryPage> {
+class _HistoryPageState extends State<HistoryPage>{
+  List<dynamic>? historyData;
 
-  final List<HistoryDiagnose> _history = [
-    HistoryDiagnose(
-      id: "1",
-      title: "Title 1",
-      content: "Lịch sử 1",
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3ptSvyhlI6mkEM1kkVUlqP15QN4_8MHg5uA&s",
-      confidenceScore: 95.0,
-    ),
-    HistoryDiagnose(
-      id: "2",
-      title: "Title 2",
-      content: "Lịch sử 2",
-      image: "ádfasf",
-      confidenceScore: 89.5,
-    ),
-    HistoryDiagnose(
-      id: "3",
-      title: "Title 3",
-      content: "Lịch sử 3",
-      image: "ádf",
-      confidenceScore: 92.3,
-    ),
-    HistoryDiagnose(
-      id: "4",
-      title: "Title 4",
-      content: "Lịch sử 4",
-      image: "https://prod-images-static.radiopaedia.org/images/23495/downloaded_image20241008-104595-4b847r_big_gallery.jpeg",
-      confidenceScore: 87.2,
-    ),
-    HistoryDiagnose(
-      id: "4",
-      title: "Title 4",
-      content: "Lịch sử 4",
-      image: "https://prod-images-static.radiopaedia.org/images/23495/downloaded_image20241008-104595-4b847r_big_gallery.jpeg",
-      confidenceScore: 87.2,
-    ),
-    HistoryDiagnose(
-      id: "4",
-      title: "Title 4",
-      content: "Lịch sử 4",
-      image: "https://prod-images-static.radiopaedia.org/images/23495/downloaded_image20241008-104595-4b847r_big_gallery.jpeg",
-      confidenceScore: 87.2,
-    ),
-    HistoryDiagnose(
-      id: "4",
-      title: "Title 4",
-      content: "Lịch sử 4",
-      image: "https://prod-images-static.radiopaedia.org/images/23495/downloaded_image20241008-104595-4b847r_big_gallery.jpeg",
-      confidenceScore: 87.2,
-    ),
-    HistoryDiagnose(
-      id: "4",
-      title: "Title 4",
-      content: "Lịch sử 4",
-      image: "https://prod-images-static.radiopaedia.org/images/23495/downloaded_image20241008-104595-4b847r_big_gallery.jpeg",
-      confidenceScore: 87.2,
-    ),
-    HistoryDiagnose(
-      id: "4",
-      title: "Title 4",
-      content: "Lịch sử 4",
-      image: "https://prod-images-static.radiopaedia.org/images/23495/downloaded_image20241008-104595-4b847r_big_gallery.jpeg",
-      confidenceScore: 87.2,
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    loadHistory();
+  }
 
-  Future<List<HistoryDiagnose>> fetchHistory() async{
-    final response = await http.get(Uri.parse('https://api.example.com/history'));
+  Future<List<dynamic>> fetchHistory() async{
+    try{
+      String idToken = await AuthService().getIdToken();
+      final response = await UserService().history(idToken);
+      return response;
+    }catch(e){
+      throw Exception(e);
+    }
+  }
 
-    if (response.statusCode == 200) {
-      List<dynamic> jsonData = json.decode(response.body);
-      return jsonData.map((item) => HistoryDiagnose.fromJson(item)).toList();
-    } else {
-      throw Exception("Lỗi khi tải dữ liệu");
+  void loadHistory() async {
+    historyData = await fetchHistory();
+    setState(() {});
+  }
+
+  Future<Map<String, dynamic>> fetchDeleteHistory(String historyId) async{
+    try{
+      String idToken = await AuthService().getIdToken();
+      final response = await UserService().deleteHistoryById(idToken, historyId);
+      return response;
+    }catch(e){
+      throw Exception(e);
     }
   }
 
@@ -118,31 +73,24 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   Widget getBody(){
-    bool showLoading = _history.isEmpty;
-    return showLoading ? GetProgressBar() : getListView();
-    // return FutureBuilder<List<HistoryDiagnose>>(
-    //   future: fetchHistory(), // Gọi API
-    //   builder: (context, snapshot) {
-    //     if (snapshot.connectionState == ConnectionState.waiting) {
-    //       return GetProgressBar(); // Hiển thị loading
-    //     } else if (snapshot.hasError) {
-    //       return Center(child: Text("Lỗi: ${snapshot.error}")); // Xử lý lỗi
-    //     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-    //       return Center(child: Text("Không có dữ liệu lịch sử"));
-    //     }
-    //
-    //     // Dữ liệu đã tải xong, hiển thị danh sách
-    //     return getListView();
-    //   },
-    // );
+    if (historyData == null) {
+      return GetProgressBar();
+    }
+
+    if (historyData!.isEmpty) {
+      return Center(child: Text("Không có dữ liệu lịch sử"));
+    }
+
+    return getListView();
   }
 
   ListView getListView(){
     return ListView.separated(
         itemBuilder: (context, position) {
+          final diagnose = historyData![position] as Map<String, dynamic>;
           return _HistoryItemSection(
-              parent: this,
-              historyDiagnose: _history[position]
+            parent: this,
+            data: diagnose,
           );
         },
         separatorBuilder: (context, index){
@@ -153,13 +101,13 @@ class _HistoryPageState extends State<HistoryPage> {
             endIndent: 24,
           );
         },
-        itemCount: _history.length,
+        itemCount: historyData!.length,
         shrinkWrap: true,
     );
   }
 
-  void showDialogItem(){
-    showDialog(
+  void showDialogItem(String diagnosisId) async{
+    final confirm = await showDialog<bool>(
       context: context,
       builder: (context){
         return AlertDialog(
@@ -183,7 +131,7 @@ class _HistoryPageState extends State<HistoryPage> {
             ),
             TextButton(
                 onPressed: (){
-                  Navigator.pop(context);
+                  Navigator.pop(context, true);
                 },
                 child: Text(
                   AppLocalizations.of(context)!.delete,
@@ -194,16 +142,42 @@ class _HistoryPageState extends State<HistoryPage> {
         );
       }
     );
+
+    if(confirm == true){
+      showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => const Center(child: CircularProgressIndicator(),)
+      );
+
+      try {
+        print(diagnosisId);
+        await fetchDeleteHistory(diagnosisId);
+        Navigator.of(context).pop(); // Tắt loading
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Xoa thanh cong')),
+        );
+
+        loadHistory(); // Tải lại dữ liệu
+      } catch (e) {
+        Navigator.of(context).pop(); // Tắt loading
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Xoá thất bại: $e")),
+        );
+        throw Exception(e);
+      }
+    }
   }
 }
 
 class _HistoryItemSection extends StatelessWidget{
   final _HistoryPageState parent;
-  final HistoryDiagnose historyDiagnose;
+  final Map<String, dynamic> data;
 
   const _HistoryItemSection({
     required this.parent,
-    required this.historyDiagnose,
+    required this.data,
   });
 
   @override
@@ -217,7 +191,7 @@ class _HistoryItemSection extends StatelessWidget{
         borderRadius: BorderRadius.circular(8),
         child: FadeInImage.assetNetwork(
           placeholder: "assets/imgs/placeholder.png",
-          image: historyDiagnose.image,
+          image: data["mriImageUrl"],
           width: 48,
           height: 48,
           fit: BoxFit.cover,
@@ -232,11 +206,11 @@ class _HistoryItemSection extends StatelessWidget{
         ),
       ),
       title: Text(
-        historyDiagnose.title,
+        data["aiPrediction"] ?? "Unknown",
         style: AppTextStyles.content,
       ),
       subtitle: Text(
-        "Percent: ${historyDiagnose.confidenceScore}",
+        "Percent: ${data["confidenceScore"]}",
         style: AppTextStyles.subtitle,
       ),
       trailing: PopupMenuButton<String>(
@@ -244,7 +218,7 @@ class _HistoryItemSection extends StatelessWidget{
           color: Color(0xfff5f5f5),
           onSelected: (value){
             if(value == 'delete'){
-              parent.showDialogItem();
+              parent.showDialogItem(data["diagnosisId"]);
             }
           },
           shape: RoundedRectangleBorder(
