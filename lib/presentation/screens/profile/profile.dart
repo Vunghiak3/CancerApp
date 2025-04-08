@@ -32,9 +32,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<Map<String, dynamic>> fetchUser() async {
     try {
-      String? userJson = await AuthService().getUser();
-      Map<String, dynamic> user = jsonDecode(userJson!);
-      String idToken = user['idToken'];
+      String idToken = await AuthService().getIdToken();
 
       final res = await UserService().getUser(idToken);
       return res;
@@ -66,11 +64,21 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void fetchLogout() async{
     try {
-      await AuthService().logout();
+      String idToken = await AuthService().getIdToken();
+      print(idToken);
+      await AuthService().logout(idToken);
+      print(idToken);
       NavigationHelper.nextPageRemoveUntil(context, LoginPage());
     } catch (e) {
       print('Logout failed: $e');
     }
+  }
+
+  void getIdToken() async{
+    String idToken = await AuthService().getIdToken();
+    final user = await AuthService().getUser();
+    print(idToken);
+    print(user);
   }
 
   @override
@@ -179,7 +187,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   bottom: -15,
                   right: -15,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: getIdToken,
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.all(0),
                       backgroundColor: Color(0xFFD9D9D9),

@@ -73,6 +73,13 @@ class AuthService{
     await _storage.delete(key: 'user');
   }
 
+  Future<String> getIdToken() async{
+    String? userJson = await AuthService().getUser();
+    Map<String, dynamic> user = jsonDecode(userJson!);
+    String idToken = user['idToken'];
+    return idToken;
+  }
+
   Future<void> loginGoogle(String idToken) async{
     final url = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.auth.loginGoogle);
 
@@ -87,6 +94,7 @@ class AuthService{
 
       if(response.statusCode == 200){
         final responseBody = jsonDecode(response.body);
+        responseBody['idToken'] = idToken;
         await saveUser(responseBody);
 
         return responseBody;
@@ -102,7 +110,25 @@ class AuthService{
 
   }
 
-  Future<void> logout() async{
+  Future<void> logout(String idToken) async{
+    final url = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.admin.signout);
 
+    try{
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $idToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        await AuthService().deleteUser();
+      } else {
+        throw (response.body);
+      }
+    }catch(e){
+      rethrow;
+    }
   }
 }
