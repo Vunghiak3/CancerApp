@@ -23,6 +23,7 @@ class UserEndpoints {
   final String createSession = '/llm/create_session';
   final String getSession = '/llm/user/session';
   final String getSessionMessages = '/llm/session/{session_id}/messages';
+  final String diagnoses = '/cnn/predict';
 }
 
 class AdminEndpoints {
