@@ -3,13 +3,19 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import 'package:testfile/presentation/screens/chooseCancer/chooseCancer.dart';
 import 'package:testfile/presentation/screens/history/history.dart';
 import 'package:testfile/presentation/screens/message/message.dart';
 import 'package:testfile/presentation/screens/profile/profile.dart';
-import 'package:testfile/theme/text_styles.dart';
+
+import 'package:testfile/services/news.dart';
+import 'package:testfile/model/news.dart';
 import 'package:testfile/utils/navigation_helper.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:testfile/theme/text_styles.dart';
+
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,13 +26,28 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
-  final List<Widget> _tabs = [
-    HomePage(),
-    Container(),
-    Container(),
-    HistoryPage(),
-    ProfilePage()
-  ];
+  late Future<List<NewsArticle>> _newsFuture;
+
+  final List<Widget> _tabs = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _newsFuture = NewsService.fetchHealthNews();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_tabs.isEmpty) {
+      _tabs.add(_buildHomeTab());
+      _tabs.add(Container());
+      _tabs.add(Container());
+      _tabs.add(HistoryPage());
+      _tabs.add(ProfilePage());
+    }
+  }
 
   void _onItemTapped(int index) {
     if (index == 1) {
@@ -64,24 +85,28 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: _onItemTapped,
           items: [
             BottomNavigationBarItem(
-                icon: _selectedIndex == 0 ? Icon(Icons.home_rounded,) : Icon(Icons.home_outlined,),
-                label: AppLocalizations.of(context)!.home
+              icon: _selectedIndex == 0
+                  ? Icon(Icons.home_rounded)
+                  : Icon(Icons.home_outlined),
+              label: AppLocalizations.of(context)!.home,
             ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.message_outlined,),
-                label: AppLocalizations.of(context)!.chat
+              icon: Icon(Icons.message_outlined),
+              label: AppLocalizations.of(context)!.chat,
             ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.file_upload_rounded, color: Colors.red,),
-                label: AppLocalizations.of(context)!.diagnose,
+              icon: Icon(Icons.file_upload_rounded, color: Colors.red),
+              label: AppLocalizations.of(context)!.diagnose,
             ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.history_rounded,),
-                label: AppLocalizations.of(context)!.history
+              icon: Icon(Icons.history_rounded),
+              label: AppLocalizations.of(context)!.history,
             ),
             BottomNavigationBarItem(
-                icon: _selectedIndex == _tabs.length - 1 ? Icon(Icons.person_rounded,) :Icon(Icons.person_outline,),
-                label: AppLocalizations.of(context)!.profile
+              icon: _selectedIndex == _tabs.length - 1
+                  ? Icon(Icons.person_rounded)
+                  : Icon(Icons.person_outline),
+              label: AppLocalizations.of(context)!.profile,
             ),
           ],
         ),
@@ -89,12 +114,90 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _showImagePickerDialog(){
+  Widget _buildHomeTab() {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              AppLocalizations.of(context)!.welcomeTitle,
+              style: TextStyle(
+                  color: Color(0xFF0E70CB),
+                  fontSize: 44,
+                  fontWeight: FontWeight.bold,
+                  fontStyle: FontStyle.italic),
+            ),
+            const SizedBox(width: 10),
+            Image.asset('assets/imgs/logowelcome2.png',
+                color: Color(0xFF0E70CB), width: 48, height: 48),
+          ],
+        ),
+      ),
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _FeatureBox(
+                  icon: Icons.health_and_safety,
+                  label: "AI Diagnosis",
+                  onTap: () {
+                    _showImagePickerDialog();
+                  },
+                ),
+                _FeatureBox(
+                  icon: Icons.chat,
+                  label: "Chat With AI",
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => MessagePage()),
+                    );
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Text("Health News",
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            FutureBuilder<List<NewsArticle>>(
+              future: _newsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Text("Error: \${snapshot.error}");
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Text("No news available.");
+                } else {
+                  return Column(
+                    children: snapshot.data!
+                        .map((article) => _NewsCard(article: article))
+                        .toList(),
+                  );
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showImagePickerDialog() {
     int previousIndex = _selectedIndex;
 
     showDialog(
         context: context,
-        builder: (BuildContext context){
+        builder: (BuildContext context) {
           return AlertDialog(
             backgroundColor: Colors.white,
             title: Text(
@@ -106,21 +209,29 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 ListTile(
                   leading: const Icon(Icons.photo_library, color: Colors.blue),
-                  title: Text(AppLocalizations.of(context)!.googlePhotos, style: AppTextStyles.content,),
+                  title: Text(
+                    AppLocalizations.of(context)!.googlePhotos,
+                    style: AppTextStyles.content,
+                  ),
                   onTap: () async {
-                      File? image = await _pickImageFromGallery();
-                      if(image != null){
-                        NavigationHelper.nextPage(context, ChooseCancerPage(selectedImage: image));
-                      }
-                    },
+                    File? image = await _pickImageFromGallery();
+                    if (image != null) {
+                      NavigationHelper.nextPage(
+                          context, ChooseCancerPage(selectedImage: image));
+                    }
+                  },
                 ),
                 ListTile(
                   leading: const Icon(Icons.image, color: Colors.green),
-                  title: Text(AppLocalizations.of(context)!.libary, style: AppTextStyles.content,),
+                  title: Text(
+                    AppLocalizations.of(context)!.libary,
+                    style: AppTextStyles.content,
+                  ),
                   onTap: () async {
                     File? image = await _pickImageFromFiles();
-                    if(image != null){
-                      NavigationHelper.nextPage(context, ChooseCancerPage(selectedImage: image));
+                    if (image != null) {
+                      NavigationHelper.nextPage(
+                          context, ChooseCancerPage(selectedImage: image));
                     }
                   },
                 ),
@@ -137,17 +248,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Text(
                     AppLocalizations.of(context)!.cancel,
                     style: AppTextStyles.cancel,
-                  )
-              )
+                  ))
             ],
           );
-        }
-    );
+        });
   }
 
-  Future _pickImageFromGallery() async{
-    final returnImage = await ImagePicker().pickImage(source: ImageSource.gallery);
-
+  Future<File?> _pickImageFromGallery() async {
+    final returnImage =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (returnImage != null) {
       return File(returnImage.path);
     }
@@ -155,10 +264,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<File?> _pickImageFromFiles() async {
-    final FilePickerResult? result = await FilePicker.platform.pickFiles(
-      // type: FileType.image,  // Chỉ cho phép chọn ảnh
-    );
-
+    final FilePickerResult? result = await FilePicker.platform.pickFiles();
     if (result != null) {
       return File(result.files.single.path!);
     }
@@ -166,35 +272,111 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class _FeatureBox extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _FeatureBox(
+      {required this.icon, required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        automaticallyImplyLeading: false,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.4,
+        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+        decoration: BoxDecoration(
+          color: Color(0xFFEDF4FF),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)],
+        ),
+        child: Column(
           children: [
-            Text(
-              AppLocalizations.of(context)!.welcomeTitle,
-              style: TextStyle(
-                color: Color(0xFF0E70CB),
-                fontSize: 44,
-                fontWeight: FontWeight.bold,
-                fontStyle: FontStyle.italic
-              ),
-            ),
-            const SizedBox(width: 10,),
-            Image.asset('assets/imgs/logowelcome2.png', color: Color(0xFF0E70CB), width: 48, height: 48,)
+            Icon(icon, size: 40, color: Color(0xFF0E70CB)),
+            const SizedBox(height: 10),
+            Text(label,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
           ],
         ),
       ),
-      backgroundColor: Colors.white,
     );
   }
 }
 
+class _NewsCard extends StatelessWidget {
+  final NewsArticle article;
 
+  const _NewsCard({required this.article});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () async {
+        final url = Uri.parse(article.link);
+        if (await canLaunchUrl(url)) {
+          await launchUrl(url);
+        }
+      },
+      child: Card(
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(16)),
+              child: article.imageUrl != null && article.imageUrl.isNotEmpty
+                  ? Image.network(
+                      article.imageUrl,
+                      height: 180,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return _placeholderImage();
+                      },
+                    )
+                  : _placeholderImage(),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    article.title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    article.description,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _placeholderImage() {
+    return Container(
+      height: 180,
+      width: double.infinity,
+      color: Colors.grey[300],
+      child: const Icon(
+        Icons.image_not_supported,
+        size: 48,
+        color: Colors.grey,
+      ),
+    );
+  }
+}

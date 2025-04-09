@@ -43,6 +43,8 @@ dependencies:
   google_sign_in: ^6.3.0
   shimmer: ^3.0.0
   uuid: ^4.0.0
+  url_launcher: ^6.1.7
+  flutter_dotenv: ^5.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -74,6 +76,7 @@ flutter:
     - assets/imgs/placeholder.png
     - assets/modelsAi/model_final.tflite
     - assets/modelsAi/labels.txt
+    - .env
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
