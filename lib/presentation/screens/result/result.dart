@@ -1,15 +1,16 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:testfile/data/brainTumorData.dart';
 import 'package:testfile/presentation/screens/home/home.dart';
+import 'package:testfile/presentation/screens/message/message.dart';
 import 'package:testfile/theme/text_styles.dart';
 import 'package:testfile/utils/navigation_helper.dart';
 
 class ResultPage extends StatefulWidget {
   final File image;
-  final String cancer;
-
-  const ResultPage({super.key, required this.image, required this.cancer});
+  final Map<String, dynamic> data;
+  const ResultPage({super.key, required this.image, required this.data});
 
   @override
   State<ResultPage> createState() => _ResultPageState();
@@ -17,13 +18,16 @@ class ResultPage extends StatefulWidget {
 
 class _ResultPageState extends State<ResultPage> {
   late File _image;
-  late String _cancer;
+  Map<String, dynamic>? cancerData;
 
   @override
   void initState() {
     super.initState();
     _image = widget.image;
-    _cancer = widget.cancer;
+    final predictionType = widget.data['prediction'];
+    cancerData = BrainTumorData.brainTumorData[predictionType];
+    print(cancerData);
+    print(widget.data);
   }
 
   @override
@@ -61,7 +65,7 @@ class _ResultPageState extends State<ResultPage> {
                   ),
                   SizedBox(height: 20),
                   Text(
-                    _cancer,
+                    capitalizeFirst(widget.data["prediction"]),
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -69,65 +73,75 @@ class _ResultPageState extends State<ResultPage> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  Container(
-                    padding: EdgeInsets.all(15),
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade300),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Giải pháp:",
-                          style: AppTextStyles.title,
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          "• Tư vấn bác sĩ chuyên khoa.\n"
-                              "• Làm xét nghiệm chuyên sâu.\n"
-                              "• Tuân thủ phác đồ điều trị.",
-                          style: AppTextStyles.content,
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 80),
+                  ...cancerData?.entries.map((entry) => solutionBox(entry.key, entry.value)).toList() ?? [],
                 ],
               ),
             ),
           ),
-
           Positioned(
-            bottom: 20,
-            right: 20,
-            child: ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                backgroundColor: Colors.blueAccent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                elevation: 5,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    AppLocalizations.of(context)!.askAi,
-                    style: TextStyle(fontSize: AppTextStyles.sizeContent, color: Colors.white),
+              bottom: 20,
+              right: 20,
+              child: ElevatedButton(
+                onPressed: () {
+                  NavigationHelper.nextPage(context, MessagePage());
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  backgroundColor: Colors.blueAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
                   ),
-                  SizedBox(width: 10),
-                  Icon(Icons.send, color: Colors.white, size: AppTextStyles.sizeIconSmall,),
-                ],
+                  elevation: 5,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context)!.askAi,
+                      style: TextStyle(fontSize: AppTextStyles.sizeContent, color: Colors.white),
+                    ),
+                    SizedBox(width: 10),
+                    Icon(Icons.send, color: Colors.white, size: AppTextStyles.sizeIconSmall,),
+                  ],
+                ),
               ),
-            ),
-          ),
+          )
         ],
       ),
     );
+  }
+
+  Widget solutionBox(String title, dynamic content) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 16),
+      padding: EdgeInsets.all(15),
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "${title[0].toUpperCase()}${title.substring(1)}:",
+            style: AppTextStyles.title,
+          ),
+          SizedBox(height: 8),
+          content is List
+              ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: content.map<Widget>((item) => Text("• $item", style: AppTextStyles.content)).toList(),
+          )
+              : Text(content.toString(), style: AppTextStyles.content),
+        ],
+      ),
+    );
+  }
+
+  String capitalizeFirst(String text) {
+    if (text.isEmpty) return text;
+    return text[0].toUpperCase() + text.substring(1).toLowerCase();
   }
 }

@@ -4,6 +4,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:testfile/presentation/screens/home/home.dart';
 import 'package:testfile/presentation/screens/result/result.dart';
+import 'package:testfile/services/auth.dart';
+import 'package:testfile/services/user.dart';
 import 'package:testfile/theme/text_styles.dart';
 import 'package:testfile/utils/navigation_helper.dart';
 
@@ -24,6 +26,22 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
   void initState() {
     super.initState();
     _selectedImage = widget.selectedImage;
+  }
+
+  void fetchDiagnoses(String cancer, File image) async {
+    try{
+      String idToken = await AuthService().getIdToken();
+      final response = await UserService().diagnoses(idToken, _selectedImage);
+      print(response);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ResultPage(image: image, data: response,),
+        ),
+      );
+    }catch(e){
+      throw Exception(e);
+    }
   }
 
   @override
@@ -184,7 +202,7 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
             ElevatedButton(
               onPressed: _selectedIndex != -1
                   ? () {
-                checkCancer(
+                fetchDiagnoses(
                   _cancer[_selectedIndex]["title"]!,
                   _selectedImage,
                 );
@@ -216,14 +234,5 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
       return File(returnImage.path);
     }
     return null;
-  }
-
-  void checkCancer(String cancer, File image) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ResultPage(cancer: cancer, image: image),
-      ),
-    );
   }
 }

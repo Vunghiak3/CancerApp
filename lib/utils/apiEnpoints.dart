@@ -18,6 +18,7 @@ class UserEndpoints {
   final String updateUser = '/users/update-user';
   final String history = '/cnn/history';
   final String deleteHistory = '/cnn/history';
+  final String diagnoses = '/cnn/predict';
 }
 
 class AdminEndpoints{
