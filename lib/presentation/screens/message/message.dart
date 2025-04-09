@@ -22,6 +22,7 @@ class _MessagePageState extends State<MessagePage> {
   void initState() {
     super.initState();
     _initializeChat();
+    _loadSessions(); // ✅ Load sessions once here
   }
 
   Future<void> _initializeChat() async {
@@ -37,7 +38,6 @@ class _MessagePageState extends State<MessagePage> {
         );
 
         if (sessionList.isEmpty) {
-          // Prompt user to create new session
           WidgetsBinding.instance.addPostFrameCallback((_) {
             _promptNewSessionDialog();
           });
@@ -162,31 +162,30 @@ class _MessagePageState extends State<MessagePage> {
                 ),
               ),
               Expanded(
-                child: FutureBuilder(
-                  future: _loadSessions(),
-                  builder: (context, snapshot) {
-                    return ListView.builder(
-                      itemCount: _sessions.length,
-                      itemBuilder: (context, index) {
-                        final session = _sessions[index];
-                        final sessionId = session['sessionId'] ?? 'Unknown ID';
-                        final sessionName = session['sessionName'] ?? sessionId;
+                child: RefreshIndicator(
+                  onRefresh: _loadSessions,
+                  child: ListView.builder(
+                    itemCount: _sessions.length,
+                    itemBuilder: (context, index) {
+                      final session = _sessions[index];
+                      final sessionId = session['sessionId'] ?? 'Unknown ID';
+                      final sessionName = session['sessionName'] ?? sessionId;
 
-                        return ListTile(
-                          title: Text(sessionName),
-                          subtitle: Text(
-                              "Created: ${session['created_at'] ?? 'N/A'}"),
-                          onTap: () async {
-                            Navigator.pop(context);
-                            setState(() => _isLoading = true);
-                            _sessionId = sessionId;
-                            await _loadMessagesForSession(_sessionId!);
-                            setState(() => _isLoading = false);
-                          },
-                        );
-                      },
-                    );
-                  },
+                      return ListTile(
+                        title: Text(sessionName),
+                        subtitle: Text(
+                          "Created: ${session['created_at'] ?? 'N/A'}",
+                        ),
+                        onTap: () async {
+                          Navigator.pop(context);
+                          setState(() => _isLoading = true);
+                          _sessionId = sessionId;
+                          await _loadMessagesForSession(_sessionId!);
+                          setState(() => _isLoading = false);
+                        },
+                      );
+                    },
+                  ),
                 ),
               ),
               Padding(
@@ -196,7 +195,7 @@ class _MessagePageState extends State<MessagePage> {
                   icon: const Icon(Icons.add),
                   label: const Text("New Session"),
                 ),
-              )
+              ),
             ],
           ),
         ),
