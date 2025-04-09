@@ -1,231 +1,266 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:testfile/theme/text_styles.dart';
+import 'package:testfile/services/llm.dart';
 
 class MessagePage extends StatefulWidget {
   const MessagePage({super.key});
 
   @override
-  _MessagePageState createState() => _MessagePageState();
+  State<MessagePage> createState() => _MessagePageState();
 }
 
 class _MessagePageState extends State<MessagePage> {
+  final LLMService _llmService = LLMService();
   final TextEditingController _messageController = TextEditingController();
-  final List<Map<String, dynamic>> _messages = [
-    {
-      'isBot': true,
-      'text': 'Hello John',
-    },
-    {
-      'isBot': true,
-      'text':
-      'Welcome to HealthAssist Chat!\nI\'m here to help. Choose a topic from the list or type your question below!',
-    },
-    {
-      'isBot': true,
-      'text': '1. General Information about Cancer\n'
-          '2. Symptoms and Early Detection\n'
-          '3. Treatment Options\n'
-          '4. Coping and Support\n'
-          '5. Prevention Tips',
-    },
-  ];
+  final TextEditingController _sessionNameController = TextEditingController();
 
-  void _sendMessage() {
-    if (_messageController.text.isNotEmpty) {
+  String? _sessionId;
+  List<Map<String, dynamic>> _messages = [];
+  List<Map<String, dynamic>> _sessions = [];
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeChat();
+  }
+
+  Future<void> _initializeChat() async {
+    setState(() => _isLoading = true);
+    try {
+      final latestSession = await _llmService.getLatestSession();
+      String? sessionId = latestSession['sessionId'];
+
+      if (sessionId == null || sessionId.isEmpty) {
+        final sessionsResponse = await _llmService.getUserSessions();
+        final sessionList = List<Map<String, dynamic>>.from(
+          sessionsResponse['sessions']?['data'] ?? [],
+        );
+
+        if (sessionList.isEmpty) {
+          // Prompt user to create new session
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _promptNewSessionDialog();
+          });
+        } else {
+          sessionId = sessionList.first['sessionId'];
+        }
+      }
+
+      if (sessionId != null) {
+        _sessionId = sessionId;
+        await _loadMessagesForSession(_sessionId!);
+      }
+    } catch (e) {
+      debugPrint('❌ Error initializing chat: $e');
+    }
+    setState(() => _isLoading = false);
+  }
+
+  Future<void> _loadMessagesForSession(String sessionId) async {
+    try {
+      final response = await _llmService.getSessionMessages(sessionId);
       setState(() {
-        _messages.add({
-          'isBot': false,
-          'text': _messageController.text,
-        });
+        _messages = List<Map<String, dynamic>>.from(response['messages']);
       });
-      _messageController.clear();
+    } catch (e) {
+      debugPrint('❌ Failed to load messages: $e');
     }
   }
 
-  void _showChatHistory() {
-    List<String> chatHistory = [
-      "Chat ngày 01/03/2025",
-      "Chat ngày 28/02/2025",
-      "Chat ngày 27/02/2025",
-    ];
+  Future<void> _sendMessage(String messageText) async {
+    if (_sessionId == null) return;
 
-    showGeneralDialog(
+    setState(() {
+      _messages.add({'sender': 'User', 'message': messageText});
+    });
+
+    try {
+      final response = await _llmService.generate({
+        'session_id': _sessionId,
+        'prompt': messageText,
+      });
+
+      setState(() {
+        _messages.add({'sender': 'AI', 'message': response});
+        _messageController.clear();
+      });
+    } catch (e) {
+      debugPrint('❌ Error sending message: $e');
+    }
+  }
+
+  Future<void> _loadSessions() async {
+    try {
+      final sessionsResponse = await _llmService.getUserSessions();
+      final sessionList = List<Map<String, dynamic>>.from(
+        sessionsResponse['sessions']?['data'] ?? [],
+      );
+
+      setState(() => _sessions = sessionList);
+    } catch (e) {
+      debugPrint('❌ Error loading sessions: $e');
+    }
+  }
+
+  Future<void> _promptNewSessionDialog() async {
+    _sessionNameController.clear();
+
+    await showDialog(
       context: context,
-      barrierDismissible: true,
-      barrierLabel: "Close",
-      transitionDuration: const Duration(milliseconds: 300),
-      pageBuilder: (_, __, ___) {
-        return Align(
-          alignment: Alignment.centerLeft,
-          child: Material(
-            color: Colors.transparent,
-            child: Container(
-              width: MediaQuery.of(context).size.width * 0.7,
-              height: MediaQuery.of(context).size.height,
-              padding: const EdgeInsets.all(10),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 30,),
-                  Text(
-                      AppLocalizations.of(context)!.chatHistory,
-                      style: AppTextStyles.title,
-                  ),
-                  const Divider(),
-                  Expanded(
-                    child: ListView.separated(
-                        itemBuilder: (context, index){
-                          return ListTile(
-                            title: Text(
-                              chatHistory[index],
-                              style: AppTextStyles.content,
-                            ),
-                            trailing: IconButton(
-                                onPressed: (){},
-                                icon: Icon(Icons.more_horiz_rounded, color: Colors.black, size: AppTextStyles.sizeIcon,)
-                            ),
-                            onTap: () {},
-                          );
-                        },
-                        separatorBuilder: (context, index){
-                          return const Divider(
-                            color: Colors.grey,
-                            thickness: 1,
-                            indent: 15,
-                            endIndent: 15,
-                          );
-                        },
-                        itemCount: chatHistory.length
-                    ),
-                  ),
-                ],
-              ),
-            ),
+      builder: (ctx) => AlertDialog(
+        title: const Text("Create New Session"),
+        content: TextField(
+          controller: _sessionNameController,
+          decoration: const InputDecoration(hintText: "Session name"),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("Cancel"),
           ),
-        );
-      },
-      transitionBuilder: (_, anim, __, child) {
-        return SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(-1, 0),
-            end: Offset.zero,
-          ).animate(anim),
-          child: child,
-        );
-      },
+          ElevatedButton(
+            onPressed: () async {
+              final name = _sessionNameController.text.trim();
+              if (name.isNotEmpty) {
+                Navigator.pop(ctx);
+                await _createNewSession(name);
+              }
+            },
+            child: const Text("Create"),
+          ),
+        ],
+      ),
     );
+  }
+
+  Future<void> _createNewSession(String name) async {
+    try {
+      final newSessionId = await _llmService.createSession({
+        'session_name': name,
+      });
+
+      _sessionId = newSessionId;
+      await _loadSessions();
+      await _loadMessagesForSession(_sessionId!);
+    } catch (e) {
+      debugPrint('❌ Error creating session: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        title: Transform.translate(
-          offset: Offset(-20, 0),
-          child: Text(
-            AppLocalizations.of(context)!.chat,
-            style: AppTextStyles.title,
+      drawer: Drawer(
+        child: SafeArea(
+          child: Column(
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text(
+                  "Sessions",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Expanded(
+                child: FutureBuilder(
+                  future: _loadSessions(),
+                  builder: (context, snapshot) {
+                    return ListView.builder(
+                      itemCount: _sessions.length,
+                      itemBuilder: (context, index) {
+                        final session = _sessions[index];
+                        final sessionId = session['sessionId'] ?? 'Unknown ID';
+                        final sessionName = session['sessionName'] ?? sessionId;
+
+                        return ListTile(
+                          title: Text(sessionName),
+                          subtitle: Text(
+                              "Created: ${session['created_at'] ?? 'N/A'}"),
+                          onTap: () async {
+                            Navigator.pop(context);
+                            setState(() => _isLoading = true);
+                            _sessionId = sessionId;
+                            await _loadMessagesForSession(_sessionId!);
+                            setState(() => _isLoading = false);
+                          },
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ElevatedButton.icon(
+                  onPressed: _promptNewSessionDialog,
+                  icon: const Icon(Icons.add),
+                  label: const Text("New Session"),
+                ),
+              )
+            ],
           ),
         ),
-        backgroundColor: Colors.white,
-        elevation: 1,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black, size: AppTextStyles.sizeIconSmall,),
-          onPressed: () => Navigator.pop(context),
-        ),
-        actions: [
-          IconButton(
-            onPressed: _showChatHistory,
-            icon: const Icon(Icons.short_text_rounded, color: Colors.black, size: AppTextStyles.sizeIcon),
-          )
-        ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(10),
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                final message = _messages[index];
-                return Align(
-                  alignment: message['isBot']
-                      ? Alignment.centerLeft
-                      : Alignment.centerRight,
-                  child: Row(
-                    mainAxisAlignment: message['isBot']
-                        ? MainAxisAlignment.start
-                        : MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (message['isBot']) // Chỉ hiện ảnh khi là tin nhắn của bot
-                        Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: Image.asset(
-                            'assets/imgs/logowelcome.png',
-                            width: 30,
+      appBar: AppBar(
+        title: const Text("LLM Chat"),
+      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: _messages.length,
+                    itemBuilder: (context, index) {
+                      final msg = _messages[index];
+                      final isUser = msg['sender'] == 'User';
+
+                      return Align(
+                        alignment: isUser
+                            ? Alignment.centerRight
+                            : Alignment.centerLeft,
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          margin: const EdgeInsets.symmetric(vertical: 4),
+                          decoration: BoxDecoration(
+                            color: isUser ? Colors.blue[100] : Colors.grey[300],
+                            borderRadius: BorderRadius.circular(8),
                           ),
+                          child: Text(msg['message'] ?? ''),
                         ),
-                      Container(
-                        constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * 0.8, // Chiều rộng tối đa là 80% màn hình
-                        ),
-                        padding: const EdgeInsets.all(12),
-                        margin: const EdgeInsets.symmetric(vertical: 5),
-                        decoration: BoxDecoration(
-                          color: message['isBot'] ? Colors.grey[200] : Colors.blue,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          message['text'],
-                          style: TextStyle(
-                            color: message['isBot'] ? Colors.black : Colors.white,
-                            fontSize: AppTextStyles.sizeContent
+                      );
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _messageController,
+                          decoration: const InputDecoration(
+                            hintText: 'Type a message...',
+                            border: OutlineInputBorder(),
                           ),
                         ),
                       ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () {
+                          final text = _messageController.text.trim();
+                          if (text.isNotEmpty) {
+                            _sendMessage(text);
+                          }
+                        },
+                        child: const Icon(Icons.send),
+                      ),
                     ],
                   ),
-                );
-              },
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              border: Border(top: BorderSide(color: Colors.grey[300]!)),
-              color: Colors.white,
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    decoration: const InputDecoration(
-                      hintText: "Write a message",
-                      hintStyle: AppTextStyles.content,
-                      border: InputBorder.none,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.send, color: Colors.blue, size: AppTextStyles.sizeIcon,),
-                  onPressed: _sendMessage,
                 ),
               ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }
