@@ -120,4 +120,24 @@ class UserService {
       rethrow;
     }
   }
+
+  Future<Map<String, dynamic>> diagnoses(String idToken, File image) async {
+    final url = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.user.diagnoses);
+
+    try {
+      var request = http.MultipartRequest('POST', url);
+      request.headers['Authorization'] = 'Bearer $idToken';
+      request.files.add(await http.MultipartFile.fromPath('image', image.path));
+      var response = await request.send();
+      final responseData = await response.stream.bytesToString();
+
+      if (response.statusCode == 200) {
+        return jsonDecode(responseData);
+      } else {
+        throw Exception("API Error: $responseData");
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
