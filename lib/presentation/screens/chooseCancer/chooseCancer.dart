@@ -5,7 +5,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:testfile/presentation/screens/home/home.dart';
 import 'package:testfile/presentation/screens/result/result.dart';
 import 'package:testfile/services/auth.dart';
-import 'package:testfile/services/user.dart';
+import 'package:testfile/services/cnn.dart';
 import 'package:testfile/theme/text_styles.dart';
 import 'package:testfile/utils/navigation_helper.dart';
 
@@ -31,7 +31,7 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
   void fetchDiagnoses(String cancer, File image) async {
     try{
       String idToken = await AuthService().getIdToken();
-      final response = await UserService().diagnoses(idToken, _selectedImage);
+      final response = await CnnService().diagnoses(idToken, _selectedImage);
       print(response);
       Navigator.push(
         context,

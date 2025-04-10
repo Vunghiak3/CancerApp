@@ -1,5 +1,5 @@
 class ApiEndpoints {
-  static final String baseUrl = 'http://127.0.0.1:8000'; //http://10.0.2.2:8000
+  static final String baseUrl = 'http://10.0.2.2:8000'; //http://10.0.2.2:8000
   static final AuthEndpoints auth = AuthEndpoints();
   static final UserEndpoints user = UserEndpoints();
   static final AdminEndpoints admin = AdminEndpoints();

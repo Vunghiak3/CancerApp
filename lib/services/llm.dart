@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:testfile/services/auth.dart';
+import 'package:testfile/utils/apiEnpoints.dart';
 
 class LLMService {
-  final String baseUrl = 'http://127.0.0.1:8000/llm';
+  // final String baseUrl = 'http://127.0.0.1:8000/llm';
+  final String baseUrl = ApiEndpoints.baseUrl + '/llm';
   String? _authToken;
 
   /// Lazily fetch auth token when needed

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:testfile/services/llm.dart';
+import 'package:testfile/theme/text_styles.dart';
 
 class MessagePage extends StatefulWidget {
   const MessagePage({super.key});
@@ -22,7 +23,7 @@ class _MessagePageState extends State<MessagePage> {
   void initState() {
     super.initState();
     _initializeChat();
-    _loadSessions(); // ✅ Load sessions once here
+    _loadSessions();
   }
 
   Future<void> _initializeChat() async {
@@ -152,56 +153,33 @@ class _MessagePageState extends State<MessagePage> {
     return Scaffold(
       drawer: Drawer(
         child: SafeArea(
-          child: Column(
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text(
-                  "Sessions",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-              ),
-              Expanded(
-                child: RefreshIndicator(
-                  onRefresh: _loadSessions,
-                  child: ListView.builder(
-                    itemCount: _sessions.length,
-                    itemBuilder: (context, index) {
-                      final session = _sessions[index];
-                      final sessionId = session['sessionId'] ?? 'Unknown ID';
-                      final sessionName = session['sessionName'] ?? sessionId;
-
-                      return ListTile(
-                        title: Text(sessionName),
-                        subtitle: Text(
-                          "Created: ${session['created_at'] ?? 'N/A'}",
-                        ),
-                        onTap: () async {
-                          Navigator.pop(context);
-                          setState(() => _isLoading = true);
-                          _sessionId = sessionId;
-                          await _loadMessagesForSession(_sessionId!);
-                          setState(() => _isLoading = false);
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ElevatedButton.icon(
-                  onPressed: _promptNewSessionDialog,
-                  icon: const Icon(Icons.add),
-                  label: const Text("New Session"),
-                ),
-              ),
-            ],
-          ),
+          child: loadHistoryChat(),
         ),
       ),
       appBar: AppBar(
-        title: const Text("LLM Chat"),
+        title: Transform.translate(
+          offset: Offset(-20, 0),
+          child: Text(
+            'LLMChat',
+            style: AppTextStyles.title,
+          ),
+        ),
+        leading: IconButton(
+            onPressed: (){
+              Navigator.pop(context);
+            },
+            icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black, size: AppTextStyles.sizeIconSmall,)
+        ),
+        actions: [
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.short_text_rounded),
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+            ),
+          ),
+        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -260,6 +238,55 @@ class _MessagePageState extends State<MessagePage> {
                 ),
               ],
             ),
+    );
+  }
+
+  Widget loadHistoryChat(){
+    return Column(
+      children: [
+        const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Text(
+            "Sessions",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+        ),
+        Expanded(
+          child: RefreshIndicator(
+            onRefresh: _loadSessions,
+            child: ListView.builder(
+              itemCount: _sessions.length,
+              itemBuilder: (context, index) {
+                final session = _sessions[index];
+                final sessionId = session['sessionId'] ?? 'Unknown ID';
+                final sessionName = session['sessionName'] ?? sessionId;
+
+                return ListTile(
+                  title: Text(sessionName),
+                  subtitle: Text(
+                    "Created: ${session['created_at'] ?? 'N/A'}",
+                  ),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    setState(() => _isLoading = true);
+                    _sessionId = sessionId;
+                    await _loadMessagesForSession(_sessionId!);
+                    setState(() => _isLoading = false);
+                  },
+                );
+              },
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ElevatedButton.icon(
+            onPressed: _promptNewSessionDialog,
+            icon: const Icon(Icons.add),
+            label: const Text("New Session"),
+          ),
+        ),
+      ],
     );
   }
 }
