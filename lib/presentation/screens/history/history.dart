@@ -14,7 +14,7 @@ class HistoryPage extends StatefulWidget {
   State<HistoryPage> createState() => _HistoryPageState();
 }
 
-class _HistoryPageState extends State<HistoryPage>{
+class _HistoryPageState extends State<HistoryPage> {
   List<dynamic>? historyData;
 
   @override
@@ -23,12 +23,12 @@ class _HistoryPageState extends State<HistoryPage>{
     loadHistory();
   }
 
-  Future<List<dynamic>> fetchHistory() async{
-    try{
+  Future<List<dynamic>> fetchHistory() async {
+    try {
       String idToken = await AuthService().getIdToken();
       final response = await UserService().history(idToken);
       return response;
-    }catch(e){
+    } catch (e) {
       throw Exception(e);
     }
   }
@@ -38,12 +38,13 @@ class _HistoryPageState extends State<HistoryPage>{
     setState(() {});
   }
 
-  Future<Map<String, dynamic>> fetchDeleteHistory(String historyId) async{
-    try{
+  Future<Map<String, dynamic>> fetchDeleteHistory(String historyId) async {
+    try {
       String idToken = await AuthService().getIdToken();
-      final response = await UserService().deleteHistoryById(idToken, historyId);
+      final response =
+          await UserService().deleteHistoryById(idToken, historyId);
       return response;
-    }catch(e){
+    } catch (e) {
       throw Exception(e);
     }
   }
@@ -57,22 +58,28 @@ class _HistoryPageState extends State<HistoryPage>{
     );
   }
 
-  PreferredSizeWidget getAppBar(){
+  PreferredSizeWidget getAppBar() {
     return AppBar(
       backgroundColor: Colors.white,
       automaticallyImplyLeading: false,
-      title: Text('Lịch sử chẩn đoán', style: AppTextStyles.title,),
+      title: Text(
+        'Lịch sử chẩn đoán',
+        style: AppTextStyles.title,
+      ),
       centerTitle: true,
       actions: [
         IconButton(
-            onPressed: (){},
-            icon: Icon(Icons.more_horiz_outlined, color: Colors.black, size: 24,)
-        )
+            onPressed: () {},
+            icon: Icon(
+              Icons.more_horiz_outlined,
+              color: Colors.black,
+              size: 24,
+            ))
       ],
     );
   }
 
-  Widget getBody(){
+  Widget getBody() {
     if (historyData == null) {
       return GetProgressBar();
     }
@@ -84,71 +91,69 @@ class _HistoryPageState extends State<HistoryPage>{
     return getListView();
   }
 
-  ListView getListView(){
+  ListView getListView() {
     return ListView.separated(
-        itemBuilder: (context, position) {
-          final diagnose = historyData![position] as Map<String, dynamic>;
-          return _HistoryItemSection(
-            parent: this,
-            data: diagnose,
-          );
-        },
-        separatorBuilder: (context, index){
-          return const Divider(
-            color: Colors.grey,
-            thickness: 1,
-            indent: 24,
-            endIndent: 24,
-          );
-        },
-        itemCount: historyData!.length,
-        shrinkWrap: true,
+      itemBuilder: (context, position) {
+        final diagnose = historyData![position] as Map<String, dynamic>;
+        return _HistoryItemSection(
+          parent: this,
+          data: diagnose,
+        );
+      },
+      separatorBuilder: (context, index) {
+        return const Divider(
+          color: Colors.grey,
+          thickness: 1,
+          indent: 24,
+          endIndent: 24,
+        );
+      },
+      itemCount: historyData!.length,
+      shrinkWrap: true,
     );
   }
 
-  void showDialogItem(String diagnosisId) async{
+  void showDialogItem(String diagnosisId) async {
     final confirm = await showDialog<bool>(
-      context: context,
-      builder: (context){
-        return AlertDialog(
-          title: Text(
-            AppLocalizations.of(context)!.confirmDeletion,
-            style: AppTextStyles.title,
-          ),
-          content: Text(
-            AppLocalizations.of(context)!.desConfirmDeletion,
-            style: AppTextStyles.content,
-          ),
-          actions: [
-            TextButton(
-                onPressed: (){
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  AppLocalizations.of(context)!.cancel,
-                  style: AppTextStyles.cancel,
-                )
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(
+              AppLocalizations.of(context)!.confirmDeletion,
+              style: AppTextStyles.title,
             ),
-            TextButton(
-                onPressed: (){
-                  Navigator.pop(context, true);
-                },
-                child: Text(
-                  AppLocalizations.of(context)!.delete,
-                  style: AppTextStyles.delete,
-                )
-            )
-          ],
-        );
-      }
-    );
+            content: Text(
+              AppLocalizations.of(context)!.desConfirmDeletion,
+              style: AppTextStyles.content,
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    AppLocalizations.of(context)!.cancel,
+                    style: AppTextStyles.cancel,
+                  )),
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context, true);
+                  },
+                  child: Text(
+                    AppLocalizations.of(context)!.delete,
+                    style: AppTextStyles.delete,
+                  ))
+            ],
+          );
+        });
 
-    if(confirm == true){
+    if (confirm == true) {
       showDialog(
           context: context,
           barrierDismissible: false,
-          builder: (_) => const Center(child: CircularProgressIndicator(),)
-      );
+          builder: (_) => const Center(
+                child: CircularProgressIndicator(),
+              ));
 
       try {
         print(diagnosisId);
@@ -171,7 +176,7 @@ class _HistoryPageState extends State<HistoryPage>{
   }
 }
 
-class _HistoryItemSection extends StatelessWidget{
+class _HistoryItemSection extends StatelessWidget {
   final _HistoryPageState parent;
   final Map<String, dynamic> data;
 
@@ -183,25 +188,22 @@ class _HistoryItemSection extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      contentPadding: const EdgeInsets.only(
-        left: 24,
-        right: 8
-      ),
+      contentPadding: const EdgeInsets.only(left: 24, right: 8),
       leading: ClipRRect(
         borderRadius: BorderRadius.circular(8),
         child: FadeInImage.assetNetwork(
           placeholder: "assets/imgs/placeholder.png",
-          image: data["mriImageUrl"],
+          image: data["signedImageUrl"],
           width: 48,
           height: 48,
           fit: BoxFit.cover,
-          imageErrorBuilder: (context, error, stackTrace){
-              return Image.asset(
-                "assets/imgs/placeholder.png",
-                width: 48,
-                height: 48,
-                fit: BoxFit.cover,
-              );
+          imageErrorBuilder: (context, error, stackTrace) {
+            return Image.asset(
+              "assets/imgs/placeholder.png",
+              width: 48,
+              height: 48,
+              fit: BoxFit.cover,
+            );
           },
         ),
       ),
@@ -214,36 +216,38 @@ class _HistoryItemSection extends StatelessWidget{
         style: AppTextStyles.subtitle,
       ),
       trailing: PopupMenuButton<String>(
-          icon: Icon(Icons.more_horiz_rounded, size: 24, color: Colors.black,),
+          icon: Icon(
+            Icons.more_horiz_rounded,
+            size: 24,
+            color: Colors.black,
+          ),
           color: Color(0xfff5f5f5),
-          onSelected: (value){
-            if(value == 'delete'){
+          onSelected: (value) {
+            if (value == 'delete') {
               parent.showDialogItem(data["diagnosisId"]);
             }
           },
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8)
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           itemBuilder: (context) => <PopupMenuEntry<String>>[
-            PopupMenuItem(
-                value: 'delete',
-                height: 30,
-                child: Row(
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!.delete,
-                      style: AppTextStyles.delete,
-                    ),
-                    Spacer(),
-                    Icon(Icons.delete_outline_rounded, color: Colors.red, size: 24,),
-                  ],
-                )
-            ),
-          ]
-      ),
-      onTap: (){
-
-      },
+                PopupMenuItem(
+                    value: 'delete',
+                    height: 30,
+                    child: Row(
+                      children: [
+                        Text(
+                          AppLocalizations.of(context)!.delete,
+                          style: AppTextStyles.delete,
+                        ),
+                        Spacer(),
+                        Icon(
+                          Icons.delete_outline_rounded,
+                          color: Colors.red,
+                          size: 24,
+                        ),
+                      ],
+                    )),
+              ]),
+      onTap: () {},
     );
   }
 }
