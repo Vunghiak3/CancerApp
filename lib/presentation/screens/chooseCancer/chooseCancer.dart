@@ -36,7 +36,7 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ResultPage(image: image, data: response,),
+          builder: (context) => ResultPage(imageFile: image, data: response,),
         ),
       );
     }catch(e){

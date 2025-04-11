@@ -48,6 +48,11 @@ class _HistoryPageState extends State<HistoryPage>{
     }
   }
 
+  void loadViewHistory(Map<String, dynamic> data){
+    print(data);
+    NavigationHelper.nextPage(context, ResultPage(imageUrl: data['mriImageUrl'], data: data,));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -242,7 +247,7 @@ class _HistoryItemSection extends StatelessWidget{
           ]
       ),
       onTap: (){
-        NavigationHelper.nextPage(context, ResultPage(image: data['mriImageUrl'], data: data));
+        parent.loadViewHistory(data);
       },
     );
   }

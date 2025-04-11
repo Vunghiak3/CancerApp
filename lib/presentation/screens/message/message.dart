@@ -17,7 +17,9 @@ class _MessagePageState extends State<MessagePage> {
   String? _sessionId;
   List<Map<String, dynamic>> _messages = [];
   List<Map<String, dynamic>> _sessions = [];
+
   bool _isLoading = false;
+  bool _isSending = false;
 
   @override
   void initState() {
@@ -68,25 +70,32 @@ class _MessagePageState extends State<MessagePage> {
     }
   }
 
-  Future<void> _sendMessage(String messageText) async {
-    if (_sessionId == null) return;
+  Future<void> _sendMessage() async {
+    String messageText = _messageController.text.trim();
+
+    if (messageText.isEmpty || _sessionId == null) return;
 
     setState(() {
-      _messages.add({'sender': 'User', 'message': messageText});
+      _isSending = true;
+      _messages.add({'sender': "User", 'message': messageText});
     });
 
     try {
+      _messageController.clear();
       final response = await _llmService.generate({
         'session_id': _sessionId,
         'prompt': messageText,
       });
 
       setState(() {
-        _messages.add({'sender': 'AI', 'message': response});
-        _messageController.clear();
+        _messages.add({'sender': "AI", 'message': response});
       });
     } catch (e) {
-      debugPrint('❌ Error sending message: $e');
+      debugPrint('Error sending message: $e');
+    }finally{
+      setState(() {
+        _isSending = false;
+      });
     }
   }
 
@@ -187,51 +196,67 @@ class _MessagePageState extends State<MessagePage> {
               children: [
                 Expanded(
                   child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(10),
                     itemCount: _messages.length,
                     itemBuilder: (context, index) {
                       final msg = _messages[index];
                       final isUser = msg['sender'] == 'User';
 
-                      return Align(
-                        alignment: isUser
-                            ? Alignment.centerRight
-                            : Alignment.centerLeft,
-                        child: Container(
-                          padding: const EdgeInsets.all(12),
-                          margin: const EdgeInsets.symmetric(vertical: 4),
-                          decoration: BoxDecoration(
-                            color: isUser ? Colors.blue[100] : Colors.grey[300],
-                            borderRadius: BorderRadius.circular(8),
+                      return Row(
+                        mainAxisAlignment: isUser ? MainAxisAlignment.start : MainAxisAlignment.end,
+                        children: [
+                          if(isUser)
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: Image.asset(
+                                'assets/imgs/logowelcome.png',
+                                width: 30,
+                              ),
+                            ),
+                          Container(
+                            constraints: BoxConstraints(
+                              maxWidth: MediaQuery.of(context).size.width * 0.8,
+                            ),
+                            padding: const EdgeInsets.all(12),
+                            margin: const EdgeInsets.symmetric(vertical: 5),
+                            decoration: BoxDecoration(
+                              color: isUser ? Colors.grey[200] : Colors.blue,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              msg['message'],
+                              style: TextStyle(
+                                  color: isUser ? Colors.black : Colors.white,
+                                  fontSize: AppTextStyles.sizeContent
+                              ),
+                            ),
                           ),
-                          child: Text(msg['message'] ?? ''),
-                        ),
+                        ],
                       );
                     },
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    border: Border(top: BorderSide(color: Colors.grey[300]!)),
+                    color: Colors.white,
+                  ),
                   child: Row(
                     children: [
                       Expanded(
                         child: TextField(
                           controller: _messageController,
                           decoration: const InputDecoration(
-                            hintText: 'Type a message...',
-                            border: OutlineInputBorder(),
+                            hintText: "Write a message",
+                            hintStyle: AppTextStyles.content,
+                            border: InputBorder.none,
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      ElevatedButton(
-                        onPressed: () {
-                          final text = _messageController.text.trim();
-                          if (text.isNotEmpty) {
-                            _sendMessage(text);
-                          }
-                        },
-                        child: const Icon(Icons.send),
+                      IconButton(
+                        icon: const Icon(Icons.send, color: Colors.blue, size: AppTextStyles.sizeIcon,),
+                        onPressed: _sendMessage,
                       ),
                     ],
                   ),

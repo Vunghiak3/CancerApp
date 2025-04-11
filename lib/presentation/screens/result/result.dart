@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -8,26 +9,23 @@ import 'package:testfile/theme/text_styles.dart';
 import 'package:testfile/utils/navigation_helper.dart';
 
 class ResultPage extends StatefulWidget {
-  final File image;
-  final Map<String, dynamic> data;
-  const ResultPage({super.key, required this.image, required this.data});
+  final File? imageFile;
+  final String? imageUrl;
+  final Map<String, dynamic>? data;
+  const ResultPage({super.key, this.imageFile, this.data, this.imageUrl});
 
   @override
   State<ResultPage> createState() => _ResultPageState();
 }
 
 class _ResultPageState extends State<ResultPage> {
-  late File _image;
   Map<String, dynamic>? cancerData;
 
   @override
   void initState() {
     super.initState();
-    _image = widget.image;
-    final predictionType = widget.data['prediction'];
+    final predictionType = widget.data?['aiPrediction'];
     cancerData = BrainTumorData.brainTumorData[predictionType];
-    print(cancerData);
-    print(widget.data);
   }
 
   @override
@@ -56,21 +54,36 @@ class _ResultPageState extends State<ResultPage> {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(15),
-                    child: Image.file(
-                      _image,
+                    child: widget.imageFile != null
+                    ? Image.file(
+                      widget.imageFile!,
+                      width: double.infinity,
+                      height: 350,
+                      fit: BoxFit.cover,
+                    )
+                    : Image.network(
+                      widget.imageUrl!,
                       width: double.infinity,
                       height: 350,
                       fit: BoxFit.cover,
                     ),
                   ),
                   SizedBox(height: 20),
-                  Text(
-                    capitalizeFirst(widget.data["prediction"]),
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.redAccent,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        capitalizeFirst(widget.data?["aiPrediction"]),
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.redAccent,
+                        ),
+                      ),
+                      Text(
+                          ' - ${(widget.data!["confidenceScore"]*100).toStringAsFixed(2)}%'
+                      ),
+                    ],
                   ),
                   SizedBox(height: 20),
                   ...cancerData?.entries.map((entry) => solutionBox(entry.key, entry.value)).toList() ?? [],
