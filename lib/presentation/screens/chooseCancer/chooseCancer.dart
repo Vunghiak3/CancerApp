@@ -26,13 +26,15 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
   void initState() {
     super.initState();
     _selectedImage = widget.selectedImage;
+    print("File tồn tại không: ${_selectedImage.existsSync()}");
+    print("Kích thước file: ${_selectedImage.lengthSync()}");
+
   }
 
   void fetchDiagnoses(String cancer, File image) async {
     try{
       String idToken = await AuthService().getIdToken();
       final response = await CnnService().diagnoses(idToken, _selectedImage);
-      print(response);
       Navigator.push(
         context,
         MaterialPageRoute(

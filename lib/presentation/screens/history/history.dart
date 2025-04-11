@@ -15,13 +15,7 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
-  List<dynamic>? historyData;
-
-  @override
-  void initState() {
-    super.initState();
-    loadHistory();
-  }
+  late Future<List<dynamic>> futureHistory = fetchHistory();
 
   Future<List<dynamic>> fetchHistory() async {
     try {
@@ -33,9 +27,10 @@ class _HistoryPageState extends State<HistoryPage> {
     }
   }
 
-  void loadHistory() async {
-    historyData = await fetchHistory();
-    setState(() {});
+  Future<void> refreshHistory() async {
+    setState(() {
+      futureHistory = fetchHistory();
+    });
   }
 
   Future<Map<String, dynamic>> fetchDeleteHistory(String historyId) async {
@@ -49,7 +44,6 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   void loadViewHistory(Map<String, dynamic> data){
-    print(data);
     NavigationHelper.nextPage(context, ResultPage(imageUrl: data['mriImageUrl'], data: data,));
   }
 
@@ -64,6 +58,7 @@ class _HistoryPageState extends State<HistoryPage> {
 
   PreferredSizeWidget getAppBar() {
     return AppBar(
+      surfaceTintColor: Colors.transparent,
       backgroundColor: Colors.white,
       automaticallyImplyLeading: false,
       title: Text(
@@ -84,36 +79,42 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   Widget getBody() {
-    if (historyData == null) {
-      return GetProgressBar();
-    }
+    return FutureBuilder<List<dynamic>>(
+        future: futureHistory,
+        builder: (context, snapshot){
+          if(snapshot.connectionState == ConnectionState.waiting){
+            return GetProgressBar();
+          }
 
-    if (historyData!.isEmpty) {
-      return Center(child: Text("Không có dữ liệu lịch sử"));
-    }
+          if(snapshot.hasError){
+            return Center(child: Text('Lỗi: ${snapshot.error}'));
+          }
+          final historyData = snapshot.data ?? [];
 
-    return getListView();
-  }
-
-  ListView getListView() {
-    return ListView.separated(
-      itemBuilder: (context, position) {
-        final diagnose = historyData![position] as Map<String, dynamic>;
-        return _HistoryItemSection(
-          parent: this,
-          data: diagnose,
-        );
-      },
-      separatorBuilder: (context, index) {
-        return const Divider(
-          color: Colors.grey,
-          thickness: 1,
-          indent: 24,
-          endIndent: 24,
-        );
-      },
-      itemCount: historyData!.length,
-      shrinkWrap: true,
+          return RefreshIndicator(
+            backgroundColor: Colors.white,
+            onRefresh: refreshHistory,
+            child: ListView.separated(
+              itemBuilder: (context, position) {
+                final diagnose = historyData![position] as Map<String, dynamic>;
+                return _HistoryItemSection(
+                  parent: this,
+                  data: diagnose,
+                );
+              },
+              separatorBuilder: (context, index) {
+                return const Divider(
+                  color: Colors.grey,
+                  thickness: 1,
+                  indent: 24,
+                  endIndent: 24,
+                );
+              },
+              itemCount: historyData!.length,
+              shrinkWrap: true,
+            ),
+          );
+        }
     );
   }
 
@@ -138,7 +139,8 @@ class _HistoryPageState extends State<HistoryPage> {
                   child: Text(
                     AppLocalizations.of(context)!.cancel,
                     style: AppTextStyles.cancel,
-                  )),
+                  )
+              ),
               TextButton(
                   onPressed: () {
                     Navigator.pop(context, true);
@@ -146,7 +148,8 @@ class _HistoryPageState extends State<HistoryPage> {
                   child: Text(
                     AppLocalizations.of(context)!.delete,
                     style: AppTextStyles.delete,
-                  ))
+                  )
+              )
             ],
           );
         });
@@ -160,17 +163,16 @@ class _HistoryPageState extends State<HistoryPage> {
               ));
 
       try {
-        print(diagnosisId);
         await fetchDeleteHistory(diagnosisId);
-        Navigator.of(context).pop(); // Tắt loading
+        Navigator.of(context).pop();
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Xoa thanh cong')),
         );
 
-        loadHistory(); // Tải lại dữ liệu
+        refreshHistory();
       } catch (e) {
-        Navigator.of(context).pop(); // Tắt loading
+        Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Xoá thất bại: $e")),
         );

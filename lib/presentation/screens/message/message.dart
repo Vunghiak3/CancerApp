@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:testfile/services/llm.dart';
 import 'package:testfile/theme/text_styles.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MessagePage extends StatefulWidget {
   const MessagePage({super.key});
@@ -13,6 +15,7 @@ class _MessagePageState extends State<MessagePage> {
   final LLMService _llmService = LLMService();
   final TextEditingController _messageController = TextEditingController();
   final TextEditingController _sessionNameController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   String? _sessionId;
   List<Map<String, dynamic>> _messages = [];
@@ -54,7 +57,7 @@ class _MessagePageState extends State<MessagePage> {
         await _loadMessagesForSession(_sessionId!);
       }
     } catch (e) {
-      debugPrint('❌ Error initializing chat: $e');
+      debugPrint('Error initializing chat: $e');
     }
     setState(() => _isLoading = false);
   }
@@ -66,7 +69,7 @@ class _MessagePageState extends State<MessagePage> {
         _messages = List<Map<String, dynamic>>.from(response['messages']);
       });
     } catch (e) {
-      debugPrint('❌ Failed to load messages: $e');
+      debugPrint('Failed to load messages: $e');
     }
   }
 
@@ -80,8 +83,13 @@ class _MessagePageState extends State<MessagePage> {
       _messages.add({'sender': "User", 'message': messageText});
     });
 
+    _messageController.clear();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollToBottom();
+    });
+
     try {
-      _messageController.clear();
       final response = await _llmService.generate({
         'session_id': _sessionId,
         'prompt': messageText,
@@ -99,6 +107,17 @@ class _MessagePageState extends State<MessagePage> {
     }
   }
 
+  void scrollToBottom() {
+    if (!_scrollController.hasClients) return;
+
+    _scrollController.animateTo(
+      0.0, // reverse = true nên offset 0 là cuối danh sách
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
+  }
+
+
   Future<void> _loadSessions() async {
     try {
       final sessionsResponse = await _llmService.getUserSessions();
@@ -108,42 +127,15 @@ class _MessagePageState extends State<MessagePage> {
 
       setState(() => _sessions = sessionList);
     } catch (e) {
-      debugPrint('❌ Error loading sessions: $e');
+      debugPrint('Error loading sessions: $e');
     }
   }
 
-  Future<void> _promptNewSessionDialog() async {
-    _sessionNameController.clear();
+  Future<void> _createNewSession() async {
+    final name = _sessionNameController.text.trim();
 
-    await showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text("Create New Session"),
-        content: TextField(
-          controller: _sessionNameController,
-          decoration: const InputDecoration(hintText: "Session name"),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text("Cancel"),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final name = _sessionNameController.text.trim();
-              if (name.isNotEmpty) {
-                Navigator.pop(ctx);
-                await _createNewSession(name);
-              }
-            },
-            child: const Text("Create"),
-          ),
-        ],
-      ),
-    );
-  }
+    if(name.isEmpty) return;
 
-  Future<void> _createNewSession(String name) async {
     try {
       final newSessionId = await _llmService.createSession({
         'session_name': name,
@@ -153,8 +145,47 @@ class _MessagePageState extends State<MessagePage> {
       await _loadSessions();
       await _loadMessagesForSession(_sessionId!);
     } catch (e) {
-      debugPrint('❌ Error creating session: $e');
+      debugPrint('Error creating session: $e');
     }
+  }
+
+  Future<void> _promptNewSessionDialog() async {
+    _sessionNameController.clear();
+
+    await showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Create New Chat", style: AppTextStyles.title,),
+        content: TextField(
+          controller: _sessionNameController,
+          decoration: const InputDecoration(hintText: "Chat name"),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+              },
+              child: Text(
+                AppLocalizations.of(context)!.cancel,
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: AppTextStyles.sizeContent
+                ),
+              )
+          ),
+          TextButton(
+              onPressed: _createNewSession,
+              child: Text(
+                "Create",
+                style: TextStyle(
+                  color: Colors.blue,
+                  fontSize: AppTextStyles.sizeContent
+                ),
+              )
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -166,6 +197,9 @@ class _MessagePageState extends State<MessagePage> {
         ),
       ),
       appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
         title: Transform.translate(
           offset: Offset(-20, 0),
           child: Text(
@@ -196,16 +230,19 @@ class _MessagePageState extends State<MessagePage> {
               children: [
                 Expanded(
                   child: ListView.builder(
+                    controller: _scrollController,
+                    reverse: true,
                     padding: const EdgeInsets.all(10),
                     itemCount: _messages.length,
                     itemBuilder: (context, index) {
-                      final msg = _messages[index];
-                      final isUser = msg['sender'] == 'User';
+                      final msg = _messages[_messages.length - 1 - index];
+                      final isBot = msg['sender'] == 'AI';
 
                       return Row(
-                        mainAxisAlignment: isUser ? MainAxisAlignment.start : MainAxisAlignment.end,
+                        mainAxisAlignment: isBot ? MainAxisAlignment.start : MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if(isUser)
+                          if(isBot)
                             Padding(
                               padding: const EdgeInsets.only(right: 8.0),
                               child: Image.asset(
@@ -220,13 +257,13 @@ class _MessagePageState extends State<MessagePage> {
                             padding: const EdgeInsets.all(12),
                             margin: const EdgeInsets.symmetric(vertical: 5),
                             decoration: BoxDecoration(
-                              color: isUser ? Colors.grey[200] : Colors.blue,
+                              color: isBot ? Colors.grey[200] : Colors.blue,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
                               msg['message'],
                               style: TextStyle(
-                                  color: isUser ? Colors.black : Colors.white,
+                                  color: isBot ? Colors.black : Colors.white,
                                   fontSize: AppTextStyles.sizeContent
                               ),
                             ),
@@ -268,28 +305,53 @@ class _MessagePageState extends State<MessagePage> {
 
   Widget loadHistoryChat(){
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Text(
-            "Sessions",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Text(
+                AppLocalizations.of(context)!.chatHistory,
+                style: AppTextStyles.title,
+              ),
+              Spacer(),
+              TextButton.icon(
+                onPressed: _promptNewSessionDialog,
+                style: ButtonStyle(
+                  overlayColor: MaterialStateProperty.all(Colors.transparent),
+                ),
+                icon: const Icon(
+                  Icons.add,
+                  size: AppTextStyles.sizeIcon,
+                  color: Colors.blue,
+                ),
+                label: const Text(
+                  "New Chat",
+                  style: AppTextStyles.content,
+                ),
+              ),
+            ],
           ),
         ),
+        const Divider(),
         Expanded(
           child: RefreshIndicator(
+            backgroundColor: Colors.white,
             onRefresh: _loadSessions,
-            child: ListView.builder(
+            child: ListView.separated(
               itemCount: _sessions.length,
               itemBuilder: (context, index) {
                 final session = _sessions[index];
                 final sessionId = session['sessionId'] ?? 'Unknown ID';
                 final sessionName = session['sessionName'] ?? sessionId;
+                String time = DateFormat('HH:mm - dd/MM/yyyy').format(DateTime.parse(session['created_at']));
 
                 return ListTile(
-                  title: Text(sessionName),
+                  title: Text(sessionName, style: AppTextStyles.content,),
                   subtitle: Text(
-                    "Created: ${session['created_at'] ?? 'N/A'}",
+                    "Created: ${time ?? 'N/A'}",
+                    style: AppTextStyles.subtitle,
                   ),
                   onTap: () async {
                     Navigator.pop(context);
@@ -298,17 +360,21 @@ class _MessagePageState extends State<MessagePage> {
                     await _loadMessagesForSession(_sessionId!);
                     setState(() => _isLoading = false);
                   },
+                  trailing: IconButton(
+                      onPressed: (){},
+                      icon: Icon(Icons.more_horiz_rounded, color: Colors.black, size: AppTextStyles.sizeIcon,)
+                  ),
+                );
+              },
+              separatorBuilder: (context, index){
+                return const Divider(
+                  color: Colors.grey,
+                  thickness: 1,
+                  indent: 15,
+                  endIndent: 15,
                 );
               },
             ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: ElevatedButton.icon(
-            onPressed: _promptNewSessionDialog,
-            icon: const Icon(Icons.add),
-            label: const Text("New Session"),
           ),
         ),
       ],

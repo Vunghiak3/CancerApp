@@ -4,8 +4,6 @@ import 'dart:io';
 import 'package:testfile/utils/apiEnpoints.dart';
 import 'package:http/http.dart' as http;
 
-
-
 class CnnService {
   Future<Map<String, dynamic>> diagnoses(String idToken, File image) async {
     final url = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.user.diagnoses);
