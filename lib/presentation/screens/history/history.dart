@@ -1,11 +1,11 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:testfile/presentation/screens/result/result.dart';
 import 'package:testfile/presentation/widgets/GetProgressBar.dart';
 import 'package:testfile/services/auth.dart';
-import 'package:testfile/services/user.dart';
+import 'package:testfile/services/cnn.dart';
 import 'package:testfile/theme/text_styles.dart';
+import 'package:testfile/utils/navigation_helper.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -26,7 +26,7 @@ class _HistoryPageState extends State<HistoryPage> {
   Future<List<dynamic>> fetchHistory() async {
     try {
       String idToken = await AuthService().getIdToken();
-      final response = await UserService().history(idToken);
+      final response = await CnnService().history(idToken);
       return response;
     } catch (e) {
       throw Exception(e);
@@ -41,8 +41,7 @@ class _HistoryPageState extends State<HistoryPage> {
   Future<Map<String, dynamic>> fetchDeleteHistory(String historyId) async {
     try {
       String idToken = await AuthService().getIdToken();
-      final response =
-          await UserService().deleteHistoryById(idToken, historyId);
+      final response = await CnnService().deleteHistoryById(idToken, historyId);
       return response;
     } catch (e) {
       throw Exception(e);
@@ -247,7 +246,10 @@ class _HistoryItemSection extends StatelessWidget {
                       ],
                     )),
               ]),
-      onTap: () {},
+      onTap: () {
+        NavigationHelper.nextPage(
+            context, ResultPage(image: data['mriImageUrl'], data: data));
+      },
     );
   }
 }
