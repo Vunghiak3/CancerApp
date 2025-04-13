@@ -106,98 +106,99 @@ class _RegisterPageState extends State<RegisterPage> {
         child: Center(
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2), // Màu bóng mờ
-                    blurRadius: 10, // Độ mờ của bóng
-                    spreadRadius: 2, // Độ lan của bóng
-                    offset: Offset(0, 5), // Dịch xuống dưới 5px
-                  ),
-                ],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          getHeader(),
-                          const SizedBox(height: 10,),
-                          InputInfor(
-                            label: AppLocalizations.of(context)!.name,
-                            inputType: TextInputType.text,
-                            controller: nameController,
-                            textError: errors['name'],
-                          ),
-                          const SizedBox(height: 10,),
-                          InputInfor(
-                            label: AppLocalizations.of(context)!.email,
-                            inputType: TextInputType.emailAddress,
-                            controller: emailController,
-                            textError: errors['email'],
-                          ),
-                          const SizedBox(height: 10,),
-                          InputInfor(
-                            label: AppLocalizations.of(context)!.password,
-                            inputType: TextInputType.visiblePassword,
-                            isPassword: true,
-                            controller: passwordController,
-                            textError: errors['password'],
-                          ),
-                          const SizedBox(height: 10,),
-                          InputInfor(
-                            label: AppLocalizations.of(context)!.confirmPassword,
-                            inputType: TextInputType.visiblePassword,
-                            isPassword: true,
-                            controller: confirmPasswordController,
-                            textError: errors['confirm_password'],
-                          ),
-                          const SizedBox(height: 20,),
-                          _isLoading
-                            ? Center(child: CircularProgressIndicator(),)
-                            : ElevatedButton(
-                            onPressed: fetchRegister,
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0xFF0E70CB),
-                                minimumSize: Size(double.infinity, 50),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10)
-                                )
-                            ),
-                            child: Text(
-                              AppLocalizations.of(context)!.signUp,
-                              style: TextStyle(
-                                  fontSize: AppTextStyles.sizeTitle,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 20,),
-                          Center(
-                            child: Text(
-                              AppLocalizations.of(context)!.orSignupWith,
-                              style: TextStyle(
-                                fontSize: AppTextStyles.sizeContent,
-                                color: Color(0xFF595959),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 20,),
-                        ],
-                      ),
+            child: IntrinsicHeight(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2), // Màu bóng mờ
+                      blurRadius: 10, // Độ mờ của bóng
+                      spreadRadius: 2, // Độ lan của bóng
+                      offset: Offset(0, 5), // Dịch xuống dưới 5px
                     ),
-                    getSocialButtons(),
                   ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            getHeader(),
+                            const SizedBox(height: 10,),
+                            InputInfor(
+                              label: AppLocalizations.of(context)!.name,
+                              inputType: TextInputType.text,
+                              controller: nameController,
+                              textError: errors['name'],
+                            ),
+                            const SizedBox(height: 10,),
+                            InputInfor(
+                              label: AppLocalizations.of(context)!.email,
+                              inputType: TextInputType.emailAddress,
+                              controller: emailController,
+                              textError: errors['email'],
+                            ),
+                            const SizedBox(height: 10,),
+                            InputInfor(
+                              label: AppLocalizations.of(context)!.password,
+                              inputType: TextInputType.visiblePassword,
+                              isPassword: true,
+                              controller: passwordController,
+                              textError: errors['password'],
+                            ),
+                            const SizedBox(height: 10,),
+                            InputInfor(
+                              label: AppLocalizations.of(context)!.confirmPassword,
+                              inputType: TextInputType.visiblePassword,
+                              isPassword: true,
+                              controller: confirmPasswordController,
+                              textError: errors['confirm_password'],
+                            ),
+                            const SizedBox(height: 20,),
+                            _isLoading
+                              ? Center(child: CircularProgressIndicator(),)
+                              : ElevatedButton(
+                              onPressed: fetchRegister,
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Color(0xFF0E70CB),
+                                  minimumSize: Size(double.infinity, 50),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)
+                                  )
+                              ),
+                              child: Text(
+                                AppLocalizations.of(context)!.signUp,
+                                style: TextStyle(
+                                    fontSize: AppTextStyles.sizeTitle,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 20,),
+                            Center(
+                              child: Text(
+                                AppLocalizations.of(context)!.orSignupWith,
+                                style: TextStyle(
+                                  fontSize: AppTextStyles.sizeContent,
+                                  color: Color(0xFF595959),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      getSocialButtons(),
+                    ],
+                  ),
                 ),
               ),
             ),

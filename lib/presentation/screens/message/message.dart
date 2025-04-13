@@ -182,7 +182,10 @@ class _MessagePageState extends State<MessagePage> {
               )
           ),
           TextButton(
-              onPressed: _createNewSession,
+              onPressed: (){
+                Navigator.pop(ctx);
+                _createNewSession();
+              },
               child: Text(
                 "Create",
                 style: TextStyle(

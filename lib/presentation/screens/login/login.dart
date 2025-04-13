@@ -128,72 +128,74 @@ class _LoginPageState extends State<LoginPage> {
         child: Center(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Container(
-              height: double.infinity,
-              width: double.infinity,
-              margin: EdgeInsets.symmetric(vertical: 140),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 10,
-                    spreadRadius: 2,
-                    offset: Offset(0, 5),
-                  ),
-                ],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: [
-                    _buildHeader(),
-                    const SizedBox(height: 10),
-                    InputInfor(
-                      label: AppLocalizations.of(context)!.email,
-                      inputType: TextInputType.emailAddress,
-                      controller: emailController,
-                      textError: errors['email'],
+            child: IntrinsicHeight(
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 30),
+                height: double.infinity,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 10,
+                      spreadRadius: 2,
+                      offset: Offset(0, 5),
                     ),
-                    const SizedBox(height: 20),
-                    InputInfor(
-                      label: AppLocalizations.of(context)!.password,
-                      inputType: TextInputType.visiblePassword,
-                      isPassword: true,
-                      controller: passwordController,
-                      textError: errors['password'],
-                    ),
-                    const SizedBox(height: 30),
-                    _isLoading
-                      ? Center(child: CircularProgressIndicator(),)
-                      : ElevatedButton(
-                      onPressed: fetchLogin,
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF0E70CB),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                          minimumSize: Size(double.infinity, 50)),
-                      child: Text(
-                        AppLocalizations.of(context)!.login,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: AppTextStyles.sizeTitle,
-                          fontWeight: FontWeight.bold,
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    children: [
+                      _buildHeader(),
+                      const SizedBox(height: 10),
+                      InputInfor(
+                        label: AppLocalizations.of(context)!.email,
+                        inputType: TextInputType.emailAddress,
+                        controller: emailController,
+                        textError: errors['email'],
+                      ),
+                      const SizedBox(height: 20),
+                      InputInfor(
+                        label: AppLocalizations.of(context)!.password,
+                        inputType: TextInputType.visiblePassword,
+                        isPassword: true,
+                        controller: passwordController,
+                        textError: errors['password'],
+                      ),
+                      const SizedBox(height: 30),
+                      _isLoading
+                        ? Center(child: CircularProgressIndicator(),)
+                        : ElevatedButton(
+                        onPressed: fetchLogin,
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFF0E70CB),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                            minimumSize: Size(double.infinity, 50)),
+                        child: Text(
+                          AppLocalizations.of(context)!.login,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: AppTextStyles.sizeTitle,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      AppLocalizations.of(context)!.orLoginWith,
-                      style: TextStyle(
-                        fontSize: AppTextStyles.sizeContent,
-                        color: Color(0xFF595959),
+                      const SizedBox(height: 20),
+                      Text(
+                        AppLocalizations.of(context)!.orLoginWith,
+                        style: TextStyle(
+                          fontSize: AppTextStyles.sizeContent,
+                          color: Color(0xFF595959),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    _buildSocialButtons(),
-                  ],
+                      const SizedBox(height: 20),
+                      _buildSocialButtons(),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -206,14 +208,11 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buildHeader(){
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 40),
-          child: Text(
-            AppLocalizations.of(context)!.login,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 32,
-            ),
+        Text(
+          AppLocalizations.of(context)!.login,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 32,
           ),
         ),
         Padding(
