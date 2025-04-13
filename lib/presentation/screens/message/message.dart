@@ -30,6 +30,14 @@ class _MessagePageState extends State<MessagePage> {
     _initializeChat();
     _loadSessions();
   }
+  @override
+  void dispose(){
+    _messageController.dispose();
+    _sessionNameController.dispose();
+    _scrollController.dispose();
+
+    super.dispose();
+  }
 
   Future<void> _initializeChat() async {
     setState(() => _isLoading = true);

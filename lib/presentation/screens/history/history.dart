@@ -44,7 +44,7 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   void loadViewHistory(Map<String, dynamic> data){
-    NavigationHelper.nextPage(context, ResultPage(imageUrl: data['mriImageUrl'], data: data,));
+    NavigationHelper.nextPage(context, ResultPage(imageUrl: data['signedImageUrl'], data: data,));
   }
 
   @override
