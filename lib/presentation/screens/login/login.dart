@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:testfile/presentation/screens/home/home.dart';
@@ -63,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
   void fetchLoginGoogle() async{
     final GoogleSignIn googleSignIn = GoogleSignIn(
       scopes: ['email', 'profile'],
-      serverClientId: '968583952916-4viga6hcqn696fa3devfo0f7rt05s5p3.apps.googleusercontent.com'
+      serverClientId: dotenv.env['CLIENT_ID_GOOGLE']
     );
     await googleSignIn.signOut();
     final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
@@ -92,6 +94,23 @@ class _LoginPageState extends State<LoginPage> {
           backgroundColor: Colors.red,
         ),
       );
+    }
+  }
+
+  void fetchLoginFacebook() async{
+    final LoginResult result = await FacebookAuth.instance.login();
+    print('Facebook login status: ${result.status}');
+
+    if(result.status == LoginStatus.success){
+      final AccessToken? accessToken = result.accessToken;
+      final String token = accessToken!.toJson()['token'];
+      print('Access Token: ${token}');
+
+      if (accessToken != null) {
+        await AuthService().loginFacebook(token);
+      }
+    }else {
+      print('Facebook login failed: ${result.message}');
     }
   }
 
@@ -266,7 +285,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
         const SizedBox(width: 20,),
         ElevatedButton(
-          onPressed: () {},
+          onPressed: fetchLoginFacebook,
           style: ElevatedButton.styleFrom(
               backgroundColor: Color(0xFFEEEEEE),
               shape: RoundedRectangleBorder(

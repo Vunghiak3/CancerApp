@@ -106,8 +106,30 @@ class AuthService{
     }
   }
   
-  Future<void> loginFacebook() async{
+  Future<void> loginFacebook(String idToken) async{
+    final url = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.auth.loginFacebook);
 
+    try{
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "id_token": idToken,
+        }),
+      );
+
+      if(response.statusCode == 200){
+        final responseBody = jsonDecode(response.body);
+        responseBody['idToken'] = idToken;
+        await saveUser(responseBody);
+
+        return responseBody;
+      }else{
+        throw response.body;
+      }
+    }catch(e){
+      rethrow;
+    }
   }
 
   Future<void> logout(String idToken) async{
