@@ -16,12 +16,14 @@ class MenuWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if(title != null && title!.isNotEmpty)...[
+        if (title != null && title!.isNotEmpty) ...[
           Text(
             title!,
             style: AppTextStyles.content,
           ),
-          const SizedBox(height: 10,),
+          const SizedBox(
+            height: 10,
+          ),
         ],
         Card(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -31,13 +33,17 @@ class MenuWidget extends StatelessWidget {
           child: Column(
             children: List.generate(
               items.length,
-                  (index) => Column(
+              (index) => Column(
                 children: [
                   Stack(
                     children: [
                       ListTile(
                         dense: true,
-                        leading: Icon(items[index].icon, color: items[index].colorIcon ?? Colors.blue, size: AppTextStyles.sizeIcon,),
+                        leading: Icon(
+                          items[index].icon,
+                          color: items[index].colorIcon ?? Colors.blue,
+                          size: AppTextStyles.sizeIcon,
+                        ),
                         title: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 5.0),
                           child: Column(

@@ -21,9 +21,14 @@ class EditProfilePage extends StatelessWidget {
           ),
         ),
         leading: IconButton(
-            onPressed: (){Navigator.pop(context);},
-            icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black, size: AppTextStyles.sizeIconSmall,)
-        ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: Colors.black,
+              size: AppTextStyles.sizeIconSmall,
+            )),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(20),
@@ -58,7 +63,10 @@ class EditProfilePage extends StatelessWidget {
                 ),
                 child: Text(
                   AppLocalizations.of(context)!.saveChanges,
-                  style: TextStyle(fontSize: AppTextStyles.sizeContent, color: Colors.white,),
+                  style: TextStyle(
+                    fontSize: AppTextStyles.sizeContent,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),

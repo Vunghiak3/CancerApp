@@ -75,6 +75,7 @@ flutter:
     - assets/imgs/logowelcome.png
     - assets/imgs/logowelcome2.png
     - assets/imgs/placeholder.png
+    - assets/imgs/imageprofile.png
     - assets/modelsAi/model_final.tflite
     - assets/modelsAi/labels.txt
     - .env

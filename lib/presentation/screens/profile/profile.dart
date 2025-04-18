@@ -102,7 +102,7 @@ class _ProfilePageState extends State<ProfilePage>{
           padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 0),
           child: Column(
             children: [
-              getUserBox(),
+              getUser(),
               const SizedBox(height: 30,),
               MenuWidget(
                   items: [
@@ -138,7 +138,7 @@ class _ProfilePageState extends State<ProfilePage>{
     );
   }
 
-  Widget getUserBox(){
+  Widget getUser(){
     return FutureBuilder<Map<String, dynamic>>(
       future: _userFuture,
       builder: (context, snapshot) {
@@ -158,20 +158,27 @@ class _ProfilePageState extends State<ProfilePage>{
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(30),
-                  child: Image.network(
-                    userData['profilePicture'] ?? '',
+                  child: (userData['profilePicture'] != null && userData['profilePicture'].isNotEmpty)
+                      ? Image.network(
+                    userData['profilePicture'],
                     width: 110,
                     height: 110,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrack) {
+                    errorBuilder: (context, error, stackTrace) {
                       return Image.asset(
-                        'assets/imgs/placeholder.png',
+                        'assets/imgs/imageprofile.png',
                         width: 110,
                         height: 110,
                         fit: BoxFit.cover,
                       );
                     },
-                  ),
+                  )
+                      : Image.asset(
+                    'assets/imgs/imageprofile.png',
+                    width: 110,
+                    height: 110,
+                    fit: BoxFit.cover,
+                  )
                 ),
                 Positioned(
                   bottom: -15,

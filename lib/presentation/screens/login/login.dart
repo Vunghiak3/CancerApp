@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:testfile/presentation/screens/home/home.dart';
 import 'package:testfile/presentation/screens/register/register.dart';
+import 'package:testfile/presentation/widgets/ButtonImage.dart';
 import 'package:testfile/presentation/widgets/InputInfor.dart';
 import 'package:testfile/services/auth.dart';
 import 'package:testfile/theme/text_styles.dart';
@@ -38,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void fetchLogin() async{
+  void fetchLogin() async {
     setState(() {
       _isLoading = true;
       errors = {'email': '', 'password': ''};
@@ -47,38 +47,38 @@ class _LoginPageState extends State<LoginPage> {
     String email = emailController.text.trim();
     String password = passwordController.text.trim();
 
-    try{
+    try {
       final authService = AuthService();
       await authService.login(email, password);
 
       NavigationHelper.nextPageReplace(context, HomeScreen());
-    }catch(e){
+    } catch (e) {
       final errorResponse = jsonDecode(e.toString())['detail'];
       handleError(errorResponse);
-    }finally{
+    } finally {
       setState(() {
         _isLoading = false;
       });
     }
   }
 
-  void fetchLoginGoogle() async{
+  void fetchLoginGoogle() async {
     final GoogleSignIn googleSignIn = GoogleSignIn(
-      scopes: ['email', 'profile'],
-      serverClientId: dotenv.env['CLIENT_ID_GOOGLE']
-    );
+        scopes: ['email', 'profile'],
+        serverClientId: dotenv.env['CLIENT_ID_GOOGLE']);
     await googleSignIn.signOut();
     final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
-    if(googleUser == null){
+    if (googleUser == null) {
       print('Dang nhap bi huy!');
       return;
     }
 
-    final GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser!.authentication;
     final idToken = googleAuth.idToken;
 
-    if(idToken == null){
+    if (idToken == null) {
       print('Khong lay duoc token id!');
       return;
     }
@@ -97,32 +97,15 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  void fetchLoginFacebook() async{
-    final LoginResult result = await FacebookAuth.instance.login();
-    print('Facebook login status: ${result.status}');
-
-    if(result.status == LoginStatus.success){
-      final AccessToken? accessToken = result.accessToken;
-      final String token = accessToken!.toJson()['token'];
-      print('Access Token: ${token}');
-
-      if (accessToken != null) {
-        await AuthService().loginFacebook(token);
-      }
-    }else {
-      print('Facebook login failed: ${result.message}');
-    }
-  }
-
-  void handleError(dynamic errorResponse){
-    String error= '';
-    if(errorResponse is List){
+  void handleError(dynamic errorResponse) {
+    String error = '';
+    if (errorResponse is List) {
       error = errorResponse[0]['msg'];
       final field = errorResponse[0]['loc'][1];
       setState(() {
         errors[field] = '$error!';
       });
-    }else{
+    } else {
       error = errorResponse.toString();
       setState(() {
         errors['password'] = '$error!';
@@ -137,13 +120,13 @@ class _LoginPageState extends State<LoginPage> {
       body: Container(
         decoration: const BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Color(0xFF2567E8),
-                Color(0xFF1CE6DA),
-              ],
-            )),
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color(0xFF2567E8),
+            Color(0xFF1CE6DA),
+          ],
+        )),
         child: Center(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -168,7 +151,7 @@ class _LoginPageState extends State<LoginPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     children: [
-                      _buildHeader(),
+                      getHeader(),
                       const SizedBox(height: 10),
                       InputInfor(
                         label: AppLocalizations.of(context)!.email,
@@ -186,23 +169,25 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(height: 30),
                       _isLoading
-                        ? Center(child: CircularProgressIndicator(),)
-                        : ElevatedButton(
-                        onPressed: fetchLogin,
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF0E70CB),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)),
-                            minimumSize: Size(double.infinity, 50)),
-                        child: Text(
-                          AppLocalizations.of(context)!.login,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: AppTextStyles.sizeTitle,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
+                          ? Center(
+                              child: CircularProgressIndicator(),
+                            )
+                          : ElevatedButton(
+                              onPressed: fetchLogin,
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Color(0xFF0E70CB),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)),
+                                  minimumSize: Size(double.infinity, 50)),
+                              child: Text(
+                                AppLocalizations.of(context)!.login,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: AppTextStyles.sizeTitle,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
                       const SizedBox(height: 20),
                       Text(
                         AppLocalizations.of(context)!.orLoginWith,
@@ -212,7 +197,13 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      _buildSocialButtons(),
+                      Wrap(
+                        spacing: 20,
+                        alignment: WrapAlignment.center,
+                        children: [
+                          ButtonImage(onPressed: fetchLoginGoogle),
+                        ],
+                      )
                     ],
                   ),
                 ),
@@ -224,7 +215,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildHeader(){
+  Widget getHeader() {
     return Column(
       children: [
         Text(
@@ -258,43 +249,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ],
             ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSocialButtons(){
-    double sizeLogo = 20;
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ElevatedButton(
-          onPressed: fetchLoginGoogle,
-          style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFFEEEEEE),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10))
-          ),
-          child: Image.asset(
-            'assets/imgs/google.png',
-            width: sizeLogo,
-            height: sizeLogo,
-          ),
-        ),
-        const SizedBox(width: 20,),
-        ElevatedButton(
-          onPressed: fetchLoginFacebook,
-          style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFFEEEEEE),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10))
-          ),
-          child: Image.asset(
-            'assets/imgs/facebook.png',
-            width: sizeLogo,
-            height: sizeLogo,
           ),
         ),
       ],

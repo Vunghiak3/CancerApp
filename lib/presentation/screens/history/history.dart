@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:testfile/presentation/screens/result/result.dart';
-import 'package:testfile/presentation/widgets/GetProgressBar.dart';
+import 'package:testfile/presentation/widgets/CustomTopNotification.dart';
 import 'package:testfile/services/auth.dart';
 import 'package:testfile/services/cnn.dart';
 import 'package:testfile/theme/text_styles.dart';
@@ -16,6 +17,9 @@ class HistoryPage extends StatefulWidget {
 
 class _HistoryPageState extends State<HistoryPage> {
   late Future<List<dynamic>> futureHistory = fetchHistory();
+  bool isChoose = false;
+
+  Set<String> selectedIds = {};
 
   Future<List<dynamic>> fetchHistory() async {
     try {
@@ -43,8 +47,13 @@ class _HistoryPageState extends State<HistoryPage> {
     }
   }
 
-  void loadViewHistory(Map<String, dynamic> data){
-    NavigationHelper.nextPage(context, ResultPage(imageUrl: data['signedImageUrl'], data: data,));
+  void loadViewHistory(Map<String, dynamic> data) {
+    NavigationHelper.nextPage(
+        context,
+        ResultPage(
+          imageUrl: data['signedImageUrl'],
+          data: data,
+        ));
   }
 
   @override
@@ -52,7 +61,32 @@ class _HistoryPageState extends State<HistoryPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: getAppBar(),
-      body: getBody(),
+      body: Stack(
+        children: [
+          getBody(),
+          if (isChoose && selectedIds.isNotEmpty)
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  ),
+                  child: Text(
+                    "Xóa (${selectedIds.length})",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
@@ -67,13 +101,46 @@ class _HistoryPageState extends State<HistoryPage> {
       ),
       centerTitle: true,
       actions: [
-        IconButton(
-            onPressed: () {},
-            icon: Icon(
-              Icons.more_horiz_outlined,
-              color: Colors.black,
-              size: 24,
-            ))
+        Padding(
+          padding: const EdgeInsets.only(right: 12.0),
+          child: FutureBuilder(
+              future: futureHistory,
+              builder: (context, snapshot){
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Container();
+                }
+
+                if (snapshot.hasError || snapshot.data!.isEmpty ?? true) {
+                  return Container();
+                }
+
+                return TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.black,
+                    backgroundColor: Colors.grey.shade200,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    minimumSize: Size(0, 36),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      selectedIds.clear();
+                      isChoose = !isChoose;
+                    });
+                  },
+                  child: Text(
+                    isChoose ? 'Hủy' : 'Chọn',
+                    style: TextStyle(
+                      fontSize: AppTextStyles.sizeSubtitle,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                );
+              }
+          ),
+        ),
       ],
     );
   }
@@ -81,15 +148,24 @@ class _HistoryPageState extends State<HistoryPage> {
   Widget getBody() {
     return FutureBuilder<List<dynamic>>(
         future: futureHistory,
-        builder: (context, snapshot){
-          if(snapshot.connectionState == ConnectionState.waiting){
-            return GetProgressBar();
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return shimmerLoadingList();
           }
 
-          if(snapshot.hasError){
+          if (snapshot.hasError) {
             return Center(child: Text('Lỗi: ${snapshot.error}'));
           }
           final historyData = snapshot.data ?? [];
+
+          if (historyData.isEmpty) {
+            return Center(
+              child: Text(
+                'Không có lịch sử chẩn đoán',
+                style: TextStyle(fontSize: AppTextStyles.sizeContent, color: Colors.grey),
+              ),
+            );
+          }
 
           return RefreshIndicator(
             backgroundColor: Colors.white,
@@ -114,8 +190,7 @@ class _HistoryPageState extends State<HistoryPage> {
               shrinkWrap: true,
             ),
           );
-        }
-    );
+        });
   }
 
   void showDialogItem(String diagnosisId) async {
@@ -139,8 +214,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   child: Text(
                     AppLocalizations.of(context)!.cancel,
                     style: AppTextStyles.cancel,
-                  )
-              ),
+                  )),
               TextButton(
                   onPressed: () {
                     Navigator.pop(context, true);
@@ -148,8 +222,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   child: Text(
                     AppLocalizations.of(context)!.delete,
                     style: AppTextStyles.delete,
-                  )
-              )
+                  ))
             ],
           );
         });
@@ -166,19 +239,71 @@ class _HistoryPageState extends State<HistoryPage> {
         await fetchDeleteHistory(diagnosisId);
         Navigator.of(context).pop();
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Xoa thanh cong')),
+        CustomTopNotification.show(
+          context,
+          message: 'Delete success!',
         );
 
         refreshHistory();
       } catch (e) {
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Xoá thất bại: $e")),
+        CustomTopNotification.show(
+          context,
+          message: 'Xóa thất bại!',
+          color: Colors.red,
+          icon: Icons.cancel
         );
         throw Exception(e);
       }
     }
+  }
+
+  Widget shimmerLoadingList(){
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 9),
+          child: Shimmer.fromColors(
+            baseColor: Colors.grey.shade300,
+            highlightColor: Colors.grey.shade100,
+            child: Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        height: 14,
+                        width: double.infinity,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        height: 12,
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        color: Colors.white,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+      separatorBuilder: (_, __) => const Divider(indent: 24, endIndent: 24),
+      itemCount: 3,
+    );
   }
 }
 
@@ -195,23 +320,50 @@ class _HistoryItemSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       contentPadding: const EdgeInsets.only(left: 24, right: 8),
-      leading: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: FadeInImage.assetNetwork(
-          placeholder: "assets/imgs/placeholder.png",
-          image: data["signedImageUrl"],
-          width: 48,
-          height: 48,
-          fit: BoxFit.cover,
-          imageErrorBuilder: (context, error, stackTrace) {
-            return Image.asset(
+      leading: Wrap(
+        spacing: 10,
+        children: [
+          if (parent.isChoose)
+            Checkbox(
+              value: parent.selectedIds.contains(data["diagnosisId"]),
+              onChanged: (value) {
+                if (value == true) {
+                  parent.setState(() {
+                    parent.selectedIds.add(data["diagnosisId"]);
+                  });
+                } else {
+                  parent.setState(() {
+                    parent.selectedIds.remove(data["diagnosisId"]);
+                  });
+                }
+              },
+            ),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: data["signedImageUrl"] != null
+                ? FadeInImage.assetNetwork(
+              placeholder: "assets/imgs/placeholder.png",
+              image: data["signedImageUrl"],
+              width: 48,
+              height: 48,
+              fit: BoxFit.cover,
+              imageErrorBuilder: (context, error, stackTrace) {
+                return Image.asset(
+                  "assets/imgs/placeholder.png",
+                  width: 48,
+                  height: 48,
+                  fit: BoxFit.cover,
+                );
+              },
+            )
+                : Image.asset(
               "assets/imgs/placeholder.png",
               width: 48,
               height: 48,
               fit: BoxFit.cover,
-            );
-          },
-        ),
+            ),
+          )
+        ],
       ),
       title: Text(
         data["aiPrediction"] ?? "Unknown",
@@ -235,23 +387,25 @@ class _HistoryItemSection extends StatelessWidget {
           },
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           itemBuilder: (context) => <PopupMenuEntry<String>>[
-            PopupMenuItem(
-                value: 'delete',
-                height: 30,
-                child: Row(
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!.delete,
-                      style: AppTextStyles.delete,
-                    ),
-                    Spacer(),
-                    Icon(Icons.delete_outline_rounded, color: Colors.red, size: 24,),
-                  ],
-                )
-            ),
-          ]
-      ),
-      onTap: (){
+                PopupMenuItem(
+                    value: 'delete',
+                    height: 30,
+                    child: Row(
+                      children: [
+                        Text(
+                          AppLocalizations.of(context)!.delete,
+                          style: AppTextStyles.delete,
+                        ),
+                        Spacer(),
+                        Icon(
+                          Icons.delete_outline_rounded,
+                          color: Colors.red,
+                          size: 24,
+                        ),
+                      ],
+                    )),
+              ]),
+      onTap: () {
         parent.loadViewHistory(data);
       },
     );

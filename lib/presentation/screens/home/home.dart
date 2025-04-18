@@ -1,13 +1,10 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
 import 'package:testfile/presentation/screens/chooseCancer/chooseCancer.dart';
 import 'package:testfile/presentation/screens/history/history.dart';
 import 'package:testfile/presentation/screens/message/message.dart';
 import 'package:testfile/presentation/screens/profile/profile.dart';
+import 'package:testfile/presentation/widgets/ImagePickerHelper.dart';
 
 import 'package:testfile/services/news.dart';
 import 'package:testfile/model/news.dart';
@@ -53,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (index == 1) {
       NavigationHelper.nextPage(context, MessagePage());
     } else if (index == 2) {
-      _showImagePickerDialog();
+      onSelectImage();
     } else if (index < _tabs.length) {
       setState(() {
         _selectedIndex = index;
@@ -149,7 +146,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: Icons.health_and_safety,
                   label: "AI Diagnosis",
                   onTap: () {
-                    _showImagePickerDialog();
+                    // _showImagePickerDialog();
+                    onSelectImage();
                   },
                 ),
                 _FeatureBox(
@@ -192,83 +190,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _showImagePickerDialog() {
-    int previousIndex = _selectedIndex;
-
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            backgroundColor: Colors.white,
-            title: Text(
-              AppLocalizations.of(context)!.selectPhotoFrom,
-              style: AppTextStyles.title,
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.photo_library, color: Colors.blue),
-                  title: Text(
-                    AppLocalizations.of(context)!.googlePhotos,
-                    style: AppTextStyles.content,
-                  ),
-                  onTap: () async {
-                    File? image = await _pickImageFromGallery();
-                    if (image != null) {
-                      NavigationHelper.nextPage(
-                          context, ChooseCancerPage(selectedImage: image));
-                    }
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.image, color: Colors.green),
-                  title: Text(
-                    AppLocalizations.of(context)!.libary,
-                    style: AppTextStyles.content,
-                  ),
-                  onTap: () async {
-                    File? image = await _pickImageFromFiles();
-                    if (image != null) {
-                      NavigationHelper.nextPage(
-                          context, ChooseCancerPage(selectedImage: image));
-                    }
-                  },
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                  onPressed: () {
-                    setState(() {
-                      _selectedIndex = previousIndex;
-                    });
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    AppLocalizations.of(context)!.cancel,
-                    style: AppTextStyles.cancel,
-                  ))
-            ],
-          );
-        });
-  }
-
-  Future<File?> _pickImageFromGallery() async {
-    final returnImage =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (returnImage != null) {
-      return File(returnImage.path);
-    }
-    return null;
-  }
-
-  Future<File?> _pickImageFromFiles() async {
-    final FilePickerResult? result = await FilePicker.platform.pickFiles();
-    if (result != null) {
-      return File(result.files.single.path!);
-    }
-    return null;
+  void onSelectImage() {
+    ImagePickerHelper.showImagePickerDialog(context, (image) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ChooseCancerPage(selectedImage: image)),
+      );
+    });
   }
 }
 

@@ -3,7 +3,12 @@ import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:testfile/presentation/screens/home/home.dart';
 import 'package:testfile/presentation/screens/login/login.dart';
+import 'package:testfile/presentation/widgets/ButtonImage.dart';
+import 'package:testfile/presentation/widgets/CustomTopNotification.dart';
 import 'package:testfile/presentation/widgets/InputInfor.dart';
 import 'package:testfile/services/auth.dart';
 import 'package:testfile/theme/text_styles.dart';
@@ -56,8 +61,9 @@ class _RegisterPageState extends State<RegisterPage> {
         confirmPasswordController.text.trim(),
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Đăng ký thành công!')),
+      CustomTopNotification.show(
+        context,
+        message: 'Đăng ký thành công!',
       );
 
       NavigationHelper.nextPageRemoveUntil(context, LoginPage());
@@ -69,6 +75,41 @@ class _RegisterPageState extends State<RegisterPage> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  void fetchLoginGoogle() async {
+    final GoogleSignIn googleSignIn = GoogleSignIn(
+        scopes: ['email', 'profile'],
+        serverClientId: dotenv.env['CLIENT_ID_GOOGLE']);
+    await googleSignIn.signOut();
+    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+    if (googleUser == null) {
+      print('Dang nhap bi huy!');
+      return;
+    }
+
+    final GoogleSignInAuthentication googleAuth =
+    await googleUser!.authentication;
+    final idToken = googleAuth.idToken;
+
+    if (idToken == null) {
+      print('Khong lay duoc token id!');
+      return;
+    }
+
+    try {
+      final authService = AuthService();
+      await authService.loginGoogle(idToken!);
+      NavigationHelper.nextPageReplace(context, HomeScreen());
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Đăng nhập thất bại!'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -124,7 +165,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
@@ -196,7 +237,13 @@ class _RegisterPageState extends State<RegisterPage> {
                           ],
                         ),
                       ),
-                      getSocialButtons(),
+                      Wrap(
+                        spacing: 20,
+                        alignment: WrapAlignment.center,
+                        children: [
+                          ButtonImage(onPressed: fetchLoginGoogle),
+                        ],
+                      )
                     ],
                   ),
                 ),
@@ -248,41 +295,6 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget getSocialButtons(){
-    double sizeLogo = 20;
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ElevatedButton(
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFFEEEEEE),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10))),
-          child: Image.asset(
-            'assets/imgs/google.png',
-            width: sizeLogo,
-            height: sizeLogo,
-          ),
-        ),
-        const SizedBox(width: 20,),
-        ElevatedButton(
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFFEEEEEE),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10))),
-          child: Image.asset(
-            'assets/imgs/facebook.png',
-            width: sizeLogo,
-            height: sizeLogo,
-          ),
-        ),
-      ],
     );
   }
 }

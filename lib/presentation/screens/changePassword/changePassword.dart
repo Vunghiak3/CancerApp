@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:testfile/presentation/widgets/CustomTopNotification.dart';
 import 'package:testfile/presentation/widgets/InputTextField.dart';
 import 'package:testfile/services/auth.dart';
 import 'package:testfile/services/user.dart';
@@ -110,8 +111,9 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
       await UserService().changePassword(currentPassword, newPassword, idToken);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Password changed successfully!')),
+      CustomTopNotification.show(
+        context,
+        message: 'Password changed successfully!',
       );
 
       currentPasswordController.clear();

@@ -4,45 +4,42 @@ import 'package:http/http.dart' as http;
 import 'package:testfile/utils/apiEnpoints.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class AuthService{
+class AuthService {
   final FlutterSecureStorage _storage = FlutterSecureStorage();
 
-  Future<Map<String, dynamic>> register(String name, String email, String password, String confirmPassword) async {
+  Future<Map<String, dynamic>> register(String name, String email,
+      String password, String confirmPassword) async {
     final url = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.auth.register);
-    try{
-      final response = await http.post(
-          url,
+    try {
+      final response = await http.post(url,
           headers: {"Content-Type": "application/json"},
           body: jsonEncode({
             "name": name,
             "email": email,
             "password": password,
             "confirm_password": confirmPassword
-          })
-      );
+          }));
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {
         throw (response.body);
       }
-    }catch(e){
+    } catch (e) {
       rethrow;
     }
   }
 
-  Future<Map<String, dynamic>> login(String email, String password) async{
+  Future<Map<String, dynamic>> login(String email, String password) async {
     final url = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.auth.login);
 
-    try{
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "email": email,
-          "password": password,
-        })
-      );
+    try {
+      final response = await http.post(url,
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode({
+            "email": email,
+            "password": password,
+          }));
 
       if (response.statusCode == 200) {
         final responseBody = jsonDecode(response.body);
@@ -52,7 +49,7 @@ class AuthService{
       } else {
         throw (response.body);
       }
-    }catch(e){
+    } catch (e) {
       rethrow;
     }
   }
@@ -73,43 +70,17 @@ class AuthService{
     await _storage.delete(key: 'user');
   }
 
-  Future<String> getIdToken() async{
+  Future<String> getIdToken() async {
     String? userJson = await AuthService().getUser();
     Map<String, dynamic> user = jsonDecode(userJson!);
     String idToken = user['idToken'];
     return idToken;
   }
 
-  Future<void> loginGoogle(String idToken) async{
+  Future<void> loginGoogle(String idToken) async {
     final url = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.auth.loginGoogle);
 
     try {
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-        "id_token": idToken,
-        }),
-      );
-
-      if(response.statusCode == 200){
-        final responseBody = jsonDecode(response.body);
-        responseBody['idToken'] = idToken;
-        await saveUser(responseBody);
-
-        return responseBody;
-      }else{
-        throw response.body;
-      }
-    } catch (e) {
-      rethrow;
-    }
-  }
-  
-  Future<void> loginFacebook(String idToken) async{
-    final url = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.auth.loginFacebook);
-
-    try{
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
@@ -118,24 +89,24 @@ class AuthService{
         }),
       );
 
-      if(response.statusCode == 200){
+      if (response.statusCode == 200) {
         final responseBody = jsonDecode(response.body);
         responseBody['idToken'] = idToken;
         await saveUser(responseBody);
 
         return responseBody;
-      }else{
+      } else {
         throw response.body;
       }
-    }catch(e){
+    } catch (e) {
       rethrow;
     }
   }
 
-  Future<void> logout(String idToken) async{
+  Future<void> logout(String idToken) async {
     final url = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.admin.signout);
 
-    try{
+    try {
       final response = await http.post(
         url,
         headers: {
@@ -149,7 +120,30 @@ class AuthService{
       } else {
         throw (response.body);
       }
-    }catch(e){
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> deleteAccount(String idToken) async {
+    final url =
+        Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.user.deleteAccount);
+
+    try {
+      final response = await http.delete(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $idToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        await AuthService().deleteUser();
+      } else {
+        throw (response.body);
+      }
+    } catch (e) {
       rethrow;
     }
   }
