@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:testfile/presentation/screens/result/result.dart';
 import 'package:testfile/presentation/widgets/CustomTopNotification.dart';
@@ -41,6 +42,7 @@ class _HistoryPageState extends State<HistoryPage> {
     try {
       String idToken = await AuthService().getIdToken();
       final response = await CnnService().deleteHistoryById(idToken, historyId);
+      print(response);
       return response;
     } catch (e) {
       throw Exception(e);
@@ -105,7 +107,7 @@ class _HistoryPageState extends State<HistoryPage> {
           padding: const EdgeInsets.only(right: 12.0),
           child: FutureBuilder(
               future: futureHistory,
-              builder: (context, snapshot){
+              builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Container();
                 }
@@ -138,8 +140,7 @@ class _HistoryPageState extends State<HistoryPage> {
                     ),
                   ),
                 );
-              }
-          ),
+              }),
         ),
       ],
     );
@@ -162,7 +163,8 @@ class _HistoryPageState extends State<HistoryPage> {
             return Center(
               child: Text(
                 'Không có lịch sử chẩn đoán',
-                style: TextStyle(fontSize: AppTextStyles.sizeContent, color: Colors.grey),
+                style: TextStyle(
+                    fontSize: AppTextStyles.sizeContent, color: Colors.grey),
               ),
             );
           }
@@ -247,18 +249,14 @@ class _HistoryPageState extends State<HistoryPage> {
         refreshHistory();
       } catch (e) {
         Navigator.of(context).pop();
-        CustomTopNotification.show(
-          context,
-          message: 'Xóa thất bại!',
-          color: Colors.red,
-          icon: Icons.cancel
-        );
+        CustomTopNotification.show(context,
+            message: 'Xóa thất bại!', color: Colors.red, icon: Icons.cancel);
         throw Exception(e);
       }
     }
   }
 
-  Widget shimmerLoadingList(){
+  Widget shimmerLoadingList() {
     return ListView.separated(
       padding: const EdgeInsets.symmetric(vertical: 8),
       itemBuilder: (context, index) {
@@ -302,7 +300,7 @@ class _HistoryPageState extends State<HistoryPage> {
         );
       },
       separatorBuilder: (_, __) => const Divider(indent: 24, endIndent: 24),
-      itemCount: 3,
+      itemCount: 5,
     );
   }
 }
@@ -319,9 +317,9 @@ class _HistoryItemSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      contentPadding: const EdgeInsets.only(left: 24, right: 8),
+      contentPadding: EdgeInsets.only(left: parent.isChoose ? 5 : 24, right: 8),
       leading: Wrap(
-        spacing: 10,
+        spacing: 5,
         children: [
           if (parent.isChoose)
             Checkbox(
@@ -342,26 +340,26 @@ class _HistoryItemSection extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             child: data["signedImageUrl"] != null
                 ? FadeInImage.assetNetwork(
-              placeholder: "assets/imgs/placeholder.png",
-              image: data["signedImageUrl"],
-              width: 48,
-              height: 48,
-              fit: BoxFit.cover,
-              imageErrorBuilder: (context, error, stackTrace) {
-                return Image.asset(
-                  "assets/imgs/placeholder.png",
-                  width: 48,
-                  height: 48,
-                  fit: BoxFit.cover,
-                );
-              },
-            )
+                    placeholder: "assets/imgs/placeholder.png",
+                    image: data["signedImageUrl"],
+                    width: 48,
+                    height: 48,
+                    fit: BoxFit.cover,
+                    imageErrorBuilder: (context, error, stackTrace) {
+                      return Image.asset(
+                        "assets/imgs/placeholder.png",
+                        width: 48,
+                        height: 48,
+                        fit: BoxFit.cover,
+                      );
+                    },
+                  )
                 : Image.asset(
-              "assets/imgs/placeholder.png",
-              width: 48,
-              height: 48,
-              fit: BoxFit.cover,
-            ),
+                    "assets/imgs/placeholder.png",
+                    width: 48,
+                    height: 48,
+                    fit: BoxFit.cover,
+                  ),
           )
         ],
       ),
@@ -373,38 +371,50 @@ class _HistoryItemSection extends StatelessWidget {
         "Percent: ${data["confidenceScore"]}",
         style: AppTextStyles.subtitle,
       ),
-      trailing: PopupMenuButton<String>(
-          icon: Icon(
-            Icons.more_horiz_rounded,
-            size: 24,
-            color: Colors.black,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            DateFormat('HH:mm - dd/MM/yyyy').format(
+                    DateTime.parse(data['diagnosedAt'] + 'Z').toLocal()) ??
+                'N/A',
+            style: AppTextStyles.subtitle,
           ),
-          color: Color(0xfff5f5f5),
-          onSelected: (value) {
-            if (value == 'delete') {
-              parent.showDialogItem(data["diagnosisId"]);
-            }
-          },
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          itemBuilder: (context) => <PopupMenuEntry<String>>[
-                PopupMenuItem(
-                    value: 'delete',
-                    height: 30,
-                    child: Row(
-                      children: [
-                        Text(
-                          AppLocalizations.of(context)!.delete,
-                          style: AppTextStyles.delete,
-                        ),
-                        Spacer(),
-                        Icon(
-                          Icons.delete_outline_rounded,
-                          color: Colors.red,
-                          size: 24,
-                        ),
-                      ],
-                    )),
-              ]),
+          PopupMenuButton<String>(
+              icon: Icon(
+                Icons.more_horiz_rounded,
+                size: 24,
+                color: Colors.black,
+              ),
+              color: Color(0xfff5f5f5),
+              onSelected: (value) {
+                if (value == 'delete') {
+                  parent.showDialogItem(data["diagnosisId"]);
+                }
+              },
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
+              itemBuilder: (context) => <PopupMenuEntry<String>>[
+                    PopupMenuItem(
+                        value: 'delete',
+                        height: 30,
+                        child: Row(
+                          children: [
+                            Text(
+                              AppLocalizations.of(context)!.delete,
+                              style: AppTextStyles.delete,
+                            ),
+                            Spacer(),
+                            Icon(
+                              Icons.delete_outline_rounded,
+                              color: Colors.red,
+                              size: 24,
+                            ),
+                          ],
+                        )),
+                  ])
+        ],
+      ),
       onTap: () {
         parent.loadViewHistory(data);
       },

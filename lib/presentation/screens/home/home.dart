@@ -146,7 +146,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: Icons.health_and_safety,
                   label: "AI Diagnosis",
                   onTap: () {
-                    // _showImagePickerDialog();
                     onSelectImage();
                   },
                 ),

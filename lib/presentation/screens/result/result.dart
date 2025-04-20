@@ -33,16 +33,24 @@ class _ResultPageState extends State<ResultPage> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-            onPressed: (){Navigator.pop(context);},
-            icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black, size: AppTextStyles.sizeIconSmall,)
-        ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: Colors.black,
+              size: AppTextStyles.sizeIconSmall,
+            )),
         actions: [
           IconButton(
-              onPressed: (){
+              onPressed: () {
                 NavigationHelper.nextPageRemoveUntil(context, HomeScreen());
               },
-              icon: Icon(Icons.home_rounded, color: Colors.black, size: AppTextStyles.sizeIcon,)
-          )
+              icon: Icon(
+                Icons.home_rounded,
+                color: Colors.black,
+                size: AppTextStyles.sizeIcon,
+              ))
         ],
       ),
       body: Stack(
@@ -55,18 +63,25 @@ class _ResultPageState extends State<ResultPage> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(15),
                     child: widget.imageFile != null
-                    ? Image.file(
-                      widget.imageFile!,
-                      width: double.infinity,
-                      height: 350,
-                      fit: BoxFit.cover,
-                    )
-                    : Image.network(
-                      widget.imageUrl!,
-                      width: double.infinity,
-                      height: 350,
-                      fit: BoxFit.cover,
-                    ),
+                        ? Image.file(
+                            widget.imageFile!,
+                            width: double.infinity,
+                            height: 350,
+                            fit: BoxFit.cover,
+                          )
+                        : widget.imageUrl != null
+                            ? Image.network(
+                                widget.imageUrl!,
+                                width: double.infinity,
+                                height: 350,
+                                fit: BoxFit.cover,
+                              )
+                            : Image.asset(
+                                "assets/imgs/placeholder.png",
+                                width: double.infinity,
+                                height: 350,
+                                fit: BoxFit.cover,
+                              ),
                   ),
                   SizedBox(height: 20),
                   Row(
@@ -81,19 +96,22 @@ class _ResultPageState extends State<ResultPage> {
                         ),
                       ),
                       Text(
-                          ' - ${(widget.data!["confidenceScore"]*100).toStringAsFixed(2)}%'
-                      ),
+                          ' - ${(widget.data!["confidenceScore"] * 100).toStringAsFixed(2)}%'),
                     ],
                   ),
                   SizedBox(height: 20),
-                  ...cancerData?.entries.map((entry) => solutionBox(entry.key, entry.value)).toList() ?? [],
+                  ...cancerData?.entries
+                          .map((entry) => solutionBox(entry.key, entry.value))
+                          .toList() ??
+                      [],
                 ],
               ),
             ),
           ),
-          Positioned(
-              bottom: 20,
-              right: 20,
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 16, right: 16),
               child: ElevatedButton(
                 onPressed: () {
                   NavigationHelper.nextPage(context, MessagePage());
@@ -111,13 +129,20 @@ class _ResultPageState extends State<ResultPage> {
                   children: [
                     Text(
                       AppLocalizations.of(context)!.askAi,
-                      style: TextStyle(fontSize: AppTextStyles.sizeContent, color: Colors.white),
+                      style: TextStyle(
+                          fontSize: AppTextStyles.sizeContent,
+                          color: Colors.white),
                     ),
                     SizedBox(width: 10),
-                    Icon(Icons.send, color: Colors.white, size: AppTextStyles.sizeIconSmall,),
+                    Icon(
+                      Icons.send,
+                      color: Colors.white,
+                      size: AppTextStyles.sizeIconSmall,
+                    ),
                   ],
                 ),
               ),
+            ),
           )
         ],
       ),
@@ -144,9 +169,12 @@ class _ResultPageState extends State<ResultPage> {
           SizedBox(height: 8),
           content is List
               ? Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: content.map<Widget>((item) => Text("• $item", style: AppTextStyles.content)).toList(),
-          )
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: content
+                      .map<Widget>((item) =>
+                          Text("• $item", style: AppTextStyles.content))
+                      .toList(),
+                )
               : Text(content.toString(), style: AppTextStyles.content),
         ],
       ),

@@ -124,7 +124,7 @@ class _RegisterPageState extends State<RegisterPage> {
     }else{
       error = errorResponse.toString();
       setState(() {
-        errors['email'] = '$error!';
+        errors['confirm_password'] = '$error!';
       });
     }
   }

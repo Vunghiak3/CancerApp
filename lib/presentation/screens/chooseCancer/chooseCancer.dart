@@ -30,14 +30,14 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
     _selectedImage = widget.selectedImage;
   }
 
-  void fetchDiagnoses(String cancer, File image) async {
+  void fetchDiagnoses(String typeCancer, File image) async {
     setState(() {
       isLoading = true;
     });
 
     try {
       String idToken = await AuthService().getIdToken();
-      final response = await CnnService().diagnoses(idToken, _selectedImage);
+      final response = await CnnService().diagnoses(idToken, _selectedImage, typeCancer);
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -68,10 +68,10 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
   Widget build(BuildContext context) {
     final List<Map<String, String>> _cancer = [
       {
-        "title": AppLocalizations.of(context)!.brainCancer,
+        "title": 'Brain',
       },
       {
-        "title": AppLocalizations.of(context)!.kidneyCancer,
+        "title": 'Lung',
       },
     ];
 
@@ -228,7 +228,7 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
                     onPressed: _selectedIndex != -1
                         ? () {
                             fetchDiagnoses(
-                              _cancer[_selectedIndex]["title"]!,
+                              _cancer[_selectedIndex]["title"]!.toLowerCase(),
                               _selectedImage,
                             );
                           }

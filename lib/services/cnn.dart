@@ -5,8 +5,8 @@ import 'package:testfile/utils/apiEnpoints.dart';
 import 'package:http/http.dart' as http;
 
 class CnnService {
-  Future<Map<String, dynamic>> diagnoses(String idToken, File image) async {
-    final url = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.user.diagnoses);
+  Future<Map<String, dynamic>> diagnoses(String idToken, File image, String type) async {
+    final url = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.user.diagnoses + '/$type');
 
     try {
       var request = http.MultipartRequest('POST', url);
