@@ -1,12 +1,14 @@
 import 'dart:convert';
+import 'dart:io';
 
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:testfile/services/auth.dart';
 import 'package:testfile/utils/apiEnpoints.dart';
 import 'package:http/http.dart' as http;
 
 class UserService {
+  final baseUrl = ApiEndpoints.baseUrl;
   Future<dynamic> getUser(String idToken) async {
-    final url = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.user.getUser);
+    final url = Uri.parse(baseUrl + ApiEndpoints.user.getUser);
 
     try {
       final response = await http.get(url, headers: {
@@ -23,15 +25,10 @@ class UserService {
     }
   }
 
-  Future<void> saveUserToStorage(Map<String, dynamic> userData) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setString('user', jsonEncode(userData));
-  }
-
   Future<void> changePassword(
       String currentPassword, String newPassword, String idToken) async {
     final url =
-        Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.user.updatePassword);
+        Uri.parse(baseUrl + ApiEndpoints.user.updatePassword);
 
     try {
       final response = await http.put(url,
@@ -55,7 +52,7 @@ class UserService {
   }
 
   Future<void> updateUser(final info, String idToken) async {
-    final url = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.user.updateUser);
+    final url = Uri.parse(baseUrl + ApiEndpoints.user.updateUser);
 
     try {
       final response = await http.put(url,
@@ -71,6 +68,32 @@ class UserService {
         throw (response.body);
       }
     } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> updateProfilePicture(File image) async{
+    final url = Uri.parse(baseUrl + ApiEndpoints.user.updateProfilePicture);
+
+    try{
+      final idToken = await AuthService().getIdToken();
+
+      var request = http.MultipartRequest('PUT', url);
+      request.headers['Authorization'] = 'Bearer $idToken';
+      request.files.add(await http.MultipartFile.fromPath('image', image.path));
+
+      var response = await request.send();
+
+      if (response.statusCode != 200) {
+        final responseData = await response.stream.bytesToString();
+        throw Exception("API Error: $responseData");
+      }else{
+        final user = await getUser(idToken);
+        user['idToken'] = idToken;
+        await AuthService().saveUser(user);
+        final user1 = await AuthService().getUser();
+      }
+    }catch(e){
       rethrow;
     }
   }

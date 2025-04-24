@@ -1,15 +1,17 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:testfile/services/user.dart';
 import 'package:testfile/utils/apiEnpoints.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthService {
   final FlutterSecureStorage _storage = FlutterSecureStorage();
+  final String baseUrl = ApiEndpoints.baseUrl;
 
   Future<Map<String, dynamic>> register(String name, String email,
       String password, String confirmPassword) async {
-    final url = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.auth.register);
+    final url = Uri.parse(baseUrl + ApiEndpoints.auth.register);
     try {
       final response = await http.post(url,
           headers: {"Content-Type": "application/json"},
@@ -31,7 +33,7 @@ class AuthService {
   }
 
   Future<Map<String, dynamic>> login(String email, String password) async {
-    final url = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.auth.login);
+    final url = Uri.parse(baseUrl + ApiEndpoints.auth.login);
 
     try {
       final response = await http.post(url,
@@ -43,7 +45,11 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final responseBody = jsonDecode(response.body);
-        await saveUser(responseBody);
+        String idToken = responseBody["idToken"];
+
+        final user = await UserService().getUser(idToken);
+        user["idToken"] = idToken;
+        await saveUser(user);
 
         return responseBody;
       } else {
@@ -78,7 +84,7 @@ class AuthService {
   }
 
   Future<void> loginGoogle(String idToken) async {
-    final url = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.auth.loginGoogle);
+    final url = Uri.parse(baseUrl + ApiEndpoints.auth.loginGoogle);
 
     try {
       final response = await http.post(
@@ -91,8 +97,10 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final responseBody = jsonDecode(response.body);
-        responseBody['idToken'] = idToken;
-        await saveUser(responseBody);
+
+        final user = await UserService().getUser(idToken);
+        user["idToken"] = idToken;
+        await saveUser(user);
 
         return responseBody;
       } else {
@@ -104,7 +112,7 @@ class AuthService {
   }
 
   Future<void> logout(String idToken) async {
-    final url = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.admin.signout);
+    final url = Uri.parse(baseUrl + ApiEndpoints.auth.signout);
 
     try {
       final response = await http.post(
@@ -127,7 +135,7 @@ class AuthService {
 
   Future<void> deleteAccount(String idToken) async {
     final url =
-        Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.user.deleteAccount);
+        Uri.parse(baseUrl + ApiEndpoints.user.deleteAccount);
 
     try {
       final response = await http.delete(

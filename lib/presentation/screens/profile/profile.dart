@@ -1,12 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:testfile/presentation/screens/changePassword/changePassword.dart';
 import 'package:testfile/presentation/screens/editprofile/editprofile.dart';
 import 'package:testfile/presentation/screens/login/login.dart';
 import 'package:testfile/presentation/screens/setting/setting.dart';
+import 'package:testfile/presentation/widgets/CustomTopNotification.dart';
+import 'package:testfile/presentation/widgets/ImagePickerHelper.dart';
 import 'package:testfile/presentation/widgets/MenuWidget.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:testfile/services/auth.dart';
@@ -21,8 +22,9 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage>{
+class _ProfilePageState extends State<ProfilePage> {
   late Future<Map<String, dynamic>> _userFuture;
+  bool isUpdatingPicture = false;
 
   @override
   void initState() {
@@ -30,44 +32,38 @@ class _ProfilePageState extends State<ProfilePage>{
     _userFuture = loadUser();
   }
 
-  Future<Map<String, dynamic>> fetchUser() async {
-    try {
-      String idToken = await AuthService().getIdToken();
-
-      final res = await UserService().getUser(idToken);
-      return res;
-    } catch (e) {
-      throw Exception(e);
-    }
-  }
-
-  Future<Map<String, dynamic>?> getUserFromStorage() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userString = prefs.getString('user');
-    if (userString != null) {
-      return jsonDecode(userString);
-    }
-    return null;
-  }
-
   Future<Map<String, dynamic>> loadUser() async {
-    final localUser = await getUserFromStorage();
-    if (localUser != null) {
-      return localUser;
-    } else {
-      final fetchedUser = await fetchUser();
-      UserService().saveUserToStorage(fetchedUser);
-      return fetchedUser;
-    }
+    final userString = await AuthService().getUser();
+    return jsonDecode(userString!);
   }
 
-  void fetchLogout() async{
+  void fetchLogout() async {
     try {
       String idToken = await AuthService().getIdToken();
       await AuthService().logout(idToken);
       NavigationHelper.nextPageRemoveUntil(context, LoginPage());
     } catch (e) {
-      print('Logout failed: $e');
+      throw Exception(e);
+    }
+  }
+
+  void fetchUpdateProfilePicture(BuildContext context) async{
+    try {
+      ImagePickerHelper.showImagePickerDialog(
+        context,
+        (image) async {
+          setState(() => isUpdatingPicture = true);
+          await UserService().updateProfilePicture(image);
+          setState(() {
+            _userFuture = loadUser();
+            isUpdatingPicture = false;
+          });
+          CustomTopNotification.show(context, message: 'Cập nhật ảnh thành công');
+        },
+      );
+    } catch (e) {
+      CustomTopNotification.show(context, message: 'Cập nhật ảnh thất bại', color: Colors.red);
+      throw Exception(e);
     }
   }
 
@@ -80,22 +76,25 @@ class _ProfilePageState extends State<ProfilePage>{
     );
   }
 
-  PreferredSizeWidget getAppBar(){
+  PreferredSizeWidget getAppBar() {
     return AppBar(
       backgroundColor: Colors.white,
       automaticallyImplyLeading: false,
       actions: [
         IconButton(
-            onPressed: (){
+            onPressed: () {
               NavigationHelper.nextPage(context, SettingPage());
             },
-            icon: Icon(Icons.settings, color: Colors.black, size: 24,)
-        )
+            icon: Icon(
+              Icons.settings,
+              color: Colors.black,
+              size: 24,
+            ))
       ],
     );
   }
 
-  Widget getBody(){
+  Widget getBody() {
     return SingleChildScrollView(
       child: Center(
         child: Padding(
@@ -103,34 +102,31 @@ class _ProfilePageState extends State<ProfilePage>{
           child: Column(
             children: [
               getUser(),
-              const SizedBox(height: 30,),
-              MenuWidget(
-                  items: [
-                    MenuItem(
-                        text: AppLocalizations.of(context)!.myAccount,
-                        subText: AppLocalizations.of(context)!.desMyAccount,
-                        icon: Icons.person_outline_rounded,
-                        onTap: (){
-                          NavigationHelper.nextPage(context, EditProfilePage());
-                        }
-                    ),
-                    MenuItem(
-                        text: AppLocalizations.of(context)!.changePassword,
-                        subText: AppLocalizations.of(context)!.desPassword,
-                        icon: Icons.key_rounded,
-                        onTap: (){
-                          NavigationHelper.nextPage(context, ChangePasswordPage());
-                        }
-                    ),
-                    MenuItem(
-                        text: AppLocalizations.of(context)!.logout,
-                        subText: AppLocalizations.of(context)!.desLogout,
-                        icon: Icons.logout,
-                        colorIcon: Colors.red,
-                        onTap: fetchLogout
-                    ),
-                  ]
-              )
+              const SizedBox(
+                height: 30,
+              ),
+              MenuWidget(items: [
+                MenuItem(
+                    text: AppLocalizations.of(context)!.myAccount,
+                    subText: AppLocalizations.of(context)!.desMyAccount,
+                    icon: Icons.person_outline_rounded,
+                    onTap: () {
+                      NavigationHelper.nextPage(context, EditProfilePage());
+                    }),
+                MenuItem(
+                    text: AppLocalizations.of(context)!.changePassword,
+                    subText: AppLocalizations.of(context)!.desPassword,
+                    icon: Icons.key_rounded,
+                    onTap: () {
+                      NavigationHelper.nextPage(context, ChangePasswordPage());
+                    }),
+                MenuItem(
+                    text: AppLocalizations.of(context)!.logout,
+                    subText: AppLocalizations.of(context)!.desLogout,
+                    icon: Icons.logout,
+                    colorIcon: Colors.red,
+                    onTap: fetchLogout),
+              ])
             ],
           ),
         ),
@@ -138,11 +134,11 @@ class _ProfilePageState extends State<ProfilePage>{
     );
   }
 
-  Widget getUser(){
+  Widget getUser() {
     return FutureBuilder<Map<String, dynamic>>(
       future: _userFuture,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+        if (isUpdatingPicture || snapshot.connectionState == ConnectionState.waiting) {
           return shimmderBox();
         }
 
@@ -157,34 +153,34 @@ class _ProfilePageState extends State<ProfilePage>{
               clipBehavior: Clip.none,
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(30),
-                  child: (userData['profilePicture'] != null && userData['profilePicture'].isNotEmpty)
-                      ? Image.network(
-                    userData['profilePicture'],
-                    width: 110,
-                    height: 110,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Image.asset(
-                        'assets/imgs/imageprofile.png',
-                        width: 110,
-                        height: 110,
-                        fit: BoxFit.cover,
-                      );
-                    },
-                  )
-                      : Image.asset(
-                    'assets/imgs/imageprofile.png',
-                    width: 110,
-                    height: 110,
-                    fit: BoxFit.cover,
-                  )
-                ),
+                    borderRadius: BorderRadius.circular(30),
+                    child: (userData['profilePicture'] != null &&
+                            userData['profilePicture'].isNotEmpty)
+                        ? Image.network(
+                            userData['profilePicture'],
+                            width: 110,
+                            height: 110,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Image.asset(
+                                'assets/imgs/imageprofile.png',
+                                width: 110,
+                                height: 110,
+                                fit: BoxFit.cover,
+                              );
+                            },
+                          )
+                        : Image.asset(
+                            'assets/imgs/imageprofile.png',
+                            width: 110,
+                            height: 110,
+                            fit: BoxFit.cover,
+                          )),
                 Positioned(
                   bottom: -15,
                   right: -15,
                   child: ElevatedButton(
-                    onPressed: (){},
+                    onPressed: () => fetchUpdateProfilePicture(context),
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.all(0),
                       backgroundColor: Color(0xFFD9D9D9),
@@ -193,7 +189,8 @@ class _ProfilePageState extends State<ProfilePage>{
                         borderRadius: BorderRadius.circular(40),
                       ),
                     ),
-                    child: Icon(Icons.camera_alt_rounded, color: Colors.black, size: 30),
+                    child: Icon(Icons.camera_alt_rounded,
+                        color: Colors.black, size: 30),
                   ),
                 )
               ],
@@ -225,45 +222,45 @@ class _ProfilePageState extends State<ProfilePage>{
     );
   }
 
-  Widget shimmderBox(){
-   return Shimmer.fromColors(
-     baseColor: Colors.grey.shade300,
-     highlightColor: Colors.grey.shade100,
-     child: Row(
-       children: [
-         Container(
-           width: 110,
-           height: 110,
-           decoration: BoxDecoration(
-             color: Colors.white,
-             borderRadius: BorderRadius.circular(30),
-           ),
-         ),
-         const SizedBox(width: 30),
-         Column(
-           crossAxisAlignment: CrossAxisAlignment.start,
-           children: [
-             Container(
-               width: 120,
-               height: 20,
-               decoration: BoxDecoration(
-                 color: Colors.white,
-                 borderRadius: BorderRadius.circular(8),
-               ),
-             ),
-             const SizedBox(height: 10),
-             Container(
-               width: 80,
-               height: 16,
-               decoration: BoxDecoration(
-                 color: Colors.white,
-                 borderRadius: BorderRadius.circular(8),
-               ),
-             ),
-           ],
-         )
-       ],
-     ),
-   );
- }
+  Widget shimmderBox() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      child: Row(
+        children: [
+          Container(
+            width: 110,
+            height: 110,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(30),
+            ),
+          ),
+          const SizedBox(width: 30),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 120,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Container(
+                width: 80,
+                height: 16,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
+  }
 }

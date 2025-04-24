@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 
 class CnnService {
   Future<Map<String, dynamic>> diagnoses(String idToken, File image, String type) async {
-    final url = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.user.diagnoses + '/$type');
+    final url = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.cnn.diagnoses + '/$type');
 
     try {
       var request = http.MultipartRequest('POST', url);
@@ -26,7 +26,7 @@ class CnnService {
   }
 
   Future<dynamic> history(String idToken) async {
-    final url = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.user.history);
+    final url = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.cnn.history);
 
     try {
       final response = await http.get(
@@ -48,7 +48,7 @@ class CnnService {
 
   Future<dynamic> deleteHistoryById(String idToken, String diagnosisId) async {
     final url = Uri.parse(
-        '${ApiEndpoints.baseUrl}${ApiEndpoints.user.history}/$diagnosisId');
+        '${ApiEndpoints.baseUrl}${ApiEndpoints.cnn.history}/$diagnosisId');
 
     try {
       final response = await http.delete(
@@ -65,6 +65,29 @@ class CnnService {
         throw (response.body);
       }
     } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> deleteMultiHistory(String idToken, List<String> listHistory) async{
+    final url = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.cnn.deleteMultiHistory);
+
+    try{
+      final response = await http.delete(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          "Authorization": 'Bearer $idToken',
+        },
+        body: jsonEncode(listHistory),
+      );
+
+      if(response.statusCode == 200){
+        return jsonDecode(response.body);
+      }else{
+        throw(response.body);
+      }
+    }catch(e){
       rethrow;
     }
   }

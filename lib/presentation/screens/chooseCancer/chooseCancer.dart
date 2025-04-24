@@ -37,8 +37,8 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
 
     try {
       String idToken = await AuthService().getIdToken();
-      final response = await CnnService().diagnoses(idToken, _selectedImage, typeCancer);
-      Navigator.push(
+      final response = await CnnService().diagnoses(idToken, image, typeCancer);
+      await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => ResultPage(

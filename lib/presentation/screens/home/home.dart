@@ -7,12 +7,10 @@ import 'package:testfile/presentation/screens/profile/profile.dart';
 import 'package:testfile/presentation/widgets/ImagePickerHelper.dart';
 import 'package:testfile/presentation/widgets/TipCarousel.dart';
 
-import 'package:testfile/data/dailyTip.dart';
 import 'package:testfile/utils/navigation_helper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:testfile/theme/text_styles.dart';
 
-import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

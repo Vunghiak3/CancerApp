@@ -20,7 +20,7 @@ class _HistoryPageState extends State<HistoryPage> {
   late Future<List<dynamic>> futureHistory = fetchHistory();
   bool isChoose = false;
 
-  Set<String> selectedIds = {};
+  List<String> selectedIds = [];
 
   Future<List<dynamic>> fetchHistory() async {
     try {
@@ -42,9 +42,26 @@ class _HistoryPageState extends State<HistoryPage> {
     try {
       String idToken = await AuthService().getIdToken();
       final response = await CnnService().deleteHistoryById(idToken, historyId);
-      print(response);
       return response;
     } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  void fetchDeleteMultiHistory(List<String> listHistory) async{
+    try{
+      String idToken = await AuthService().getIdToken();
+      final response = await CnnService().deleteMultiHistory(idToken, listHistory);
+      await refreshHistory();
+      setState(() {
+        isChoose = !isChoose;
+      });
+      CustomTopNotification.show(
+        context,
+        message: 'Delete success!',
+      );
+      return response;
+    }catch(e){
       throw Exception(e);
     }
   }
@@ -72,7 +89,9 @@ class _HistoryPageState extends State<HistoryPage> {
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 16.0),
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: (){
+                    fetchDeleteMultiHistory(selectedIds);
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
                     shape: RoundedRectangleBorder(

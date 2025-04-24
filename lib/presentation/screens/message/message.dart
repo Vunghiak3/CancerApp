@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:testfile/services/llm.dart';
 import 'package:testfile/theme/text_styles.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -11,11 +12,14 @@ class MessagePage extends StatefulWidget {
   State<MessagePage> createState() => _MessagePageState();
 }
 
-class _MessagePageState extends State<MessagePage> {
+class _MessagePageState extends State<MessagePage>
+    with TickerProviderStateMixin {
   final LLMService _llmService = LLMService();
   final TextEditingController _messageController = TextEditingController();
   final TextEditingController _sessionNameController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  late AnimationController _typingIndicatorController;
+  late Animation<double> _typingIndicatorScale;
 
   String? _sessionId;
   List<Map<String, dynamic>> _messages = [];
@@ -29,14 +33,38 @@ class _MessagePageState extends State<MessagePage> {
     super.initState();
     _initializeChat();
     _loadSessions();
+    _typingIndicatorController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    )..repeat(reverse: true);
+
+    _typingIndicatorScale = Tween<double>(begin: 0.8, end: 1.2).animate(
+      CurvedAnimation(
+        parent: _typingIndicatorController,
+        curve: Curves.easeInOut,
+      ),
+    );
   }
+
   @override
-  void dispose(){
+  void dispose() {
     _messageController.dispose();
     _sessionNameController.dispose();
     _scrollController.dispose();
+    _typingIndicatorController.dispose();
 
     super.dispose();
+  }
+
+  Future<void> fetchDeleteSessionById(String sessionId) async {
+    try {
+      final response = await LLMService().deleteSessionById(sessionId);
+      await _loadSessions();
+      await _initializeChat();
+      return response;
+    } catch (e) {
+      throw Exception(e);
+    }
   }
 
   Future<void> _initializeChat() async {
@@ -108,7 +136,7 @@ class _MessagePageState extends State<MessagePage> {
       });
     } catch (e) {
       debugPrint('Error sending message: $e');
-    }finally{
+    } finally {
       setState(() {
         _isSending = false;
       });
@@ -119,12 +147,11 @@ class _MessagePageState extends State<MessagePage> {
     if (!_scrollController.hasClients) return;
 
     _scrollController.animateTo(
-      0.0, // reverse = true nên offset 0 là cuối danh sách
+      0.0,
       duration: Duration(milliseconds: 300),
       curve: Curves.easeOut,
     );
   }
-
 
   Future<void> _loadSessions() async {
     try {
@@ -142,7 +169,7 @@ class _MessagePageState extends State<MessagePage> {
   Future<void> _createNewSession() async {
     final name = _sessionNameController.text.trim();
 
-    if(name.isEmpty) return;
+    if (name.isEmpty) return;
 
     try {
       final newSessionId = await _llmService.createSession({
@@ -151,7 +178,9 @@ class _MessagePageState extends State<MessagePage> {
 
       _sessionId = newSessionId;
       await _loadSessions();
+      await _initializeChat();
       await _loadMessagesForSession(_sessionId!);
+      Navigator.pop(context);
     } catch (e) {
       debugPrint('Error creating session: $e');
     }
@@ -163,7 +192,10 @@ class _MessagePageState extends State<MessagePage> {
     await showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text("Create New Chat", style: AppTextStyles.title,),
+        title: const Text(
+          "Create New Chat",
+          style: AppTextStyles.title,
+        ),
         content: TextField(
           controller: _sessionNameController,
           decoration: const InputDecoration(hintText: "Chat name"),
@@ -176,24 +208,18 @@ class _MessagePageState extends State<MessagePage> {
               child: Text(
                 AppLocalizations.of(context)!.cancel,
                 style: TextStyle(
-                  color: Colors.red,
-                  fontSize: AppTextStyles.sizeContent
-                ),
-              )
-          ),
+                    color: Colors.red, fontSize: AppTextStyles.sizeContent),
+              )),
           TextButton(
-              onPressed: (){
+              onPressed: () async {
                 Navigator.pop(ctx);
-                _createNewSession();
+                await _createNewSession();
               },
               child: Text(
                 "Create",
                 style: TextStyle(
-                  color: Colors.blue,
-                  fontSize: AppTextStyles.sizeContent
-                ),
-              )
-          ),
+                    color: Colors.blue, fontSize: AppTextStyles.sizeContent),
+              )),
         ],
       ),
     );
@@ -219,11 +245,14 @@ class _MessagePageState extends State<MessagePage> {
           ),
         ),
         leading: IconButton(
-            onPressed: (){
+            onPressed: () {
               Navigator.pop(context);
             },
-            icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black, size: AppTextStyles.sizeIconSmall,)
-        ),
+            icon: Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: Colors.black,
+              size: AppTextStyles.sizeIconSmall,
+            )),
         actions: [
           Builder(
             builder: (context) => IconButton(
@@ -235,86 +264,176 @@ class _MessagePageState extends State<MessagePage> {
           ),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    controller: _scrollController,
-                    reverse: true,
-                    padding: const EdgeInsets.all(10),
-                    itemCount: _messages.length,
-                    itemBuilder: (context, index) {
-                      final msg = _messages[_messages.length - 1 - index];
-                      final isBot = msg['sender'] == 'AI';
-
-                      return Row(
-                        mainAxisAlignment: isBot ? MainAxisAlignment.start : MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if(isBot)
-                            Padding(
-                              padding: const EdgeInsets.only(right: 8.0),
-                              child: Image.asset(
-                                'assets/imgs/logowelcome.png',
-                                width: 30,
+      body: Column(
+        children: [
+          _isLoading
+              ? Expanded(
+                  child: Shimmer.fromColors(
+                    baseColor: Colors.grey.shade300,
+                    highlightColor: Colors.grey.shade100,
+                    child: ListView.builder(
+                      reverse: true,
+                      padding: const EdgeInsets.all(10),
+                      itemCount: 6,
+                      itemBuilder: (context, index) {
+                        final isBot = index % 2 == 0;
+                        List<double> userMessageWidths = [
+                          MediaQuery.of(context).size.width * 0.75,
+                          MediaQuery.of(context).size.width * 0.6,
+                          MediaQuery.of(context).size.width * 0.5,
+                        ];
+                        double messageWidth = isBot
+                            ? MediaQuery.of(context).size.width * 0.6
+                            : userMessageWidths[index % 3];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Row(
+                            mainAxisAlignment: isBot
+                                ? MainAxisAlignment.start
+                                : MainAxisAlignment.end,
+                            children: [
+                              if (isBot)
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: ClipOval(
+                                    child: Container(
+                                      width: 40,
+                                      height: 40,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              Container(
+                                width: messageWidth,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
                               ),
-                            ),
-                          Container(
-                            constraints: BoxConstraints(
-                              maxWidth: MediaQuery.of(context).size.width * 0.8,
-                            ),
-                            padding: const EdgeInsets.all(12),
-                            margin: const EdgeInsets.symmetric(vertical: 5),
-                            decoration: BoxDecoration(
-                              color: isBot ? Colors.grey[200] : Colors.blue,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              msg['message'],
-                              style: TextStyle(
-                                  color: isBot ? Colors.black : Colors.white,
-                                  fontSize: AppTextStyles.sizeContent
-                              ),
-                            ),
+                            ],
                           ),
-                        ],
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    border: Border(top: BorderSide(color: Colors.grey[300]!)),
-                    color: Colors.white,
-                  ),
-                  child: Row(
+                )
+              : Expanded(
+                  child: Column(
                     children: [
                       Expanded(
-                        child: TextField(
-                          controller: _messageController,
-                          decoration: const InputDecoration(
-                            hintText: "Write a message",
-                            hintStyle: AppTextStyles.content,
-                            border: InputBorder.none,
-                          ),
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          reverse: true,
+                          padding: const EdgeInsets.all(10),
+                          itemCount: _messages.length + (_isSending ? 1 : 0),
+                          itemBuilder: (context, index) {
+                            if (_isSending && index == 0) {
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8.0),
+                                child: Row(
+                                  children: [
+                                    const SizedBox(width: 10),
+                                    ScaleTransition(
+                                      scale: _typingIndicatorScale,
+                                      child: Container(
+                                        width: 18,
+                                        height: 18,
+                                        decoration: const BoxDecoration(
+                                          color: Colors.blue,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+
+                            final msg = _messages[_messages.length -
+                                1 -
+                                (index - (_isSending ? 1 : 0))];
+                            final isBot = msg['sender'] == 'AI';
+
+                            return Row(
+                              mainAxisAlignment: isBot
+                                  ? MainAxisAlignment.start
+                                  : MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (isBot)
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: Image.asset(
+                                      'assets/imgs/logowelcome.png',
+                                      width: 40,
+                                    ),
+                                  ),
+                                Container(
+                                  constraints: BoxConstraints(
+                                    maxWidth:
+                                        MediaQuery.of(context).size.width * 0.8,
+                                  ),
+                                  padding: const EdgeInsets.all(12),
+                                  margin:
+                                      const EdgeInsets.symmetric(vertical: 5),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        isBot ? Colors.grey[200] : Colors.blue,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    msg['message'],
+                                    style: TextStyle(
+                                        color:
+                                            isBot ? Colors.black : Colors.white,
+                                        fontSize: AppTextStyles.sizeContent),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.send, color: Colors.blue, size: AppTextStyles.sizeIcon,),
-                        onPressed: _sendMessage,
                       ),
                     ],
                   ),
                 ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: Colors.grey[300]!)),
+              color: Colors.white,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _messageController,
+                    decoration: const InputDecoration(
+                      hintText: "Write a message",
+                      hintStyle: AppTextStyles.content,
+                      border: InputBorder.none,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.send,
+                    color: Colors.blue,
+                    size: AppTextStyles.sizeIcon,
+                  ),
+                  onPressed: _sendMessage,
+                ),
               ],
             ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget loadHistoryChat(){
+  Widget loadHistoryChat() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -356,10 +475,14 @@ class _MessagePageState extends State<MessagePage> {
                 final session = _sessions[index];
                 final sessionId = session['sessionId'] ?? 'Unknown ID';
                 final sessionName = session['sessionName'] ?? sessionId;
-                String time = DateFormat('HH:mm - dd/MM/yyyy').format(DateTime.parse(session['created_at']));
+                String time = DateFormat('HH:mm - dd/MM/yyyy')
+                    .format(DateTime.parse(session['created_at']));
 
                 return ListTile(
-                  title: Text(sessionName, style: AppTextStyles.content,),
+                  title: Text(
+                    sessionName,
+                    style: AppTextStyles.content,
+                  ),
                   subtitle: Text(
                     "Created: ${time ?? 'N/A'}",
                     style: AppTextStyles.subtitle,
@@ -371,13 +494,35 @@ class _MessagePageState extends State<MessagePage> {
                     await _loadMessagesForSession(_sessionId!);
                     setState(() => _isLoading = false);
                   },
-                  trailing: IconButton(
-                      onPressed: (){},
-                      icon: Icon(Icons.more_horiz_rounded, color: Colors.black, size: AppTextStyles.sizeIcon,)
-                  ),
+                  trailing: PopupMenuButton(
+                      icon: Icon(
+                        Icons.more_horiz_rounded,
+                        color: Colors.black,
+                        size: AppTextStyles.sizeIcon,
+                      ),
+                      color: Color(0xfff5f5f5),
+                      onSelected: (value) {
+                        if (value == 'delete') {
+                          fetchDeleteSessionById(sessionId);
+                        }
+                      },
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
+                      itemBuilder: (context) => [
+                            PopupMenuItem(
+                                value: 'delete',
+                                height: 30,
+                                padding: EdgeInsets.zero,
+                                child: Center(
+                                  child: Text(
+                                    AppLocalizations.of(context)!.delete,
+                                    style: AppTextStyles.delete,
+                                  ),
+                                ))
+                          ]),
                 );
               },
-              separatorBuilder: (context, index){
+              separatorBuilder: (context, index) {
                 return const Divider(
                   color: Colors.grey,
                   thickness: 1,

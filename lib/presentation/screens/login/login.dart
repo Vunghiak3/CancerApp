@@ -8,6 +8,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:testfile/presentation/screens/home/home.dart';
 import 'package:testfile/presentation/screens/register/register.dart';
 import 'package:testfile/presentation/widgets/ButtonImage.dart';
+import 'package:testfile/presentation/widgets/CustomTopNotification.dart';
 import 'package:testfile/presentation/widgets/InputInfor.dart';
 import 'package:testfile/services/auth.dart';
 import 'package:testfile/theme/text_styles.dart';
@@ -88,12 +89,7 @@ class _LoginPageState extends State<LoginPage> {
       await authService.loginGoogle(idToken!);
       NavigationHelper.nextPageReplace(context, HomeScreen());
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Đăng nhập thất bại!'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      CustomTopNotification.show(context, message: 'Đăng nhập thất bại!', color: Colors.red,);
     }
   }
 

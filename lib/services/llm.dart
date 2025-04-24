@@ -4,16 +4,14 @@ import 'package:testfile/services/auth.dart';
 import 'package:testfile/utils/apiEnpoints.dart';
 
 class LLMService {
-  // final String baseUrl = 'http://127.0.0.1:8000/llm';
-  final String baseUrl = ApiEndpoints.baseUrl + '/llm';
+  final String baseUrl = ApiEndpoints.baseUrl;
   String? _authToken;
 
-  /// Lazily fetch auth token when needed
   Future<Map<String, String>> _getHeaders() async {
     _authToken ??= await AuthService().getIdToken();
 
     if (_authToken == null) {
-      throw Exception('❗ Auth token could not be retrieved.');
+      throw Exception('Auth token could not be retrieved.');
     }
 
     return {
@@ -25,7 +23,7 @@ class LLMService {
   Future<Map<String, dynamic>> getLatestSession() async {
     final headers = await _getHeaders();
     final response = await http.get(
-      Uri.parse('$baseUrl/user/latest_session/'),
+      Uri.parse(baseUrl + ApiEndpoints.llm.latestSession),
       headers: headers,
     );
 
@@ -39,7 +37,7 @@ class LLMService {
   Future<String> createSession(Map<String, dynamic> body) async {
     final headers = await _getHeaders();
     final response = await http.post(
-      Uri.parse('$baseUrl/create_session'),
+      Uri.parse(baseUrl + ApiEndpoints.llm.createSession),
       headers: headers,
       body: jsonEncode(body),
     );
@@ -55,7 +53,7 @@ class LLMService {
   Future<Map<String, dynamic>> getSessionMessages(String sessionId) async {
     final headers = await _getHeaders();
     final response = await http.get(
-      Uri.parse('$baseUrl/session/$sessionId/messages'),
+      Uri.parse(baseUrl + ApiEndpoints.llm.getSessionMessages(sessionId)),
       headers: headers,
     );
 
@@ -69,7 +67,7 @@ class LLMService {
   Future<String> generate(Map<String, dynamic> body) async {
     final headers = await _getHeaders();
     final response = await http.post(
-      Uri.parse('$baseUrl/generate'),
+      Uri.parse(baseUrl + ApiEndpoints.llm.generate),
       headers: headers,
       body: jsonEncode(body),
     );
@@ -85,7 +83,7 @@ class LLMService {
   Future<Map<String, dynamic>> getUserSessions() async {
     final headers = await _getHeaders();
     final response = await http.get(
-      Uri.parse('$baseUrl/user/session'),
+      Uri.parse(baseUrl + ApiEndpoints.llm.getSession),
       headers: headers,
     );
 
@@ -93,6 +91,28 @@ class LLMService {
       return jsonDecode(response.body);
     } else {
       throw Exception('Failed to fetch sessions: ${response.statusCode}');
+    }
+  }
+
+  Future<void> deleteSessionById(String sessionId) async{
+    final url = Uri.parse(baseUrl + ApiEndpoints.llm.deleteSessionById(sessionId));
+    try{
+      final idToken = await AuthService().getIdToken();
+
+      final response = await http.delete(
+        url,
+        headers: {
+          'Authorization': 'Bearer $idToken',
+          'Content-Type': 'application/json',
+        }
+      );
+
+      if (response.statusCode != 200) {
+        final error = jsonDecode(response.body)['detail'] ?? 'Unknown error';
+        throw Exception('Failed to delete session: $error');
+      }
+    }catch(e){
+      rethrow;
     }
   }
 }

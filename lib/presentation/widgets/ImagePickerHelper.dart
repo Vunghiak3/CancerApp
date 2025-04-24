@@ -50,8 +50,8 @@ class ImagePickerHelper {
                   onTap: () async {
                     File? image = await pickImageFromGallery();
                     if (image != null) {
-                      NavigationHelper.nextPage(
-                          context, ChooseCancerPage(selectedImage: image));
+                      Navigator.pop(context);
+                      onImagePicked(image);
                     }
                   },
                 ),
@@ -64,8 +64,8 @@ class ImagePickerHelper {
                   onTap: () async {
                     File? image = await pickImageFromFiles();
                     if (image != null) {
-                      NavigationHelper.nextPage(
-                          context, ChooseCancerPage(selectedImage: image));
+                      Navigator.pop(context);
+                      onImagePicked(image);
                     }
                   },
                 ),
