@@ -100,7 +100,7 @@ class _HistoryPageState extends State<HistoryPage> {
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   ),
                   child: Text(
-                    "Xóa (${selectedIds.length})",
+                    "Delete (${selectedIds.length})",
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -117,7 +117,7 @@ class _HistoryPageState extends State<HistoryPage> {
       backgroundColor: Colors.white,
       automaticallyImplyLeading: false,
       title: Text(
-        'Lịch sử chẩn đoán',
+        'Diagnosis History',
         style: AppTextStyles.title,
       ),
       centerTitle: true,
@@ -152,7 +152,7 @@ class _HistoryPageState extends State<HistoryPage> {
                     });
                   },
                   child: Text(
-                    isChoose ? 'Hủy' : 'Chọn',
+                    isChoose ? 'Cancel' : 'Select',
                     style: TextStyle(
                       fontSize: AppTextStyles.sizeSubtitle,
                       fontWeight: FontWeight.w500,
@@ -174,14 +174,14 @@ class _HistoryPageState extends State<HistoryPage> {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Lỗi: ${snapshot.error}'));
+            return Center(child: Text('Error: ${snapshot.error}'));
           }
           final historyData = snapshot.data ?? [];
 
           if (historyData.isEmpty) {
             return Center(
               child: Text(
-                'Không có lịch sử chẩn đoán',
+                'No diagnosis history.',
                 style: TextStyle(
                     fontSize: AppTextStyles.sizeContent, color: Colors.grey),
               ),
@@ -269,7 +269,7 @@ class _HistoryPageState extends State<HistoryPage> {
       } catch (e) {
         Navigator.of(context).pop();
         CustomTopNotification.show(context,
-            message: 'Xóa thất bại!', color: Colors.red, icon: Icons.cancel);
+            message: 'Deletion failed!', color: Colors.red, icon: Icons.cancel);
         throw Exception(e);
       }
     }

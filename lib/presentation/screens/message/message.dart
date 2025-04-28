@@ -466,72 +466,79 @@ class _MessagePageState extends State<MessagePage>
         ),
         const Divider(),
         Expanded(
-          child: RefreshIndicator(
-            backgroundColor: Colors.white,
-            onRefresh: _loadSessions,
-            child: ListView.separated(
-              itemCount: _sessions.length,
-              itemBuilder: (context, index) {
-                final session = _sessions[index];
-                final sessionId = session['sessionId'] ?? 'Unknown ID';
-                final sessionName = session['sessionName'] ?? sessionId;
-                String time = DateFormat('HH:mm - dd/MM/yyyy')
-                    .format(DateTime.parse(session['created_at']));
+            child: RefreshIndicator(
+                backgroundColor: Colors.white,
+                onRefresh: _loadSessions,
+                child: _sessions.isNotEmpty
+                    ? ListView.separated(
+                        itemCount: _sessions.length,
+                        itemBuilder: (context, index) {
+                          final session = _sessions[index];
+                          final sessionId =
+                              session['sessionId'] ?? 'Unknown ID';
+                          final sessionName =
+                              session['sessionName'] ?? sessionId;
+                          String time = DateFormat('HH:mm - dd/MM/yyyy')
+                              .format(DateTime.parse(session['created_at']));
 
-                return ListTile(
-                  title: Text(
-                    sessionName,
-                    style: AppTextStyles.content,
-                  ),
-                  subtitle: Text(
-                    "Created: ${time ?? 'N/A'}",
-                    style: AppTextStyles.subtitle,
-                  ),
-                  onTap: () async {
-                    Navigator.pop(context);
-                    setState(() => _isLoading = true);
-                    _sessionId = sessionId;
-                    await _loadMessagesForSession(_sessionId!);
-                    setState(() => _isLoading = false);
-                  },
-                  trailing: PopupMenuButton(
-                      icon: Icon(
-                        Icons.more_horiz_rounded,
-                        color: Colors.black,
-                        size: AppTextStyles.sizeIcon,
-                      ),
-                      color: Color(0xfff5f5f5),
-                      onSelected: (value) {
-                        if (value == 'delete') {
-                          fetchDeleteSessionById(sessionId);
-                        }
-                      },
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8)),
-                      itemBuilder: (context) => [
-                            PopupMenuItem(
-                                value: 'delete',
-                                height: 30,
-                                padding: EdgeInsets.zero,
-                                child: Center(
-                                  child: Text(
-                                    AppLocalizations.of(context)!.delete,
-                                    style: AppTextStyles.delete,
-                                  ),
-                                ))
-                          ]),
-                );
-              },
-              separatorBuilder: (context, index) {
-                return const Divider(
-                  color: Colors.grey,
-                  thickness: 1,
-                  indent: 15,
-                  endIndent: 15,
-                );
-              },
-            ),
-          ),
+                          return ListTile(
+                            title: Text(
+                              sessionName,
+                              style: AppTextStyles.content,
+                            ),
+                            subtitle: Text(
+                              "Created: ${time ?? 'N/A'}",
+                              style: AppTextStyles.subtitle,
+                            ),
+                            onTap: () async {
+                              Navigator.pop(context);
+                              setState(() => _isLoading = true);
+                              _sessionId = sessionId;
+                              await _loadMessagesForSession(_sessionId!);
+                              setState(() => _isLoading = false);
+                            },
+                            trailing: PopupMenuButton(
+                                icon: Icon(
+                                  Icons.more_horiz_rounded,
+                                  color: Colors.black,
+                                  size: AppTextStyles.sizeIcon,
+                                ),
+                                color: Color(0xfff5f5f5),
+                                onSelected: (value) {
+                                  if (value == 'delete') {
+                                    fetchDeleteSessionById(sessionId);
+                                  }
+                                },
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8)),
+                                itemBuilder: (context) => [
+                                      PopupMenuItem(
+                                          value: 'delete',
+                                          height: 30,
+                                          padding: EdgeInsets.zero,
+                                          child: Center(
+                                            child: Text(
+                                              AppLocalizations.of(context)!
+                                                  .delete,
+                                              style: AppTextStyles.delete,
+                                            ),
+                                          ))
+                                    ]),
+                          );
+                        },
+                        separatorBuilder: (context, index) {
+                          return const Divider(
+                            color: Colors.grey,
+                            thickness: 1,
+                            indent: 15,
+                            endIndent: 15,
+                          );
+                        },
+                      )
+                    : Center(
+                        child: Text('No chat history.'),
+                      )
+            )
         ),
       ],
     );
