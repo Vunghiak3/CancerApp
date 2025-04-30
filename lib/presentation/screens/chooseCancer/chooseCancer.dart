@@ -229,7 +229,7 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
                       backgroundColor: Color(0xFF0E70CB),
                       foregroundColor: Colors.white,
                       padding:
-                          EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                          const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),

@@ -4,15 +4,24 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:testfile/theme/text_styles.dart';
 
 class BirthdayInput extends StatefulWidget {
-  const BirthdayInput({super.key});
+  final DateTime? initialDate;
+  final ValueChanged<DateTime> onDateSelected;
+
+  const BirthdayInput({super.key, required this.initialDate, required this.onDateSelected});
 
   @override
   State<BirthdayInput> createState() => _BirthdayInputState();
 }
 
 class _BirthdayInputState extends State<BirthdayInput> {
-  DateTime selectedDate = DateTime.now();
+  late DateTime selectedDate;
   DateTime tempDate = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    selectedDate = widget.initialDate ?? DateTime(2000, 1, 1);
+  }
 
   void _showDatePicker(BuildContext context) {
     showDialog(
@@ -64,6 +73,7 @@ class _BirthdayInputState extends State<BirthdayInput> {
                         setState(() {
                           selectedDate = tempDate;
                         });
+                        widget.onDateSelected(selectedDate);
                         Navigator.pop(context);
                       },
                       child: Text(

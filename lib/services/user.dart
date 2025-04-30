@@ -51,18 +51,26 @@ class UserService {
     }
   }
 
-  Future<void> updateUser(final info, String idToken) async {
+  Future<void> updateUser(Map<String, dynamic>info) async {
     final url = Uri.parse(baseUrl + ApiEndpoints.user.updateUser);
 
     try {
-      final response = await http.put(url,
+      final idToken = await AuthService().getIdToken();
+
+      final response = await http.put(
+          url,
           headers: {
             "Authorization": 'Bearer $idToken',
             "Content-Type": "application/json"
           },
-          body: jsonDecode(info));
+          body: jsonEncode(info)
+      );
 
       if (response.statusCode == 200) {
+        final user = await getUser(idToken);
+        user["idToken"] = idToken;
+        await AuthService().saveUser(user);
+
         return jsonDecode(response.body);
       } else {
         throw (response.body);

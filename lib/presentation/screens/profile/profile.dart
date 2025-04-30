@@ -111,7 +111,15 @@ class _ProfilePageState extends State<ProfilePage> {
                     subText: AppLocalizations.of(context)!.desMyAccount,
                     icon: Icons.person_outline_rounded,
                     onTap: () {
-                      NavigationHelper.nextPage(context, EditProfilePage());
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => EditProfilePage()),
+                      ).then((_) {
+                        setState(() {
+                          _userFuture = loadUser();
+                        });
+                      });
+
                     }),
                 MenuItem(
                     text: AppLocalizations.of(context)!.changePassword,
@@ -208,7 +216,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
                 Text(
-                  AppLocalizations.of(context)!.free,
+                  '${AppLocalizations.of(context)!.email}: ${userData['email']}',
                   style: TextStyle(
                     fontSize: AppTextStyles.sizeContent,
                     color: Colors.grey,

@@ -12,8 +12,8 @@ class MessagePage extends StatefulWidget {
   State<MessagePage> createState() => _MessagePageState();
 }
 
-class _MessagePageState extends State<MessagePage>
-    with TickerProviderStateMixin {
+class _MessagePageState extends State<MessagePage> with TickerProviderStateMixin {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final LLMService _llmService = LLMService();
   final TextEditingController _messageController = TextEditingController();
   final TextEditingController _sessionNameController = TextEditingController();
@@ -94,8 +94,9 @@ class _MessagePageState extends State<MessagePage>
       }
     } catch (e) {
       debugPrint('Error initializing chat: $e');
+    }finally{
+      setState(() => _isLoading = false);
     }
-    setState(() => _isLoading = false);
   }
 
   Future<void> _loadMessagesForSession(String sessionId) async {
@@ -180,7 +181,9 @@ class _MessagePageState extends State<MessagePage>
       await _loadSessions();
       await _initializeChat();
       await _loadMessagesForSession(_sessionId!);
-      Navigator.pop(context);
+      if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {
+        Navigator.pop(context);
+      }
     } catch (e) {
       debugPrint('Error creating session: $e');
     }
@@ -228,6 +231,7 @@ class _MessagePageState extends State<MessagePage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       drawer: Drawer(
         child: SafeArea(
           child: loadHistoryChat(),
