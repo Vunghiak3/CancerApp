@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:testfile/presentation/screens/changePassword/changePassword.dart';
 import 'package:testfile/presentation/screens/editprofile/editprofile.dart';
@@ -204,31 +205,65 @@ class _ProfilePageState extends State<ProfilePage> {
               ],
             ),
             const SizedBox(width: 30),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  userData['nickName'] ?? userData['name'] ?? 'Unknown',
-                  style: const TextStyle(
-                    fontSize: AppTextStyles.sizeTitle,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    userData['nickName'] ?? userData['name'] ?? 'Unknown',
+                    style: const TextStyle(
+                      fontSize: AppTextStyles.sizeTitle,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                Text(
-                  '${AppLocalizations.of(context)!.email}: ${userData['email']}',
-                  style: TextStyle(
-                    fontSize: AppTextStyles.sizeContent,
-                    color: Colors.grey,
+                  Text(
+                    maskEmail(userData['email']),
+                    style: TextStyle(
+                      fontSize: AppTextStyles.sizeContent,
+                      color: Colors.grey,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-              ],
+                  Text(
+                    DateFormat('dd-MM-yyyy').format(DateTime.parse(userData['dob'])),
+                    style: TextStyle(
+                      fontSize: AppTextStyles.sizeContent,
+                      color: Colors.grey,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
           ],
         );
       },
     );
   }
+
+  String maskEmail(String email) {
+    final parts = email.split('@');
+    if (parts.length != 2) return email; // email không hợp lệ
+
+    String name = parts[0];
+    String domain = parts[1];
+
+    if (name.length <= 4) {
+      return '${name[0]}***@$domain';
+    }
+
+    String firstTwo = name.substring(0, 2);
+    String lastTwo = name.substring(name.length - 2);
+    String masked = '*' * (name.length - 4);
+
+    return '$firstTwo$masked$lastTwo@$domain';
+  }
+
 
   Widget shimmderBox() {
     return Shimmer.fromColors(
