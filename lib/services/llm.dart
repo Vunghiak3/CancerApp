@@ -44,7 +44,7 @@ class LLMService {
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       final data = jsonDecode(response.body);
-      return data['sessionId'] ?? '';
+      return data['session_id'] ?? '';
     } else {
       throw Exception('Failed to create session: ${response.statusCode}');
     }

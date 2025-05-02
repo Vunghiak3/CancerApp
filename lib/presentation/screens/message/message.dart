@@ -59,8 +59,8 @@ class _MessagePageState extends State<MessagePage> with TickerProviderStateMixin
   Future<void> fetchDeleteSessionById(String sessionId) async {
     try {
       final response = await LLMService().deleteSessionById(sessionId);
-      await _loadSessions();
       await _initializeChat();
+      await _loadSessions();
       return response;
     } catch (e) {
       throw Exception(e);
@@ -80,9 +80,8 @@ class _MessagePageState extends State<MessagePage> with TickerProviderStateMixin
         );
 
         if (sessionList.isEmpty) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            _promptNewSessionDialog();
-          });
+          final newSessionId = await _llmService.createSession({'session_name': 'New Chat'});
+          sessionId = newSessionId;
         } else {
           sessionId = sessionList.first['sessionId'];
         }
