@@ -220,7 +220,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    maskEmail(userData['email']),
+                    maskEmail(userData['email']) ?? '',
                     style: TextStyle(
                       fontSize: AppTextStyles.sizeContent,
                       color: Colors.grey,
@@ -229,7 +229,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    DateFormat('dd-MM-yyyy').format(DateTime.parse(userData['dob'])),
+                    userData['dob'] != null ? DateFormat('dd-MM-yyyy').format(DateTime.parse(userData['dob'])) : '',
                     style: TextStyle(
                       fontSize: AppTextStyles.sizeContent,
                       color: Colors.grey,

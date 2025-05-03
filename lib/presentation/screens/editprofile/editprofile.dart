@@ -77,8 +77,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   void fetchUpdateUser() async {
-    if (!isValidPhoneNumber( _controllers['phone']?.text ?? '')) {
-      CustomTopNotification.show(context, message: 'Số điện thoại không hợp lệ!', color: Colors.red, icon: Icons.cancel);
+    String phone = _controllers['phone']?.text.trim() ?? '';
+
+    if (phone.isNotEmpty && !isValidPhoneNumber(phone)) {
+      CustomTopNotification.show(context,
+          message: 'Số điện thoại không hợp lệ!',
+          color: Colors.red,
+          icon: Icons.cancel);
       return;
     }
 
@@ -89,15 +94,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final data = <String, dynamic>{
       for (var e in _controllers.entries)
         if (e.key != 'dob' && e.value.text.isNotEmpty) e.key: e.value.text,
-      'dob': _formatDateIso(_selectedDate!),
+      if(_selectedDate != null) 'dob': _formatDateIso(_selectedDate!),
     };
 
     try {
+      print(data);
       await UserService().updateUser(data);
-      CustomTopNotification.show(context, message: 'Cập nhật thông tin thành công!');
+      CustomTopNotification.show(context,
+          message: 'Cập nhật thông tin thành công!');
       Navigator.pop(context);
     } catch (e) {
-      CustomTopNotification.show(context, message: 'Cập nhật thông tin thất bại!');
+      CustomTopNotification.show(context,
+          message: 'Cập nhật thông tin thất bại!');
       throw Exception(e);
     } finally {
       setState(() {
@@ -118,7 +126,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
     };
 
     final currentDob = _formatDateIso(_selectedDate ?? DateTime(1900));
-    final originalDob = _formatDateIso(DateTime.tryParse(_initialValues['dob'] ?? '') ?? DateTime(1900));
+    final originalDob = _formatDateIso(
+        DateTime.tryParse(_initialValues['dob'] ?? '') ?? DateTime(1900));
 
     final hasChanged = currentData.entries.any((e) {
       if (e.key == 'dob') return currentDob != originalDob;
@@ -179,37 +188,39 @@ class _EditProfilePageState extends State<EditProfilePage> {
               keyboardType: TextInputType.phone,
               controller: _controllers['phone'],
             ),
-            if (_selectedDate != null)
-              BirthdayInput(
-                initialDate: _selectedDate!,
-                onDateSelected: (DateTime newDate) {
-                  setState(() {
-                    _selectedDate = newDate;
-                    _controllers['dob']!.text =
-                    '${newDate.day}/${newDate.month}/${newDate.year}';
-                  });
-                },
-              ),
+            BirthdayInput(
+              initialDate: _selectedDate,
+              onDateSelected: (DateTime newDate) {
+                setState(() {
+                  _selectedDate = newDate;
+                  _controllers['dob']!.text =
+                      '${newDate.day}/${newDate.month}/${newDate.year}';
+                });
+              },
+            ),
             const SizedBox(height: 20),
             Align(
               alignment: Alignment.center,
-              child: isUpdating ? GetProgressBar() : ElevatedButton(
-                onPressed: _hasChanges ? fetchUpdateUser : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF0E70CB),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 40),
-                ),
-                child: Text(
-                  AppLocalizations.of(context)!.saveChanges,
-                  style: TextStyle(
-                    fontSize: AppTextStyles.sizeContent,
-                  ),
-                ),
-              ),
+              child: isUpdating
+                  ? GetProgressBar()
+                  : ElevatedButton(
+                      onPressed: _hasChanges ? fetchUpdateUser : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF0E70CB),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 14, horizontal: 40),
+                      ),
+                      child: Text(
+                        AppLocalizations.of(context)!.saveChanges,
+                        style: TextStyle(
+                          fontSize: AppTextStyles.sizeContent,
+                        ),
+                      ),
+                    ),
             ),
           ],
         ),
