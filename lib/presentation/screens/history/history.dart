@@ -58,7 +58,7 @@ class _HistoryPageState extends State<HistoryPage> {
       });
       CustomTopNotification.show(
         context,
-        message: 'Delete success!',
+        message: AppLocalizations.of(context)!.deleteSuccess,
       );
       return response;
     }catch(e){
@@ -100,7 +100,7 @@ class _HistoryPageState extends State<HistoryPage> {
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   ),
                   child: Text(
-                    "Delete (${selectedIds.length})",
+                    "${AppLocalizations.of(context)!.delete} (${selectedIds.length})",
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -117,7 +117,7 @@ class _HistoryPageState extends State<HistoryPage> {
       backgroundColor: Colors.white,
       automaticallyImplyLeading: false,
       title: Text(
-        'Diagnosis History',
+        AppLocalizations.of(context)!.diagnosisHistory,
         style: AppTextStyles.title,
       ),
       centerTitle: true,
@@ -152,7 +152,7 @@ class _HistoryPageState extends State<HistoryPage> {
                     });
                   },
                   child: Text(
-                    isChoose ? 'Cancel' : 'Select',
+                    isChoose ? AppLocalizations.of(context)!.cancel : AppLocalizations.of(context)!.select,
                     style: TextStyle(
                       fontSize: AppTextStyles.sizeSubtitle,
                       fontWeight: FontWeight.w500,
@@ -174,14 +174,14 @@ class _HistoryPageState extends State<HistoryPage> {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(child: Text('${AppLocalizations.of(context)!.error}: ${snapshot.error}'));
           }
           final historyData = snapshot.data ?? [];
 
           if (historyData.isEmpty) {
             return Center(
               child: Text(
-                'No diagnosis history.',
+                AppLocalizations.of(context)!.noDiagnosisHistory,
                 style: TextStyle(
                     fontSize: AppTextStyles.sizeContent, color: Colors.grey),
               ),
@@ -262,14 +262,14 @@ class _HistoryPageState extends State<HistoryPage> {
 
         CustomTopNotification.show(
           context,
-          message: 'Delete success!',
+          message: AppLocalizations.of(context)!.deleteSuccess,
         );
 
         refreshHistory();
       } catch (e) {
         Navigator.of(context).pop();
         CustomTopNotification.show(context,
-            message: 'Deletion failed!', color: Colors.red, icon: Icons.cancel);
+            message: AppLocalizations.of(context)!.deletionFailed, color: Colors.red, icon: Icons.cancel);
         throw Exception(e);
       }
     }
@@ -387,7 +387,7 @@ class _HistoryItemSection extends StatelessWidget {
         style: AppTextStyles.content,
       ),
       subtitle: Text(
-        "Percent: ${data["confidenceScore"]}",
+        "${AppLocalizations.of(context)!.accuracy}: ${data["confidenceScore"]}",
         style: AppTextStyles.subtitle,
       ),
       trailing: Row(
@@ -407,7 +407,7 @@ class _HistoryItemSection extends StatelessWidget {
               ),
               color: Color(0xfff5f5f5),
               onSelected: (value) {
-                if (value == 'delete') {
+                if (value == AppLocalizations.of(context)!.delete) {
                   parent.showDialogItem(data["diagnosisId"]);
                 }
               },
@@ -415,7 +415,7 @@ class _HistoryItemSection extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8)),
               itemBuilder: (context) => <PopupMenuEntry<String>>[
                     PopupMenuItem(
-                        value: 'delete',
+                        value: AppLocalizations.of(context)!.delete,
                         height: 30,
                         child: Row(
                           children: [

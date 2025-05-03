@@ -58,11 +58,11 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     Map<String, String> errorMap = {};
 
     if (newPassword != confirmPassword) {
-      errorMap['confirm_password'] = 'Password confirmation does not match.';
+      errorMap['confirm_password'] = AppLocalizations.of(context)!.passwordNotMatch;
     }
 
     if (currentPassword == newPassword) {
-      errorMap['confirm_password'] = 'New password must be different from the current password.';
+      errorMap['confirm_password'] = AppLocalizations.of(context)!.newPasswordDifferentCurrentPassword;
     }
 
     if (errorMap.isNotEmpty) {
@@ -113,7 +113,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
       CustomTopNotification.show(
         context,
-        message: 'Password changed successfully!',
+        message: AppLocalizations.of(context)!.changePasswordSuccess,
       );
 
       currentPasswordController.clear();

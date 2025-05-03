@@ -194,13 +194,13 @@ class _MessagePageState extends State<MessagePage> with TickerProviderStateMixin
     await showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text(
-          "Create New Chat",
+        title: Text(
+          AppLocalizations.of(context)!.createNewChat,
           style: AppTextStyles.title,
         ),
         content: TextField(
           controller: _sessionNameController,
-          decoration: const InputDecoration(hintText: "Chat name"),
+          decoration: InputDecoration(hintText: AppLocalizations.of(context)!.chatName),
         ),
         actions: [
           TextButton(
@@ -218,7 +218,7 @@ class _MessagePageState extends State<MessagePage> with TickerProviderStateMixin
                 await _createNewSession();
               },
               child: Text(
-                "Create",
+                AppLocalizations.of(context)!.create,
                 style: TextStyle(
                     color: Colors.blue, fontSize: AppTextStyles.sizeContent),
               )),
@@ -243,7 +243,7 @@ class _MessagePageState extends State<MessagePage> with TickerProviderStateMixin
         title: Transform.translate(
           offset: Offset(-20, 0),
           child: Text(
-            'LLMChat',
+            AppLocalizations.of(context)!.chatWithAI,
             style: AppTextStyles.title,
           ),
         ),
@@ -413,8 +413,8 @@ class _MessagePageState extends State<MessagePage> with TickerProviderStateMixin
                 Expanded(
                   child: TextField(
                     controller: _messageController,
-                    decoration: const InputDecoration(
-                      hintText: "Write a message",
+                    decoration: InputDecoration(
+                      hintText: AppLocalizations.of(context)!.writeMessage,
                       hintStyle: AppTextStyles.content,
                       border: InputBorder.none,
                     ),
@@ -459,8 +459,8 @@ class _MessagePageState extends State<MessagePage> with TickerProviderStateMixin
                   size: AppTextStyles.sizeIcon,
                   color: Colors.blue,
                 ),
-                label: const Text(
-                  "New Chat",
+                label: Text(
+                  AppLocalizations.of(context)!.newChat,
                   style: AppTextStyles.content,
                 ),
               ),
@@ -490,7 +490,7 @@ class _MessagePageState extends State<MessagePage> with TickerProviderStateMixin
                               style: AppTextStyles.content,
                             ),
                             subtitle: Text(
-                              "Created: ${time ?? 'N/A'}",
+                              "${AppLocalizations.of(context)!.created}: ${time ?? 'N/A'}",
                               style: AppTextStyles.subtitle,
                             ),
                             onTap: () async {
@@ -508,7 +508,7 @@ class _MessagePageState extends State<MessagePage> with TickerProviderStateMixin
                                 ),
                                 color: Color(0xfff5f5f5),
                                 onSelected: (value) {
-                                  if (value == 'delete') {
+                                  if (value == AppLocalizations.of(context)?.delete) {
                                     fetchDeleteSessionById(sessionId);
                                   }
                                 },
@@ -516,7 +516,7 @@ class _MessagePageState extends State<MessagePage> with TickerProviderStateMixin
                                     borderRadius: BorderRadius.circular(8)),
                                 itemBuilder: (context) => [
                                       PopupMenuItem(
-                                          value: 'delete',
+                                          value: AppLocalizations.of(context)?.delete,
                                           height: 30,
                                           padding: EdgeInsets.zero,
                                           child: Center(
@@ -539,7 +539,7 @@ class _MessagePageState extends State<MessagePage> with TickerProviderStateMixin
                         },
                       )
                     : Center(
-                        child: Text('No chat history.'),
+                        child: Text(AppLocalizations.of(context)!.noChatHistory),
                       )
             )
         ),

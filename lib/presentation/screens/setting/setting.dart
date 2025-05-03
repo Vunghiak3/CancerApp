@@ -18,12 +18,12 @@ class SettingPage extends StatelessWidget {
       NavigationHelper.nextPageRemoveUntil(context, LoginPage());
       CustomTopNotification.show(
         context,
-        message: 'Xóa tài khoản thành công!',
+        message: AppLocalizations.of(context)!.deleteSuccess,
       );
     } catch (e) {
       CustomTopNotification.show(
         context,
-        message: 'Xóa tài khoản thất bại!',
+        message: AppLocalizations.of(context)!.deletionFailed,
         color: Colors.red,
         icon: Icons.cancel
       );
@@ -37,11 +37,11 @@ class SettingPage extends StatelessWidget {
         builder: (BuildContext dialogContext) {
           return AlertDialog(
             title: Text(
-              'Xác nhận!',
+              AppLocalizations.of(context)!.confirm,
               style: AppTextStyles.title,
             ),
             content: Text(
-              'Bạn có chắc chắn muốn xóa tài khoản không?',
+              AppLocalizations.of(context)!.desConfirmDeleteAccount,
               style: AppTextStyles.content,
             ),
             actions: [
@@ -101,12 +101,6 @@ class SettingPage extends StatelessWidget {
             child: Column(
               children: [
                 MenuWidget(items: [
-                  // MenuItem(
-                  //     text: AppLocalizations.of(context)!.savedBeneficiary,
-                  //     subText: AppLocalizations.of(context)!.desSavedBeneficiary,
-                  //     icon: Icons.person_outline_rounded,
-                  //     onTap: (){}
-                  // ),
                   MenuItem(
                       text: AppLocalizations.of(context)!.deleteAccount,
                       subText: AppLocalizations.of(context)!.desDeleteAccount,
@@ -120,11 +114,6 @@ class SettingPage extends StatelessWidget {
                   height: 30,
                 ),
                 MenuWidget(title: AppLocalizations.of(context)!.more, items: [
-                  // MenuItem(
-                  //     text: AppLocalizations.of(context)!.helpSupport,
-                  //     icon: Icons.notifications_none_outlined,
-                  //     onTap: (){}
-                  // ),
                   MenuItem(
                       text: AppLocalizations.of(context)!.changeLanguage,
                       icon: Icons.language_rounded,

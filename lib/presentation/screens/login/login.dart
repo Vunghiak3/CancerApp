@@ -71,7 +71,6 @@ class _LoginPageState extends State<LoginPage> {
     final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
     if (googleUser == null) {
-      print('Dang nhap bi huy!');
       return;
     }
 
@@ -80,7 +79,6 @@ class _LoginPageState extends State<LoginPage> {
     final idToken = googleAuth.idToken;
 
     if (idToken == null) {
-      print('Khong lay duoc token id!');
       return;
     }
 
@@ -89,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
       await authService.loginGoogle(idToken!);
       NavigationHelper.nextPageReplace(context, HomeScreen());
     } catch (e) {
-      CustomTopNotification.show(context, message: 'Đăng nhập thất bại!', color: Colors.red,);
+      CustomTopNotification.show(context, message: AppLocalizations.of(context)!.loginFail, color: Colors.red,);
     }
   }
 

@@ -63,7 +63,7 @@ class ImagePickerHelper {
                     } else {
                       CustomTopNotification.show(
                         context,
-                        message: 'Invalid Image Error. Please select again.',
+                        message: AppLocalizations.of(context)!.errorImage,
                         color: Colors.red,
                         icon: Icons.error,
                       );
@@ -73,7 +73,7 @@ class ImagePickerHelper {
                 ListTile(
                   leading: const Icon(Icons.image, color: Colors.green),
                   title: Text(
-                    AppLocalizations.of(context)!.libary,
+                    AppLocalizations.of(context)!.gallery,
                     style: AppTextStyles.content,
                   ),
                   onTap: () async {
@@ -84,7 +84,7 @@ class ImagePickerHelper {
                     } else {
                       CustomTopNotification.show(
                         context,
-                        message: 'Invalid Image Error. Please select again.',
+                        message: AppLocalizations.of(context)!.errorImage,
                         color: Colors.red,
                         icon: Icons.error,
                       );

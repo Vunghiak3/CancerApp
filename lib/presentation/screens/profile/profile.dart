@@ -59,11 +59,11 @@ class _ProfilePageState extends State<ProfilePage> {
             _userFuture = loadUser();
             isUpdatingPicture = false;
           });
-          CustomTopNotification.show(context, message: 'Cập nhật ảnh thành công');
+          CustomTopNotification.show(context, message: AppLocalizations.of(context)!.updatePhotoSuccess);
         },
       );
     } catch (e) {
-      CustomTopNotification.show(context, message: 'Cập nhật ảnh thất bại', color: Colors.red);
+      CustomTopNotification.show(context, message: AppLocalizations.of(context)!.updatePhotoFail, color: Colors.red);
       throw Exception(e);
     }
   }
@@ -152,7 +152,7 @@ class _ProfilePageState extends State<ProfilePage> {
         }
 
         if (snapshot.hasError) {
-          return Text("Lỗi tải thông tin người dùng");
+          return Text(AppLocalizations.of(context)!.errorLoadingUserInfo);
         }
 
         final userData = snapshot.data!;

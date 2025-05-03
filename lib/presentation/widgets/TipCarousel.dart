@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:testfile/data/dailyTip.dart';
 import 'package:testfile/presentation/widgets/TipCard.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TipCarousel extends StatefulWidget {
   const TipCarousel({Key? key}) : super(key: key);
@@ -14,7 +15,7 @@ class _TipCarouselState extends State<TipCarousel> {
   late PageController _pageController;
   late int _dailyTipIndex;
 
-  final List<String> _categories = ['Lung Cancer', 'Brain Cancer'];
+
 
   @override
   void initState() {
@@ -42,6 +43,8 @@ class _TipCarouselState extends State<TipCarousel> {
 
   @override
   Widget build(BuildContext context) {
+    final List<String> categories = [AppLocalizations.of(context)!.lungCancer, AppLocalizations.of(context)!.brainCancer];
+
     final tips = _selectedCategoryIndex == 0
         ? CancerTips.lungCancerTips
         : CancerTips.brainCancerTips;
@@ -55,7 +58,7 @@ class _TipCarouselState extends State<TipCarousel> {
         Center(
           child: ToggleButtons(
             isSelected: List.generate(
-              _categories.length,
+              categories.length,
               (index) => index == _selectedCategoryIndex,
             ),
             onPressed: (index) {
@@ -70,7 +73,7 @@ class _TipCarouselState extends State<TipCarousel> {
             fillColor: Theme.of(context).primaryColor,
             color: Theme.of(context).primaryColor,
             textStyle: Theme.of(context).textTheme.bodyLarge,
-            children: _categories
+            children: categories
                 .map((category) => Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 8),

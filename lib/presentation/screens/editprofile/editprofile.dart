@@ -81,7 +81,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     if (phone.isNotEmpty && !isValidPhoneNumber(phone)) {
       CustomTopNotification.show(context,
-          message: 'Số điện thoại không hợp lệ!',
+          message: AppLocalizations.of(context)!.invalidPhone,
           color: Colors.red,
           icon: Icons.cancel);
       return;
@@ -101,11 +101,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
       print(data);
       await UserService().updateUser(data);
       CustomTopNotification.show(context,
-          message: 'Cập nhật thông tin thành công!');
+          message: AppLocalizations.of(context)!.updateInfoSuccess);
       Navigator.pop(context);
     } catch (e) {
       CustomTopNotification.show(context,
-          message: 'Cập nhật thông tin thất bại!');
+          message: AppLocalizations.of(context)!.updateInfoFail);
       throw Exception(e);
     } finally {
       setState(() {
@@ -183,7 +183,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               controller: _controllers['name'],
             ),
             InputTextField(
-              placeholder: 'Phone',
+              placeholder: AppLocalizations.of(context)!.phone,
               icon: Icons.phone,
               keyboardType: TextInputType.phone,
               controller: _controllers['phone'],

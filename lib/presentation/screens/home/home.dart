@@ -56,8 +56,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> tabs = [
+      _buildHomeTab(),
+      Container(),
+      Container(),
+      HistoryPage(),
+      ProfilePage(),
+    ];
+
     return Scaffold(
-      body: _tabs[_selectedIndex],
+      body: tabs[_selectedIndex],
       bottomNavigationBar: Container(
         height: 75,
         decoration: BoxDecoration(
@@ -116,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              AppLocalizations.of(context)!.welcomeTitle,
+              AppLocalizations.of(context)!.curely,
               style: TextStyle(
                 color: Color(0xFF0E70CB),
                 fontSize: 44,
@@ -145,12 +153,12 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 _FeatureBox(
                   icon: Icons.health_and_safety,
-                  label: "AI Diagnosis",
+                  label: AppLocalizations.of(context)!.aiDiagnosis,
                   onTap: onSelectImage,
                 ),
                 _FeatureBox(
                   icon: Icons.chat,
-                  label: "Chat With AI",
+                  label: AppLocalizations.of(context)!.chatWithAI,
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => MessagePage()),
@@ -165,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                "Daily Health Tips",
+                AppLocalizations.of(context)!.dailyHealthTips,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),

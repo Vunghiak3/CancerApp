@@ -63,7 +63,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
       CustomTopNotification.show(
         context,
-        message: 'Đăng ký thành công!',
+        message: AppLocalizations.of(context)!.registerSuccess,
       );
 
       NavigationHelper.nextPageRemoveUntil(context, LoginPage());
@@ -104,12 +104,8 @@ class _RegisterPageState extends State<RegisterPage> {
       await authService.loginGoogle(idToken!);
       NavigationHelper.nextPageReplace(context, HomeScreen());
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Đăng nhập thất bại!'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      CustomTopNotification.show(context, message: AppLocalizations.of(context)!.registerFail, icon: Icons.cancel, color: Colors.red);
+      throw Exception(e);
     }
   }
 
