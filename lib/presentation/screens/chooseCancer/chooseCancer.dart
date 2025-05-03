@@ -1,9 +1,12 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:testfile/presentation/screens/home/home.dart';
 import 'package:testfile/presentation/screens/result/result.dart';
+import 'package:testfile/presentation/widgets/GetProgressBar.dart';
+import 'package:testfile/presentation/widgets/ImagePickerHelper.dart';
+import 'package:testfile/services/auth.dart';
+import 'package:testfile/services/cnn.dart';
 import 'package:testfile/theme/text_styles.dart';
 import 'package:testfile/utils/navigation_helper.dart';
 
@@ -19,6 +22,7 @@ class ChooseCancerPage extends StatefulWidget {
 class _ChooseCancerPageState extends State<ChooseCancerPage> {
   int _selectedIndex = -1;
   late File _selectedImage;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -26,16 +30,40 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
     _selectedImage = widget.selectedImage;
   }
 
+  void fetchDiagnoses(String typeCancer, File image) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      String idToken = await AuthService().getIdToken();
+      final response = await CnnService().diagnoses(idToken, image, typeCancer);
+      NavigationHelper.nextPage(context, ResultPage(imageFile: image, data: response,));
+    } catch (e) {
+      throw Exception(e);
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void pickNewImage() {
+    ImagePickerHelper.showImagePickerDialog(context, (image) {
+      setState(() {
+        _selectedImage = image;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final List<Map<String, String>> _cancer = [
       {
-        "img": "https://via.placeholder.com/110",
-        "title": AppLocalizations.of(context)!.brainCancer,
+        "title": 'Brain',
       },
       {
-        "img": "https://via.placeholder.com/110",
-        "title": AppLocalizations.of(context)!.kidneyCancer,
+        "title": 'Lung',
       },
     ];
 
@@ -47,19 +75,26 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
             child: Text(
               AppLocalizations.of(context)!.selectCancerType,
               style: AppTextStyles.title,
-            )
-        ),
+            )),
         leading: IconButton(
-            onPressed: (){Navigator.pop(context);},
-            icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black, size: AppTextStyles.sizeIconSmall,)
-        ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: Colors.black,
+              size: AppTextStyles.sizeIconSmall,
+            )),
         actions: [
           IconButton(
-              onPressed: (){
+              onPressed: () {
                 NavigationHelper.nextPageRemoveUntil(context, HomeScreen());
               },
-              icon: Icon(Icons.home_rounded, color: Colors.black, size: AppTextStyles.sizeIcon,)
-          )
+              icon: Icon(
+                Icons.home_rounded,
+                color: Colors.black,
+                size: AppTextStyles.sizeIcon,
+              ))
         ],
       ),
       body: SingleChildScrollView(
@@ -90,14 +125,7 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
             ),
             SizedBox(height: 10),
             ElevatedButton.icon(
-              onPressed: () async {
-                File? image = await _pickImageFromGallery();
-                if (image != null) {
-                  setState(() {
-                    _selectedImage = image;
-                  });
-                }
-              },
+              onPressed: pickNewImage,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 foregroundColor: Color(0xFF0E70CB),
@@ -107,7 +135,11 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
                   side: BorderSide(color: Color(0xFF0E70CB)),
                 ),
               ),
-              icon: Icon(Icons.photo_library_outlined, color: Color(0xFF0E70CB), size: AppTextStyles.sizeIconSmall,),
+              icon: Icon(
+                Icons.photo_library_outlined,
+                color: Color(0xFF0E70CB),
+                size: AppTextStyles.sizeIconSmall,
+              ),
               label: Text(
                 AppLocalizations.of(context)!.selectAnotherPhoto,
                 style: TextStyle(
@@ -155,7 +187,8 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
                         ),
                       ],
                       border: Border.all(
-                        color: isSelected ? Color(0xFF0E70CB) : Colors.transparent,
+                        color:
+                            isSelected ? Color(0xFF0E70CB) : Colors.transparent,
                         width: 2,
                       ),
                     ),
@@ -181,48 +214,34 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
               },
             ),
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _selectedIndex != -1
-                  ? () {
-                checkCancer(
-                  _cancer[_selectedIndex]["title"]!,
-                  _selectedImage,
-                );
-              }
-                  : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF0E70CB),
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: Text(
-                AppLocalizations.of(context)!.diagnosis,
-                style: TextStyle(fontSize: AppTextStyles.sizeContent),
-              ),
-            ),
+            isLoading
+                ? GetProgressBar()
+                : ElevatedButton(
+                    onPressed: _selectedIndex != -1
+                        ? () {
+                            fetchDiagnoses(
+                              _cancer[_selectedIndex]["title"]!.toLowerCase(),
+                              _selectedImage,
+                            );
+                          }
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF0E70CB),
+                      foregroundColor: Colors.white,
+                      padding:
+                          const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Text(
+                      AppLocalizations.of(context)!.diagnosis,
+                      style: TextStyle(fontSize: AppTextStyles.sizeContent),
+                    ),
+                  ),
             SizedBox(height: 20),
           ],
         ),
-      ),
-    );
-  }
-
-  Future<File?> _pickImageFromGallery() async {
-    final returnImage = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (returnImage != null) {
-      return File(returnImage.path);
-    }
-    return null;
-  }
-
-  void checkCancer(String cancer, File image) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ResultPage(cancer: cancer, image: image),
       ),
     );
   }

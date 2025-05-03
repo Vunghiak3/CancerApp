@@ -1,4 +1,4 @@
-package com.example.testfile;
+package com.curely.myapp;
 
 import io.flutter.embedding.android.FlutterActivity;
 

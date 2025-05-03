@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Curely</string>
+    <string name="facebook_app_id">29014742078139521</string>
+    <string name="facebook_client_token">bc06445fad27f04af33adf5ac03ab111</string>
+    <string name="fb_login_protocol_scheme">fb29014742078139521</string>
+</resources>

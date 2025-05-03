@@ -1,15 +1,16 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import 'package:testfile/presentation/screens/chooseCancer/chooseCancer.dart';
 import 'package:testfile/presentation/screens/history/history.dart';
 import 'package:testfile/presentation/screens/message/message.dart';
 import 'package:testfile/presentation/screens/profile/profile.dart';
-import 'package:testfile/theme/text_styles.dart';
+import 'package:testfile/presentation/widgets/ImagePickerHelper.dart';
+import 'package:testfile/presentation/widgets/TipCarousel.dart';
+
 import 'package:testfile/utils/navigation_helper.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:testfile/theme/text_styles.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,19 +21,32 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
-  final List<Widget> _tabs = [
-    HomePage(),
-    Container(),
-    Container(),
-    HistoryPage(),
-    ProfilePage()
-  ];
+
+  final List<Widget> _tabs = [];
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_tabs.isEmpty) {
+      _tabs.add(_buildHomeTab());
+      _tabs.add(Container());
+      _tabs.add(Container());
+      _tabs.add(HistoryPage());
+      _tabs.add(ProfilePage());
+    }
+  }
 
   void _onItemTapped(int index) {
     if (index == 1) {
       NavigationHelper.nextPage(context, MessagePage());
     } else if (index == 2) {
-      _showImagePickerDialog();
+      onSelectImage();
     } else if (index < _tabs.length) {
       setState(() {
         _selectedIndex = index;
@@ -42,8 +56,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> tabs = [
+      _buildHomeTab(),
+      Container(),
+      Container(),
+      HistoryPage(),
+      ProfilePage(),
+    ];
+
     return Scaffold(
-      body: _tabs[_selectedIndex],
+      body: tabs[_selectedIndex],
       bottomNavigationBar: Container(
         height: 75,
         decoration: BoxDecoration(
@@ -64,24 +86,28 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: _onItemTapped,
           items: [
             BottomNavigationBarItem(
-                icon: _selectedIndex == 0 ? Icon(Icons.home_rounded,) : Icon(Icons.home_outlined,),
-                label: AppLocalizations.of(context)!.home
+              icon: _selectedIndex == 0
+                  ? Icon(Icons.home_rounded)
+                  : Icon(Icons.home_outlined),
+              label: AppLocalizations.of(context)!.home,
             ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.message_outlined,),
-                label: AppLocalizations.of(context)!.chat
+              icon: Icon(Icons.message_outlined),
+              label: AppLocalizations.of(context)!.chat,
             ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.file_upload_rounded, color: Colors.red,),
-                label: AppLocalizations.of(context)!.diagnose,
+              icon: Icon(Icons.file_upload_rounded, color: Colors.red),
+              label: AppLocalizations.of(context)!.diagnose,
             ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.history_rounded,),
-                label: AppLocalizations.of(context)!.history
+              icon: Icon(Icons.history_rounded),
+              label: AppLocalizations.of(context)!.history,
             ),
             BottomNavigationBarItem(
-                icon: _selectedIndex == _tabs.length - 1 ? Icon(Icons.person_rounded,) :Icon(Icons.person_outline,),
-                label: AppLocalizations.of(context)!.profile
+              icon: _selectedIndex == _tabs.length - 1
+                  ? Icon(Icons.person_rounded)
+                  : Icon(Icons.person_outline),
+              label: AppLocalizations.of(context)!.profile,
             ),
           ],
         ),
@@ -89,88 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _showImagePickerDialog(){
-    int previousIndex = _selectedIndex;
-
-    showDialog(
-        context: context,
-        builder: (BuildContext context){
-          return AlertDialog(
-            backgroundColor: Colors.white,
-            title: Text(
-              AppLocalizations.of(context)!.selectPhotoFrom,
-              style: AppTextStyles.title,
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.photo_library, color: Colors.blue),
-                  title: Text(AppLocalizations.of(context)!.googlePhotos, style: AppTextStyles.content,),
-                  onTap: () async {
-                      File? image = await _pickImageFromGallery();
-                      if(image != null){
-                        NavigationHelper.nextPage(context, ChooseCancerPage(selectedImage: image));
-                      }
-                    },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.image, color: Colors.green),
-                  title: Text(AppLocalizations.of(context)!.libary, style: AppTextStyles.content,),
-                  onTap: () async {
-                    File? image = await _pickImageFromFiles();
-                    if(image != null){
-                      NavigationHelper.nextPage(context, ChooseCancerPage(selectedImage: image));
-                    }
-                  },
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                  onPressed: () {
-                    setState(() {
-                      _selectedIndex = previousIndex;
-                    });
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    AppLocalizations.of(context)!.cancel,
-                    style: AppTextStyles.cancel,
-                  )
-              )
-            ],
-          );
-        }
-    );
-  }
-
-  Future _pickImageFromGallery() async{
-    final returnImage = await ImagePicker().pickImage(source: ImageSource.gallery);
-
-    if (returnImage != null) {
-      return File(returnImage.path);
-    }
-    return null;
-  }
-
-  Future<File?> _pickImageFromFiles() async {
-    final FilePickerResult? result = await FilePicker.platform.pickFiles(
-      // type: FileType.image,  // Chỉ cho phép chọn ảnh
-    );
-
-    if (result != null) {
-      return File(result.files.single.path!);
-    }
-    return null;
-  }
-}
-
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildHomeTab() {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -179,22 +124,114 @@ class HomePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              AppLocalizations.of(context)!.welcomeTitle,
+              AppLocalizations.of(context)!.curely,
               style: TextStyle(
                 color: Color(0xFF0E70CB),
                 fontSize: 44,
                 fontWeight: FontWeight.bold,
-                fontStyle: FontStyle.italic
+                fontStyle: FontStyle.italic,
               ),
             ),
-            const SizedBox(width: 10,),
-            Image.asset('assets/imgs/logowelcome2.png', color: Color(0xFF0E70CB), width: 48, height: 48,)
+            const SizedBox(width: 10),
+            Image.asset(
+              'assets/imgs/logowelcome2.png',
+              color: Color(0xFF0E70CB),
+              width: 48,
+              height: 48,
+            ),
           ],
         ),
       ),
       backgroundColor: Colors.white,
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            // ── your top feature buttons ──
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _FeatureBox(
+                  icon: Icons.health_and_safety,
+                  label: AppLocalizations.of(context)!.aiDiagnosis,
+                  onTap: onSelectImage,
+                ),
+                _FeatureBox(
+                  icon: Icons.chat,
+                  label: AppLocalizations.of(context)!.chatWithAI,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => MessagePage()),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 24),
+
+            // ── Header ──
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                AppLocalizations.of(context)!.dailyHealthTips,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // ── Carousel ──
+            Expanded(
+              child: TipCarousel(),
+            ),
+          ],
+        ),
+      ),
     );
+  }
+
+  void onSelectImage() {
+    ImagePickerHelper.showImagePickerDialog(context, (image) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ChooseCancerPage(selectedImage: image)),
+      );
+    });
   }
 }
 
+class _FeatureBox extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
 
+  const _FeatureBox(
+      {required this.icon, required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.4,
+        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+        decoration: BoxDecoration(
+          color: Color(0xFFEDF4FF),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)],
+        ),
+        child: Column(
+          children: [
+            Icon(icon, size: 40, color: Color(0xFF0E70CB)),
+            const SizedBox(height: 10),
+            Text(label,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+          ],
+        ),
+      ),
+    );
+  }
+}

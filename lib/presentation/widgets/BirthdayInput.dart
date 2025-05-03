@@ -4,17 +4,22 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:testfile/theme/text_styles.dart';
 
 class BirthdayInput extends StatefulWidget {
-  const BirthdayInput({super.key});
+  final DateTime? initialDate;
+  final ValueChanged<DateTime> onDateSelected;
+
+  const BirthdayInput({super.key, required this.initialDate, required this.onDateSelected});
 
   @override
   State<BirthdayInput> createState() => _BirthdayInputState();
 }
 
 class _BirthdayInputState extends State<BirthdayInput> {
-  DateTime selectedDate = DateTime.now();
   DateTime tempDate = DateTime.now();
 
+  DateTime get selectedDate => widget.initialDate ?? DateTime(2000, 1, 1);
+
   void _showDatePicker(BuildContext context) {
+    tempDate = selectedDate;
     showDialog(
       context: context,
       builder: (BuildContext builder) {
@@ -32,8 +37,8 @@ class _BirthdayInputState extends State<BirthdayInput> {
                       dateTimePickerTextStyle: TextStyle(
                         fontSize: AppTextStyles.sizeContent,
                         color: Colors.black,
-                      )
-                    )
+                      ),
+                    ),
                   ),
                   child: CupertinoDatePicker(
                     mode: CupertinoDatePickerMode.date,
@@ -61,14 +66,16 @@ class _BirthdayInputState extends State<BirthdayInput> {
                     ),
                     TextButton(
                       onPressed: () {
-                        setState(() {
-                          selectedDate = tempDate;
-                        });
+                        widget.onDateSelected(tempDate);
                         Navigator.pop(context);
                       },
                       child: Text(
                         AppLocalizations.of(context)!.save,
-                        style: TextStyle(color: Colors.blue, fontSize: AppTextStyles.sizeContent, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontSize: AppTextStyles.sizeContent,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ],
@@ -83,6 +90,7 @@ class _BirthdayInputState extends State<BirthdayInput> {
 
   @override
   Widget build(BuildContext context) {
+    final date = selectedDate;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: GestureDetector(
@@ -90,16 +98,14 @@ class _BirthdayInputState extends State<BirthdayInput> {
         child: InputDecorator(
           decoration: InputDecoration(
             labelText: AppLocalizations.of(context)!.birthday,
-            labelStyle: TextStyle(
-              fontSize: AppTextStyles.sizeContent
-            ),
+            labelStyle: TextStyle(fontSize: AppTextStyles.sizeContent),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
             ),
             prefixIcon: Icon(Icons.calendar_today_outlined, color: Colors.grey),
           ),
           child: Text(
-            "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}",
+            "${date.day}/${date.month}/${date.year}",
             style: TextStyle(fontSize: AppTextStyles.sizeContent),
           ),
         ),
