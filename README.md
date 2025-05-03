@@ -1,18 +1,17 @@
 # CancerApp - Ứng Dụng Đoán Bệnh Ung Thư Bằng AI
 
 ## 🏥 Giới Thiệu
-**CancerApp** là một ứng dụng sử dụng trí tuệ nhân tạo (AI) để hỗ trợ chẩn đoán **ung thư não** và **ung thư thận**. Ứng dụng giúp người dùng phát hiện bệnh ung thư thông qua phân tích hình ảnh y tế, hỗ trợ bác sĩ trong việc chẩn đoán chính xác hơn.
+**CancerApp** là một ứng dụng sử dụng trí tuệ nhân tạo (AI) để hỗ trợ chẩn đoán **ung thư não** và **ung thư phổi**,... Ứng dụng giúp người dùng phát hiện bệnh ung thư thông qua phân tích hình ảnh y tế, hỗ trợ bác sĩ trong việc chẩn đoán chính xác hơn.
 
 ## 🚀 Tính Năng Chính
 - 📰 **Cung cấp các thông tin mới**: Cập nhật tin tức y tế và nghiên cứu mới nhất về ung thư.
 - 📸 **Tải lên hình ảnh y tế**: Hỗ trợ hình ảnh MRI cho ung thư não và CT Scan cho ung thư thận.
 - 💾 **Lưu trữ lịch sử xét nghiệm**: Theo dõi tiến trình sức khỏe thông qua lịch sử chẩn đoán.
-- 📌 **Gợi ý chuyên gia & bệnh viện**: Đề xuất bác sĩ và bệnh viện chuyên khoa phù hợp.
 
 ## 🛠 Công Nghệ Sử Dụng
 - 🤖 **Trí tuệ nhân tạo (AI)**: Mô hình Deep Learning với TensorFlow/Keras.
-- ⚛ **Flutter**: Xây dựng ứng dụng đa nền tảng (Android, Window & iOS).
-- 🔥 **Firebase**: Lưu trữ dữ liệu và xác thực người dùng.
+- ⚛ **Flutter**: Xây dựng ứng dụng trên nền tảng: Android.
+- 🔥 **Supabase**: Lưu trữ dữ liệu và xác thực người dùng.
 - 🖥 **Python**: Huấn luyện mô hình AI, xử lý hình ảnh.
 
 ## 📥 Cài Đặt & Sử Dụng
