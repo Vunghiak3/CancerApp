@@ -335,6 +335,11 @@ class _HistoryItemSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double score = ((data["confidenceScore"] as num) * 100).toDouble();
+    final String displayScore = (score == 100)
+        ? '100'
+        : '${score.toStringAsFixed(3)}';
+
     return ListTile(
       contentPadding: EdgeInsets.only(left: parent.isChoose ? 5 : 24, right: 8),
       leading: Wrap(
@@ -387,7 +392,7 @@ class _HistoryItemSection extends StatelessWidget {
         style: AppTextStyles.content,
       ),
       subtitle: Text(
-        "${AppLocalizations.of(context)!.accuracy}: ${data["confidenceScore"]}",
+        "${AppLocalizations.of(context)!.accuracy}: $displayScore%",
         style: AppTextStyles.subtitle,
       ),
       trailing: Row(
