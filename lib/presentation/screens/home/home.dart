@@ -134,10 +134,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(width: 10),
             Image.asset(
-              'assets/imgs/logowelcome2.png',
+              'assets/imgs/logo_app_1.png',
               color: Color(0xFF0E70CB),
-              width: 48,
-              height: 48,
+              width: 45,
+              height: 45,
             ),
           ],
         ),

@@ -368,9 +368,20 @@ class _MessagePageState extends State<MessagePage> with TickerProviderStateMixin
                                 if (isBot)
                                   Padding(
                                     padding: const EdgeInsets.only(right: 8.0),
-                                    child: Image.asset(
-                                      'assets/imgs/logowelcome.png',
-                                      width: 40,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(50),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Color(0xff040404)
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(7),
+                                          child: Image.asset(
+                                            'assets/imgs/logo_app_1.png',
+                                            width: 23,
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 Container(
