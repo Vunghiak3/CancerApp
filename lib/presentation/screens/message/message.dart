@@ -82,6 +82,7 @@ class _MessagePageState extends State<MessagePage> with TickerProviderStateMixin
         if (sessionList.isEmpty) {
           final newSessionId = await _llmService.createSession({'session_name': 'New Chat'});
           sessionId = newSessionId;
+          await _loadSessions();
         } else {
           sessionId = sessionList.first['sessionId'];
         }

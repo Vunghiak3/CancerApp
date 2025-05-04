@@ -97,6 +97,7 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final responseBody = jsonDecode(response.body);
+        idToken = responseBody['access_token'];
 
         final user = await UserService().getUser(idToken);
         user["idToken"] = idToken;
