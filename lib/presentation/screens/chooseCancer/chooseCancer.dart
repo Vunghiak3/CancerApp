@@ -62,9 +62,9 @@ class _ChooseCancerPageState extends State<ChooseCancerPage> {
       {
         "title": 'Brain',
       },
-      // {
-      //   "title": 'Lung',
-      // },
+      {
+        "title": 'Lung',
+      },
     ];
 
     return Scaffold(

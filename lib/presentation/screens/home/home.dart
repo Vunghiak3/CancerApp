@@ -158,7 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 _FeatureBox(
                   icon: Icons.chat,
-                  label: AppLocalizations.of(context)!.chatWithAI,
+                  label: 'Chat With AI',
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => MessagePage()),
